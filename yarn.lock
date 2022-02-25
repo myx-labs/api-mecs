@@ -195,11 +195,11 @@ __metadata:
     "@googleapis/docs": ^0.2.0
     "@types/dotenv-safe": ^8.1.2
     dotenv-safe: ^8.2.0
-    fastify: ^3.22.0
-    fastify-cors: ^6.0.2
-    got: ^11.8.2
+    fastify: ^3.27.2
+    fastify-cors: ^6.0.3
+    got: ^11.8.3
     p-limit: ^4.0.0
-    typescript: ^4.4.3
+    typescript: ^4.5.5
   languageName: unknown
   linkType: soft
 
@@ -217,7 +217,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cacheable-request@npm:^7.0.1":
+"cacheable-request@npm:^7.0.2":
   version: 7.0.2
   resolution: "cacheable-request@npm:7.0.2"
   dependencies:
@@ -395,13 +395,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify-cors@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "fastify-cors@npm:6.0.2"
+"fastify-cors@npm:^6.0.3":
+  version: 6.0.3
+  resolution: "fastify-cors@npm:6.0.3"
   dependencies:
     fastify-plugin: ^3.0.0
     vary: ^1.1.2
-  checksum: f600eb30d2259bf0277c3df72c73f09f6891f3984c62e1c9a7489f0d6b2ffb1749dbe9a79a05ad74b08a660c1a707c9fb7636c20b87d07eae0e6efd9c951fd03
+  checksum: 054cf4e1cf0b20778ac24d9995a99f44e9b026ca9a028db0cbb6093922bcc931dff5f5bb185d19e881014392bb5886a8b5f9da6af3d3ab5e62b7a68f4eca33c4
   languageName: node
   linkType: hard
 
@@ -426,27 +426,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^3.22.0":
-  version: 3.22.0
-  resolution: "fastify@npm:3.22.0"
+"fastify@npm:^3.27.2":
+  version: 3.27.2
+  resolution: "fastify@npm:3.27.2"
   dependencies:
     "@fastify/ajv-compiler": ^1.0.0
     abstract-logging: ^2.0.0
     avvio: ^7.1.2
     fast-json-stringify: ^2.5.2
     fastify-error: ^0.3.0
-    fastify-warning: ^0.2.0
-    find-my-way: ^4.1.0
+    find-my-way: ^4.5.0
     flatstr: ^1.0.12
     light-my-request: ^4.2.0
     pino: ^6.13.0
+    process-warning: ^1.0.0
     proxy-addr: ^2.0.7
-    readable-stream: ^3.4.0
     rfdc: ^1.1.4
     secure-json-parse: ^2.0.0
     semver: ^7.3.2
-    tiny-lru: ^7.0.0
-  checksum: 4f06ccb4b75df5748d8683b11050920439db642a6fecf508d0e6aa58cefd874a4d9ef76e3ec29a9e87a06c373c4d1adfa0d92c092f793d1bbfd9f3207e2c1c6a
+    tiny-lru: ^8.0.1
+  checksum: cf52f1f0d9fd94ffc09c1cc0787df5454d806da1affc40f4823d6f252bc9ef79e7ed32cb84e6224bac7be05e51fee1d550695b6329d80e8afd454f25c88bb454
   languageName: node
   linkType: hard
 
@@ -459,15 +458,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-my-way@npm:^4.1.0":
-  version: 4.3.3
-  resolution: "find-my-way@npm:4.3.3"
+"find-my-way@npm:^4.5.0":
+  version: 4.5.1
+  resolution: "find-my-way@npm:4.5.1"
   dependencies:
     fast-decode-uri-component: ^1.0.1
     fast-deep-equal: ^3.1.3
     safe-regex2: ^2.0.0
     semver-store: ^0.3.0
-  checksum: c5f212d2d2a5e76be91a86409b2de9391a1c3cf5210d357facf0fe91d1e46608865aa2396a98a8d4772116bfae2eb0b05abe4efa725d5cf3cc9b9554bb34e048
+  checksum: 85b8c07d34a36f0203438e0c0f0cdbfaf5e1c521ed2e56f9250bed846ceb0eea074127fad7f70137d61bed56387047f212969cc0ba5d818ed5e37b3e3606c43f
   languageName: node
   linkType: hard
 
@@ -577,22 +576,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:^11.8.2":
-  version: 11.8.2
-  resolution: "got@npm:11.8.2"
+"got@npm:^11.8.3":
+  version: 11.8.3
+  resolution: "got@npm:11.8.3"
   dependencies:
     "@sindresorhus/is": ^4.0.0
     "@szmarczak/http-timer": ^4.0.5
     "@types/cacheable-request": ^6.0.1
     "@types/responselike": ^1.0.0
     cacheable-lookup: ^5.0.3
-    cacheable-request: ^7.0.1
+    cacheable-request: ^7.0.2
     decompress-response: ^6.0.0
     http2-wrapper: ^1.0.0-beta.5.2
     lowercase-keys: ^2.0.0
     p-cancelable: ^2.0.0
     responselike: ^2.0.0
-  checksum: 41ad7bf74f7ec18bca81997ea0a6c8b6b75405cc3ba76d49c5d9d4658cad200d5a9fa7b0a13058458d0df6bed217baabd122d5d351c6bc6996514a5e428744bb
+  checksum: 3b6db107d9765470b18e4cb22f7c7400381be7425b9be5823f0168d6c21b5d6b28b023c0b3ee208f73f6638c3ce251948ca9b54a1e8f936d3691139ac202d01b
   languageName: node
   linkType: hard
 
@@ -860,6 +859,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"process-warning@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "process-warning@npm:1.0.0"
+  checksum: c708a03241deec3cabaeee39c4f9ee8c4d71f1c5ef9b746c8252cdb952a6059068cfcdaf348399775244cbc441b6ae5e26a9c87ed371f88335d84f26d19180f9
+  languageName: node
+  linkType: hard
+
 "proxy-addr@npm:^2.0.7":
   version: 2.0.7
   resolution: "proxy-addr@npm:2.0.7"
@@ -917,7 +923,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:^3.4.0, readable-stream@npm:^3.6.0":
+"readable-stream@npm:^3.6.0":
   version: 3.6.0
   resolution: "readable-stream@npm:3.6.0"
   dependencies:
@@ -1057,10 +1063,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-lru@npm:^7.0.0":
-  version: 7.0.6
-  resolution: "tiny-lru@npm:7.0.6"
-  checksum: 36a786a9111a3a358a698c9404783ad3f5396f6ed891672ffa4cd7dec4617abb8dfed6af7611bbaf8a3942a9475534c8b80f9bd58d7efa9aa594f395c9805f09
+"tiny-lru@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "tiny-lru@npm:8.0.1"
+  checksum: 189181b35992ff131f2947515bc53782aab1e39d50c6a8f102dc4c63a755609d39bf341c498a0cd6e4a1a6b24fbbee778e0de1ff5ded0ef8e243d66a38ee7f41
   languageName: node
   linkType: hard
 
@@ -1071,23 +1077,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-typescript@^4.4.3:
-  version: 4.4.3
-  resolution: "typescript@npm:4.4.3"
+typescript@^4.5.5:
+  version: 4.5.5
+  resolution: "typescript@npm:4.5.5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 05823f21796d450531a7e4ab299715d38fd9ded0e4ce7400876053f4b5166ca3dde7a68cecfe72d9086039f03c0b6edba36516fb10ed83c5837d9600532ea4c2
+  checksum: 506f4c919dc8aeaafa92068c997f1d213b9df4d9756d0fae1a1e7ab66b585ab3498050e236113a1c9e57ee08c21ec6814ca7a7f61378c058d79af50a4b1f5a5e
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>":
-  version: 4.4.3
-  resolution: "typescript@patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=32657b"
+"typescript@patch:typescript@^4.5.5#~builtin<compat/typescript>":
+  version: 4.5.5
+  resolution: "typescript@patch:typescript@npm%3A4.5.5#~builtin<compat/typescript>::version=4.5.5&hash=32657b"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 28ab98313afab46788ff41014fdb5932430ada6e03cf9e92ac47f406526a2cac1ae2894834e7da61e46b7429318e9c47f45ba8de323332f0cb9af99b72ebae74
+  checksum: ed34e0986bc395da29a9a749fc980741fcbf698c205d6dc282310a652ee4ae61b571c26fd62c8a264ec26ff23ef12d888d5db7b41031cfaad1798db0d090f5c3
   languageName: node
   linkType: hard
 
