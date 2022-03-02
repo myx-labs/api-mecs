@@ -2,7 +2,7 @@
 import { config as config_env } from "dotenv";
 config_env();
 import got from "got";
-import fastify from "fastify";
+import fastify, { FastifyRequest } from "fastify";
 import pLimit from "p-limit";
 import fastifyCors from "fastify-cors";
 
@@ -27,14 +27,14 @@ import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 
 // Variables
 
-const server = fastify({trustProxy: "127.0.0.1"});
+const server = fastify({ trustProxy: "127.0.0.1" });
 const port: number = config.port;
 
 const automated_limit = pLimit(1);
 const manual_limit = pLimit(1);
 
 server.register(fastifyCors, {
-  origin: [/localhost/, /yanix\.dev$/, /yan3321\.com$/, /yan\.gg$/],
+  origin: [/localhost/, /yan3321\.com$/, /yan\.gg$/],
 });
 
 const flattenObject = (obj: any, prefix = "") =>
@@ -90,6 +90,55 @@ async function getImmigrationUser(
   return new ImmigrationUser(userId, userName);
 }
 
+async function logPayload(req: FastifyRequest, payload: any) {
+  try {
+    const requestEmbed = new MessageEmbed()
+      .setFields([
+        {
+          name: "Request URL",
+          value: req.url,
+          inline: true,
+        },
+        {
+          name: "Request IP",
+          value: req.ips ? req.ips[req.ips.length - 1] : "unavailable",
+          inline: true,
+        },
+      ])
+      .setTitle("Request data")
+      .setTimestamp();
+    const userEmbed = new MessageEmbed()
+      .setFields([
+        {
+          name: "User ID",
+          value: payload.user.userId.toString(),
+          inline: true,
+        },
+        {
+          name: "User Name",
+          value: payload.user.username,
+          inline: true,
+        },
+      ])
+      .setTitle("User data");
+    const testEmbed = new MessageEmbed()
+      .setFields(
+        Object.keys(payload.tests).map((key) => {
+          const test = payload.tests[key as keyof typeof payload.tests];
+          return {
+            name: key,
+            value: test.status ? "Yes" : "No",
+          };
+        })
+      )
+      .setTitle("Test data");
+    webhookClient.send({
+      username: "MECS",
+      embeds: [requestEmbed, userEmbed, testEmbed],
+    });
+  } catch {}
+}
+
 interface userParams {
   id: string;
 }
@@ -139,7 +188,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
         throw new Error("User parameter is not valid.");
       }
       const limit = (() => {
-        if (req.headers.origin === "https://mys-iefe.yanix.dev") {
+        if (req.headers.origin === "https://mys-mecs.yan.gg") {
           console.log("Manual limit in use");
           return manual_limit;
         }
@@ -148,10 +197,10 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
       const user = await limit(() => {
         return getImmigrationUser(userParam, userId, userName);
       });
-      const testResults: object = await limit(() => {
+      const testResults = await limit(() => {
         return user.getTestStatus(blacklistOnly);
       });
-      if (testResults) {
+      if (testResults !== null && typeof testResults !== "undefined") {
         const payload = {
           user: {
             userId: user.userId,
@@ -164,22 +213,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
           },
           tests: testResults,
         };
-        const embed = new MessageEmbed().setFields([
-          {
-            name: "Request URL",
-            value: req.url,
-            inline: true
-          },
-          {
-            name: "Request IPs",
-            value: req.ips ? req.ips[req.ips.length - 1] : "unavailable",
-            inline: true
-          },
-        ]);
-        webhookClient.send({
-          username: "MECS",
-          embeds: [embed]
-        });
+        logPayload(req, payload);
         res.send(payload);
       } else {
         res.status(500);
@@ -207,7 +241,7 @@ server.post<{ Params: userParams; Querystring: userParams2 }>(
         throw new Error("User parameter is not valid.");
       }
       const limit = (() => {
-        if (req.headers.origin === "https://mys-iefe.yanix.dev") {
+        if (req.headers.origin === "https://mys-mecs.yan.gg") {
           console.log("Manual limit in use");
           return manual_limit;
         }
