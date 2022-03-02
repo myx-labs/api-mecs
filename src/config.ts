@@ -25,6 +25,12 @@ export default {
     google: JSON.parse(process.env.GOOGLEAUTH),
     roblox: process.env.ROBLOSECURITY as string,
     api: process.env.AUTHENTICATION_KEY as string,
+    discord: {
+      webhook: {
+        id: process.env.DISCORD_WEBHOOK_ID as string,
+        token: process.env.DISCORD_WEBHOOK_TOKEN as string,
+      },
+    },
   },
   flags: {
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",

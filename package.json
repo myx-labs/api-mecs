@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@googleapis/docs": "^0.2.0",
+    "discord.js": "^13.6.0",
     "dotenv-safe": "^8.2.0",
     "fastify": "^3.27.2",
     "fastify-cors": "^6.0.3",

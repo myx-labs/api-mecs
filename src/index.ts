@@ -10,6 +10,13 @@ import fastifyCors from "fastify-cors";
 import ImmigrationUser from "./ImmigrationUser.js";
 import config from "./config.js";
 
+import { EmbedFieldData, MessageEmbed, WebhookClient } from "discord.js";
+
+const webhookClient = new WebhookClient({
+  id: config.credentials.discord.webhook.id,
+  token: config.credentials.discord.webhook.token,
+});
+
 // Typings
 import {
   RobloxAPI_ApiArrayResponse,
@@ -29,6 +36,15 @@ const manual_limit = pLimit(1);
 server.register(fastifyCors, {
   origin: [/localhost/, /yanix\.dev$/, /yan3321\.com$/, /yan\.gg$/],
 });
+
+const flattenObject = (obj: any, prefix = "") =>
+  Object.keys(obj).reduce((acc: any, k) => {
+    const pre = prefix.length ? prefix + "." : "";
+    if (typeof obj[k] === "object")
+      Object.assign(acc, flattenObject(obj[k], pre + k));
+    else acc[pre + k] = obj[k];
+    return acc;
+  }, {});
 
 function isEmpty(text: string) {
   return text == null || text.match(/^\s*$/) !== null;
@@ -136,7 +152,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
         return user.getTestStatus(blacklistOnly);
       });
       if (testResults) {
-        res.send({
+        const payload = {
           user: {
             userId: user.userId,
             username: user.username,
@@ -147,7 +163,37 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
                 : false,
           },
           tests: testResults,
+        };
+        // const flatPayload = (() => {
+        //   const p = flattenObject(payload);
+        //   const array = [] as EmbedFieldData[];
+        //   for (const key in p) {
+        //     const value = p[key];
+        //     array.push({
+        //       name: key,
+        //       value: value,
+        //     });
+        //   }
+        //   return array;
+        // })();
+        const embed = new MessageEmbed().setFields([
+          {
+            name: "Request URL",
+            value: req.url,
+            inline: true
+          },
+          {
+            name: "Request IP",
+            value: req.ip,
+            inline: true
+          },
+        ]);
+        webhookClient.send({
+          username: "MECS",
+          content: JSON.stringify(payload, null, 2),
+          embeds: [embed]
         });
+        res.send(payload);
       } else {
         res.status(500);
       }
