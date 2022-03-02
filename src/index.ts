@@ -27,7 +27,7 @@ import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 
 // Variables
 
-const server = fastify();
+const server = fastify({trustProxy: "127.0.0.1"});
 const port: number = config.port;
 
 const automated_limit = pLimit(1);
@@ -164,18 +164,6 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
           },
           tests: testResults,
         };
-        // const flatPayload = (() => {
-        //   const p = flattenObject(payload);
-        //   const array = [] as EmbedFieldData[];
-        //   for (const key in p) {
-        //     const value = p[key];
-        //     array.push({
-        //       name: key,
-        //       value: value,
-        //     });
-        //   }
-        //   return array;
-        // })();
         const embed = new MessageEmbed().setFields([
           {
             name: "Request URL",
@@ -183,14 +171,13 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
             inline: true
           },
           {
-            name: "Request IP",
-            value: req.ip,
+            name: "Request IPs",
+            value: req.ips ? req.ips[req.ips.length - 1] : "unavailable",
             inline: true
           },
         ]);
         webhookClient.send({
           username: "MECS",
-          content: JSON.stringify(payload, null, 2),
           embeds: [embed]
         });
         res.send(payload);
