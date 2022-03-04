@@ -10,7 +10,7 @@ import fastifyCors from "fastify-cors";
 import ImmigrationUser from "./ImmigrationUser.js";
 import config from "./config.js";
 
-import { EmbedFieldData, MessageEmbed, WebhookClient } from "discord.js";
+import { MessageEmbed, WebhookClient } from "discord.js";
 
 const webhookClient = new WebhookClient({
   id: config.credentials.discord.webhook.id,
@@ -19,6 +19,7 @@ const webhookClient = new WebhookClient({
 
 // Typings
 import {
+  DefaultAPIResponse,
   RobloxAPI_ApiArrayResponse,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
@@ -34,7 +35,7 @@ const automated_limit = pLimit(1);
 const manual_limit = pLimit(1);
 
 server.register(fastifyCors, {
-  origin: [/localhost/, /yan3321\.com$/, /yan\.gg$/],
+  origin: [/localhost/, /yan3321\.com$/, /yan\.gg$/, /127.0.0.1/],
 });
 
 const flattenObject = (obj: any, prefix = "") =>
@@ -69,6 +70,7 @@ async function getImmigrationUser(
       },
       responseType: "json",
     });
+    console.log(response.body);
     if (response) {
       if (response.statusCode === 200) {
         const json: RobloxAPI_ApiArrayResponse = response.body;
@@ -197,15 +199,19 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
       const user = await limit(() => {
         return getImmigrationUser(userParam, userId, userName);
       });
-      const testResults = await limit(() => {
-        return user.getTestStatus(blacklistOnly);
-      });
+
+      const [testResults, hccGamepassOwned] = await Promise.all([
+        limit(async () => user.getTestStatus(blacklistOnly)),
+        user.getHCC().catch(() => false),
+      ]);
+
       if (testResults !== null && typeof testResults !== "undefined") {
-        const payload = {
+        const payload: DefaultAPIResponse = {
           user: {
             userId: user.userId,
             username: user.username,
             groupMembership: user.groupMembership,
+            hccGamepassOwned: hccGamepassOwned,
             exempt:
               user.groupMembership != null
                 ? user.isExempt(user.groupMembership.role.id)
@@ -221,6 +227,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
     } catch (error) {
       if (error instanceof Error) {
         res.status(500);
+        console.error(error);
         res.send({ error: error.message });
       } else {
         res.status(500);

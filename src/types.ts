@@ -48,6 +48,19 @@ export interface IndividualTest {
   };
 }
 
+export type CombinedTestResults = Record<string, IndividualTest>;
+
+export interface DefaultAPIResponse {
+  user: {
+    userId: number;
+    username: string;
+    groupMembership?: any;
+    hccGamepassOwned?: boolean;
+    exempt: boolean;
+  };
+  tests: CombinedTestResults;
+}
+
 export interface CriteriaResponse {
   pass: boolean;
   reason?: string;

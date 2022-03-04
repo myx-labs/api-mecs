@@ -8,6 +8,7 @@ import {
   RobloxAPI_Group_ApiArrayResponse,
   RobloxAPI_Group_GroupMembershipResponse,
   RankResponse,
+  CombinedTestResults,
 } from "./types.js";
 
 // Functions
@@ -119,7 +120,7 @@ export default class ImmigrationUser {
   }
 
   async getTestStatus(blacklist_only: boolean = false) {
-    await Promise.all([await this.fetchUser(), await this.fetchGroups()]);
+    await Promise.all([this.fetchUser(), this.fetchGroups()]);
     const isBanned = await this.isBanned();
     if (isBanned) {
       throw new Error("Banned");
@@ -468,6 +469,24 @@ export default class ImmigrationUser {
     return this.fetchRobloxURL(
       `https://inventory.roblox.com/v2/users/${this.userId}/inventory?assetTypes=Shirt,Pants,Hat&limit=10&sortOrder=Asc`
     );
+  }
+
+  fetchGamepassOwnership(id: number) {
+    return this.fetchRobloxURL(
+      `https://inventory.roblox.com/v1/users/${this.userId}/items/GamePass/${id}`
+    );
+  }
+
+  async getHCC() {
+    const response = await this.fetchGamepassOwnership(
+      activeGroup.gamepasses.hcc.id
+    );
+    if (response.statusCode === 200) {
+      const json = response.body as any;
+      return (json.data as any[]).length > 0;
+    } else {
+      throw new Error("Error occured while fetching HCC data");
+    }
   }
 
   async getMembership() {

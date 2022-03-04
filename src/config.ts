@@ -12,6 +12,11 @@ export default {
         idc: 7476578,
         citizen: 7476582,
       },
+      gamepasses: {
+        hcc: {
+          id: 1251870
+        }
+      },
       blacklists: {
         docs: {
           users: "1SurqGXE34siGefJTGiUQfZgHnC6l3xlatGcVBI8mn8A",
