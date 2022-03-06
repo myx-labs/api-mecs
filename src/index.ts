@@ -26,6 +26,12 @@ import {
 import getCSRFToken from "./csrf.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 
+const requestCounter = {
+  valid: 0,
+};
+
+const sessionStart = new Date();
+
 // Variables
 
 const server = fastify({ trustProxy: "127.0.0.1" });
@@ -94,6 +100,7 @@ async function getImmigrationUser(
 
 async function logPayload(req: FastifyRequest, payload: any) {
   try {
+    requestCounter.valid++;
     const requestEmbed = new MessageEmbed()
       .setFields([
         {
@@ -273,15 +280,27 @@ server.post<{ Params: userParams; Querystring: userParams2 }>(
   }
 );
 
+server.get("/session", async (req, res) => {
+  try {
+    res.send({
+      requestCounter: requestCounter,
+      sessionStart: sessionStart,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500);
+      res.send({ error: error.message });
+    } else {
+      res.status(500);
+      res.send({ error: "Unknown error occured" });
+    }
+  }
+});
+
 async function bootstrap() {
   await getCSRFToken();
-  server.listen(port, (err, address) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    console.log(`Server listening at ${address}`);
-  });
+  const address = await server.listen(port);
+  console.log(`Server listening at ${address}`);
 }
 
 await bootstrap();
