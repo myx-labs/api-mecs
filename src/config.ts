@@ -14,8 +14,8 @@ export default {
       },
       gamepasses: {
         hcc: {
-          id: 1251870
-        }
+          id: 1251870,
+        },
       },
       blacklists: {
         docs: {
@@ -39,5 +39,8 @@ export default {
   },
   flags: {
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",
+  },
+  stats: {
+    previousQueries: parseInt(process.env.PREVIOUS_QUERY_COUNT) || 0,
   },
 };

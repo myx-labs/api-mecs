@@ -27,7 +27,7 @@ import getCSRFToken from "./csrf.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 
 const requestCounter = {
-  valid: 0,
+  valid: 0 + config.stats.previousQueries,
 };
 
 const sessionStart = new Date();
@@ -76,7 +76,6 @@ async function getImmigrationUser(
       },
       responseType: "json",
     });
-    console.log(response.body);
     if (response) {
       if (response.statusCode === 200) {
         const json: RobloxAPI_ApiArrayResponse = response.body;

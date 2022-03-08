@@ -332,6 +332,8 @@ export default class ImmigrationUser {
 
       if (acc_count >= results.values.pass) {
         results.status = true;
+      } else {
+        results.status = false;
       }
     } catch (error) {
       results.values.current = null;
