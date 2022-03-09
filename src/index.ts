@@ -1,5 +1,5 @@
 // Modules
-import { config as config_env } from "dotenv";
+import { config as config_env } from "dotenv-safe";
 config_env();
 import got from "got";
 import fastify, { FastifyRequest } from "fastify";
