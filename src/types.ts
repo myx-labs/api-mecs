@@ -12,6 +12,7 @@ export interface RobloxAPI_ApiArrayResponse {
 export interface BlacklistedGroup {
   id: number;
   name?: string;
+  reason?: string;
 }
 
 export interface RobloxAPI_Group_ApiArrayResponse {

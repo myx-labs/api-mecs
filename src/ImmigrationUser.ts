@@ -179,17 +179,19 @@ export default class ImmigrationUser {
     // User blacklist
 
     try {
-      const user_blacklisted: boolean = await this.getUserBlacklisted();
+      const [user_blacklisted, reason] = await this.getUserBlacklisted();
       if (user_blacklisted) {
         results.status = false;
         results.values.current = false;
         results.metadata.player = true;
+        results.metadata.reason = reason || undefined;
         results.descriptions.current += `User is individually blacklisted`;
       } else {
         results.metadata.player = false;
         results.descriptions.current += `User is not individually blacklisted`;
       }
     } catch (error) {
+      console.error(error);
       throw new Error("Unable to fetch user blacklist");
     }
 
@@ -535,16 +537,17 @@ export default class ImmigrationUser {
   async getGroupBlacklisted() {
     const groups: RobloxAPI_Group_GroupMembershipResponse[] =
       await this.getGroups();
-    const blacklisted_IDs: number[] = await getBlacklistedGroupIDs();
+    const blacklisted_IDs = await getBlacklistedGroupIDs();
     const blacklistedGroups: BlacklistedGroup[] = [];
     groups.forEach(
       (player_group_membership: RobloxAPI_Group_GroupMembershipResponse) => {
         const group = player_group_membership.group;
         blacklisted_IDs.forEach((blacklistedGroupID) => {
-          if (group.id === blacklistedGroupID) {
+          if (group.id === blacklistedGroupID.id) {
             blacklistedGroups.push({
               id: group.id,
               name: group.name,
+              reason: blacklistedGroupID.reason || undefined,
             });
           }
         });
@@ -554,13 +557,13 @@ export default class ImmigrationUser {
   }
 
   async getUserBlacklisted() {
-    const userIDs: number[] = await getBlacklistedUserIDs();
+    const userIDs = await getBlacklistedUserIDs();
     for (const blacklisted_id of userIDs) {
-      if (blacklisted_id === this.userId) {
-        return true;
+      if (blacklisted_id.id === this.userId) {
+        return [true, blacklisted_id.reason] as [boolean, string];
       }
     }
-    return false;
+    return [false, null] as [boolean, string];
   }
 
   async getAge() {

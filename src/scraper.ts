@@ -4,14 +4,14 @@ import config from "./config.js";
 const groups = config.groups;
 
 const cache_blacklist = {
-  users: null as number[],
-  groups: null as number[],
+  users: null as blacklisted_id[],
+  groups: null as blacklisted_id[],
 };
 
 declare global {
   interface Array<T> {
     inArray(comparer: Function): boolean;
-    pushIfNotExist(element: any, comparer: Function): void;
+    pushIfNotExist(element: T, comparer: Function): void;
   }
 }
 
@@ -33,13 +33,19 @@ const doc_auth = new auth.GoogleAuth({
   credentials: config.credentials.google,
 });
 
+interface blacklisted_id {
+  id: number;
+  reason?: string;
+}
+
 function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
-  const idArray: number[] = [];
+  const idArray: blacklisted_id[] = [];
   res.body.content.forEach((value) => {
     const paragraph = value.paragraph;
     if (paragraph) {
       const elements = paragraph.elements;
       if (elements) {
+        // console.dir(elements, { depth: null });
         elements.forEach((value) => {
           const textRun = value.textRun;
           if (textRun) {
@@ -57,9 +63,27 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
                         if (id !== groups[0].id) {
                           // no accidental blacklisting the whole group
                           if (textStyle.strikethrough !== true) {
-                            idArray.pushIfNotExist(id, (element: any) => {
-                              return element === id;
-                            });
+                            let reason: string = null;
+                            try {
+                              const reasonElement = elements.find(
+                                (element) =>
+                                  element.startIndex === value.endIndex
+                              );
+                              if (reasonElement) {
+                                const regex2 = /\(([^)]+)\)/;
+                                reason =
+                                  reasonElement.textRun?.content?.match(
+                                    regex2
+                                  )[1] || null;
+                              }
+                            } catch (error) {}
+
+                            idArray.pushIfNotExist(
+                              { id: id, reason: reason },
+                              (element: blacklisted_id) => {
+                                return element.id === id;
+                              }
+                            );
                           }
                         }
                       }
