@@ -8,12 +8,15 @@ import {
   RobloxAPI_Group_ApiArrayResponse,
   RobloxAPI_Group_GroupMembershipResponse,
   RankResponse,
-  CombinedTestResults,
 } from "./types.js";
 
 // Functions
 import getCSRFToken from "./csrf.js";
-import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
+import {
+  getBlacklistedGroupIDs,
+  getBlacklistedUserIDs,
+  processReasonString,
+} from "./scraper.js";
 import config from "./config.js";
 
 const ROBLOSECURITY = config.credentials.roblox;
@@ -184,7 +187,8 @@ export default class ImmigrationUser {
         results.status = false;
         results.values.current = false;
         results.metadata.player = true;
-        results.metadata.reason = reason || undefined;
+        results.metadata.reason =
+          processReasonString(reason, this.username) || undefined;
         results.descriptions.current += `User is individually blacklisted`;
       } else {
         results.metadata.player = false;

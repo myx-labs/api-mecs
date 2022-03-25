@@ -1,4 +1,7 @@
 import { docs, auth, docs_v1 } from "@googleapis/docs";
+import got from "got";
+
+import Fuse from "fuse.js";
 
 import config from "./config.js";
 const groups = config.groups;
@@ -7,6 +10,8 @@ const cache_blacklist = {
   users: null as blacklisted_id[],
   groups: null as blacklisted_id[],
 };
+
+const ROBLOSECURITY = config.credentials.roblox;
 
 declare global {
   interface Array<T> {
@@ -35,7 +40,90 @@ const doc_auth = new auth.GoogleAuth({
 
 interface blacklisted_id {
   id: number;
+  name?: string;
   reason?: string;
+}
+
+async function getRobloxURL(url: string, cookieRequired: boolean = false) {
+  const headers = {
+    "content-type": "application/json;charset=UTF-8",
+    cookie: undefined as string,
+  };
+  if (cookieRequired) {
+    headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+  }
+  return got
+    .get(url, {
+      throwHttpErrors: false,
+      headers: headers,
+    })
+    .json<any>();
+}
+
+async function postRobloxURL(
+  url: string,
+  body: any,
+  cookieRequired: boolean = false
+) {
+  const headers = {
+    "content-type": "application/json;charset=UTF-8",
+    cookie: undefined as string,
+  };
+  if (cookieRequired) {
+    headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+  }
+  return got
+    .post(url, {
+      throwHttpErrors: false,
+      headers: headers,
+      json: body,
+    })
+    .json<any>();
+}
+
+export function processReasonString(reason: string, name?: string) {
+  interface NameObject {
+    name: string;
+  }
+
+  const cleanup = (string: string) => {
+    string = string.trim();
+    string = string.replace("/", " / ");
+    string = string.trim();
+    string = string.replace(/(^\/+)|(\/+$)/g, "");
+    string = string.trim();
+    string = string.replace(/\s{2,}/g, " ");
+    string = string.trim();
+    return string;
+  };
+
+  const names: NameObject[] = [];
+
+  if (name) {
+    names.push({ name: name });
+  }
+
+  const nameFuse = new Fuse(names, { keys: ["name", "displayName"] });
+
+  reason = cleanup(reason);
+
+  const reasons = reason
+    .split(" / ")
+    .map(cleanup)
+    .filter((reason) =>
+      !reason.toLowerCase().match("alt")
+        ? nameFuse.search(reason).length === 0
+        : true
+    );
+
+  if (reasons.length === 0 || reason.length === 0 || reason === null) {
+    reason = undefined;
+  } else {
+    reason = reasons.join(" / ");
+    reason = reason.charAt(0).toUpperCase() + reason.slice(1);
+  }
+
+  return reason;
 }
 
 function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
@@ -72,9 +160,11 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
                               if (reasonElement) {
                                 const regex2 = /\(([^)]+)\)/;
                                 reason =
-                                  reasonElement.textRun?.content?.match(
-                                    regex2
-                                  )[1] || null;
+                                  processReasonString(
+                                    reasonElement.textRun?.content?.match(
+                                      regex2
+                                    )[1]
+                                  ) || null;
                               }
                             } catch (error) {}
 
@@ -100,7 +190,7 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
   return idArray;
 }
 
-async function getIDs(type: string) {
+async function getIDs(type: string, includeNames = false) {
   let documentId = null;
   let regex: RegExp = null;
   if (type === "users") {
@@ -117,14 +207,58 @@ async function getIDs(type: string) {
     });
     const document = res.data;
     const ids = extractIDsFromDocument(document, regex);
+
+    if (includeNames) {
+      try {
+        if (type === "groups") {
+          const groupData = await getRobloxURL(
+            `https://groups.roblox.com/v2/groups?groupIds=${ids
+              .map((id) => id.id)
+              .join(",")}`
+          );
+          const data = groupData.data as any[];
+          const newIds = ids.map((id) => ({
+            ...id,
+            name: data.find((value) => value.id === id.id)?.name || undefined,
+          }));
+          return newIds;
+        } else if (type === "users") {
+          const userData = await postRobloxURL(
+            `https://users.roblox.com/v1/users`,
+            { userIds: ids.map((id) => id.id), excludeBannedUsers: false }
+          );
+          const data = userData.data as any[];
+          const newIds = ids.map((id) => {
+            const user = data.find((value) => value.id === id.id);
+            if (user) {
+              const name = user.name as string;
+              return {
+                ...id,
+                reason: id.reason
+                  ? processReasonString(id.reason, name)
+                  : undefined,
+                name: user.name || undefined,
+              };
+            }
+            return id;
+          });
+          return newIds;
+        }
+      } catch {
+        console.error(
+          "Unable to get names for blacklist, falling back to regular list"
+        );
+      }
+    }
     return ids;
   }
+  throw new Error("Unable to get IDs");
 }
 
-async function getBlacklist(type: string, force = false) {
+async function getBlacklist(type: string, force = false, includeNames = false) {
   if (type === "users" || type === "groups") {
     if (cache_blacklist[type] === null || force === true) {
-      const id_array = await getIDs(type);
+      const id_array = await getIDs(type, includeNames);
       cache_blacklist[type] = id_array;
       return id_array;
     } else {
@@ -135,10 +269,16 @@ async function getBlacklist(type: string, force = false) {
   }
 }
 
-export async function getBlacklistedGroupIDs(force = true) {
-  return getBlacklist("groups", force);
+export async function getBlacklistedGroupIDs(
+  force = true,
+  includeNames = false
+) {
+  return getBlacklist("groups", force, includeNames);
 }
 
-export async function getBlacklistedUserIDs(force = true) {
-  return getBlacklist("users", force);
+export async function getBlacklistedUserIDs(
+  force = true,
+  includeNames = false
+) {
+  return getBlacklist("users", force, includeNames);
 }

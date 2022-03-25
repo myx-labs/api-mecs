@@ -7,6 +7,7 @@ specifiers:
   dotenv-safe: ^8.2.0
   fastify: ^3.27.4
   fastify-cors: ^6.0.3
+  fuse.js: ^6.5.3
   got: ^12.0.2
   nodemon: ^2.0.15
   p-limit: ^4.0.0
@@ -18,6 +19,7 @@ dependencies:
   dotenv-safe: 8.2.0
   fastify: 3.27.4
   fastify-cors: 6.0.3
+  fuse.js: 6.5.3
   got: 12.0.2
   p-limit: 4.0.0
 
@@ -673,6 +675,11 @@ packages:
 
   /function-bind/1.1.1:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
+    dev: false
+
+  /fuse.js/6.5.3:
+    resolution: {integrity: sha512-sA5etGE7yD/pOqivZRBvUBd/NaL2sjAu6QuSaFoe1H2BrJSkH/T/UXAJ8CdXdw7DvY3Hs8CXKYkDWX7RiP5KOg==}
+    engines: {node: '>=10'}
     dev: false
 
   /gaxios/4.3.2:

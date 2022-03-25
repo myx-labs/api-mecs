@@ -157,7 +157,7 @@ interface userParams2 {
 
 server.get("/blacklist/groups", async (req, res) => {
   try {
-    res.send(await getBlacklistedGroupIDs());
+    res.send(await getBlacklistedGroupIDs(undefined, true));
   } catch (error) {
     if (error instanceof Error) {
       res.status(500);
@@ -171,7 +171,7 @@ server.get("/blacklist/groups", async (req, res) => {
 
 server.get("/blacklist/users", async (req, res) => {
   try {
-    res.send(await getBlacklistedUserIDs());
+    res.send(await getBlacklistedUserIDs(undefined, true));
   } catch (error) {
     if (error instanceof Error) {
       res.status(500);
