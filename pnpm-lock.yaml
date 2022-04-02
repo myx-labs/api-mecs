@@ -1,7 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
-  '@googleapis/docs': ^0.2.0
+  '@googleapis/docs': ^0.4.1
   '@types/dotenv-safe': ^8.1.2
   discord.js: ^13.6.0
   dotenv-safe: ^8.2.0
@@ -14,7 +14,7 @@ specifiers:
   typescript: ^4.6.3
 
 dependencies:
-  '@googleapis/docs': 0.2.0
+  '@googleapis/docs': 0.4.1
   discord.js: 13.6.0
   dotenv-safe: 8.2.0
   fastify: 3.27.4
@@ -52,8 +52,8 @@ packages:
       ajv: 6.12.6
     dev: false
 
-  /@googleapis/docs/0.2.0:
-    resolution: {integrity: sha512-0VAhxZ5OnYsgNULESlO11m1ygmn6tHHDB/riZPxNqYrnKG8uQfmAZtK55063EQnxGNVSubaRhUv3+wxTDRRSFA==}
+  /@googleapis/docs/0.4.1:
+    resolution: {integrity: sha512-Ypa+rB5TGgGkbvx1R19rF7SahvrwduNZpT+hOmevbAyX8sbNfabHVPUk0eIrZBpCclmUYfAQWdJtwJnlZ04pZw==}
     engines: {node: '>=10.0.0'}
     dependencies:
       googleapis-common: 5.1.0
