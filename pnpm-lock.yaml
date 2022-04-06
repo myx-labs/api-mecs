@@ -5,7 +5,7 @@ specifiers:
   '@types/dotenv-safe': ^8.1.2
   discord.js: ^13.6.0
   dotenv-safe: ^8.2.0
-  fastify: ^3.27.4
+  fastify: ^3.28.0
   fastify-cors: ^6.0.3
   fuse.js: ^6.5.3
   got: ^12.0.3
@@ -17,7 +17,7 @@ dependencies:
   '@googleapis/docs': 0.4.1
   discord.js: 13.6.0
   dotenv-safe: 8.2.0
-  fastify: 3.27.4
+  fastify: 3.28.0
   fastify-cors: 6.0.3
   fuse.js: 6.5.3
   got: 12.0.3
@@ -38,7 +38,7 @@ packages:
       discord-api-types: 0.26.1
       ts-mixer: 6.0.1
       tslib: 2.3.1
-      zod: 3.14.3
+      zod: 3.14.4
     dev: false
 
   /@discordjs/collection/0.4.0:
@@ -108,6 +108,10 @@ packages:
 
   /@types/http-cache-semantics/4.0.1:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
+    dev: false
+
+  /@types/json-buffer/3.0.0:
+    resolution: {integrity: sha512-3YP80IxxFJB4b5tYC2SUPwkg0XQLiu0nWvhRgEatgjf+29IcWO9X1k8xRv5DGssJ/lCrjYTjQPcobJr2yWIVuQ==}
     dev: false
 
   /@types/keyv/3.1.4:
@@ -310,7 +314,7 @@ packages:
       clone-response: 1.0.2
       get-stream: 5.2.0
       http-cache-semantics: 4.1.0
-      keyv: 4.1.1
+      keyv: 4.2.1
       lowercase-keys: 2.0.0
       normalize-url: 6.1.0
       responselike: 2.0.0
@@ -383,6 +387,14 @@ packages:
       delayed-stream: 1.0.0
     dev: false
 
+  /compress-brotli/1.3.6:
+    resolution: {integrity: sha512-au99/GqZtUtiCBliqLFbWlhnCxn+XSYjwZ77q6mKN4La4qOXDoLVPZ50iXr0WmAyMxl8yqoq3Yq4OeQNPPkyeQ==}
+    engines: {node: '>= 12'}
+    dependencies:
+      '@types/json-buffer': 3.0.0
+      json-buffer: 3.0.1
+    dev: false
+
   /concat-map/0.0.1:
     resolution: {integrity: sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=}
     dev: true
@@ -392,7 +404,7 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       dot-prop: 5.3.0
-      graceful-fs: 4.2.9
+      graceful-fs: 4.2.10
       make-dir: 3.1.0
       unique-string: 2.0.0
       write-file-atomic: 3.0.3
@@ -589,8 +601,8 @@ packages:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
     dev: false
 
-  /fastify/3.27.4:
-    resolution: {integrity: sha512-SOfnHBxG9zxCSIvt6aHoR/cao8QBddWmGP/mb5KQKRc+KI1kB7b79M2hCDOTSyHdLAF2OX+oI6X3weeLc+MqKg==}
+  /fastify/3.28.0:
+    resolution: {integrity: sha512-LAQtGllpkRe8L6Tpf3zdbvXzXFOrgaWV3Tbvp3xMv9ngcr9zht9U2/mo5zq9qp9kplSiBJ0w43aVAMqv6PBMbw==}
     dependencies:
       '@fastify/ajv-compiler': 1.1.0
       abstract-logging: 2.0.1
@@ -824,8 +836,8 @@ packages:
       url-parse-lax: 3.0.0
     dev: true
 
-  /graceful-fs/4.2.9:
-    resolution: {integrity: sha512-NtNxqUcXgpW2iMrfqSfR73Glt39K+BLwWsPs94yR63v45T0Wbej7eRmL5cWfwEgqXnmjQp3zaJTshdRW/qC2ZQ==}
+  /graceful-fs/4.2.10:
+    resolution: {integrity: sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==}
     dev: true
 
   /gtoken/5.3.2:
@@ -1031,9 +1043,10 @@ packages:
       json-buffer: 3.0.0
     dev: true
 
-  /keyv/4.1.1:
-    resolution: {integrity: sha512-tGv1yP6snQVDSM4X6yxrv2zzq/EvpW+oYiUz6aueW1u9CtS8RzUQYxxmFwgZlO2jSgCxQbchhxaqXXp2hnKGpQ==}
+  /keyv/4.2.1:
+    resolution: {integrity: sha512-cAJq5cTfxQdq1DHZEVNpnk4mEvhP+8UP8UQftLtTtJ98beKkRHf+62M0mIDM2u/IWXyP8bmGB375/6uGdSX2MA==}
     dependencies:
+      compress-brotli: 1.3.6
       json-buffer: 3.0.1
     dev: false
 
@@ -1639,6 +1652,6 @@ packages:
     engines: {node: '>=12.20'}
     dev: false
 
-  /zod/3.14.3:
-    resolution: {integrity: sha512-OzwRCSXB1+/8F6w6HkYHdbuWysYWnAF4fkRgKDcSFc54CE+Sv0rHXKfeNUReGCrHukm1LNpi6AYeXotznhYJbQ==}
+  /zod/3.14.4:
+    resolution: {integrity: sha512-U9BFLb2GO34Sfo9IUYp0w3wJLlmcyGoMd75qU9yf+DrdGA4kEx6e+l9KOkAlyUO0PSQzZCa3TR4qVlcmwqSDuw==}
     dev: false
