@@ -1,5 +1,5 @@
 {
-  "name": "blue-wizard-api",
+  "name": "myx-mecs-api",
   "version": "2.0.0",
   "description": "",
   "type": "module",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yanix-digital/blue-wizard-api.git"
+    "url": "git+https://github.com/myx-labs/api-mecs.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/yanix-digital/blue-wizard-api/issues"
+    "url": "https://github.com/myx-labs/api-mecs/issues"
   },
-  "homepage": "https://github.com/yanix-digital/blue-wizard-api#readme",
+  "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
     "nodemon": "^2.0.15",

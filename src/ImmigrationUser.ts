@@ -30,6 +30,10 @@ interface cachedResponse {
   response: Response;
 }
 
+interface TestStatus {
+  [name: string]: IndividualTest;
+}
+
 export default class ImmigrationUser {
   userId: number;
   username: string;
@@ -149,12 +153,12 @@ export default class ImmigrationUser {
           badges: tests[3],
           friends: tests[4],
           groups: tests[5],
-        };
+        } as TestStatus;
       } else {
         const test = await this.testBlacklist();
         return {
           blacklist: test,
-        };
+        } as TestStatus;
       }
     }
   }
@@ -241,23 +245,24 @@ export default class ImmigrationUser {
   }
 
   async criteriaPassing(blacklistOnly: boolean) {
+    type CriteriaResult = [boolean, TestStatus];
     const testStatus = await this.getTestStatus(blacklistOnly);
     if (testStatus.blacklist.status === true) {
       // If blacklist passed
       if (blacklistOnly) {
-        return [true, testStatus];
+        return [true, testStatus] as CriteriaResult;
       } else {
         if (testStatus.age.status === true) {
           // If age test passing
           const testPercentage = this.getTestPercentage(testStatus);
           const passingPercentage = 0.75;
           if (testPercentage >= passingPercentage) {
-            return [true, testStatus];
+            return [true, testStatus] as CriteriaResult;
           }
         }
       }
     }
-    return [false, testStatus];
+    return [false, testStatus] as CriteriaResult;
   }
 
   async automatedReview() {
