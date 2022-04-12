@@ -4,14 +4,13 @@ import got from "got";
 import Fuse from "fuse.js";
 
 import config from "./config.js";
+import { getCookie } from "./cookies.js";
 const groups = config.groups;
 
 const cache_blacklist = {
   users: null as blacklisted_id[],
   groups: null as blacklisted_id[],
 };
-
-const ROBLOSECURITY = config.credentials.roblox;
 
 declare global {
   interface Array<T> {
@@ -50,6 +49,8 @@ async function getRobloxURL(url: string, cookieRequired: boolean = false) {
     cookie: undefined as string,
   };
   if (cookieRequired) {
+    const cookie = await getCookie();
+    const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
   return got
@@ -70,6 +71,8 @@ async function postRobloxURL(
     cookie: undefined as string,
   };
   if (cookieRequired) {
+    const cookie = await getCookie();
+    const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
   return got

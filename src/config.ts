@@ -28,8 +28,6 @@ export default {
   port: parseInt(process.env.API_PORT) as number,
   credentials: {
     google: JSON.parse(process.env.GOOGLEAUTH),
-    roblox: process.env.ROBLOSECURITY as string,
-    roblox_audit: process.env.ROBLOSECURITY_AUDIT as string,
     api: process.env.AUTHENTICATION_KEY as string,
     discord: {
       webhook: {

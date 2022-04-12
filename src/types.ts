@@ -51,6 +51,25 @@ export interface IndividualTest {
 
 export type CombinedTestResults = Record<string, IndividualTest>;
 
+export interface GroupData {
+  id: number;
+  rolesets: {
+    pending: number;
+    idc: number;
+    citizen: number;
+  };
+  gamepasses: {
+    hcc: {
+      id: number;
+    };
+  };
+  blacklists: {
+    docs: {
+      users: string;
+      groups: string;
+    };
+  };
+}
 export interface DefaultAPIResponse {
   user: {
     userId: number;
@@ -60,6 +79,7 @@ export interface DefaultAPIResponse {
     exempt: boolean;
   };
   tests: CombinedTestResults;
+  group?: GroupData;
 }
 
 export interface CriteriaResponse {

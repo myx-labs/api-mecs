@@ -18,8 +18,7 @@ import {
   processReasonString,
 } from "./scraper.js";
 import config from "./config.js";
-
-const ROBLOSECURITY = config.credentials.roblox;
+import { getCookie } from "./cookies.js";
 
 const activeGroup = config.groups[0];
 const rolesets = activeGroup.rolesets;
@@ -87,7 +86,9 @@ export default class ImmigrationUser {
       return respond(false, "Target roleset is same as current user roleset");
     }
     if (rolesetValid) {
-      const ROBLOX_X_CSRF_TOKEN: string = await getCSRFToken(true);
+      const cookie = await getCookie(false, true);
+      const ROBLOSECURITY = cookie.cookie;
+      const ROBLOX_X_CSRF_TOKEN: string = cookie.csrf;
       const response = await got(
         `https://groups.roblox.com/v1/groups/${activeGroup.id}/users/${this.userId}`,
         {
@@ -431,16 +432,18 @@ export default class ImmigrationUser {
     return results;
   }
 
-  async fetchRobloxURL(url: string, cookieRequired: boolean = false) {
+  async fetchRobloxURL(url: string) {
     const cacheHit = this.requestCache.find((element) => element.url === url);
     if (cacheHit === undefined) {
       const headers = {
         "content-type": "application/json;charset=UTF-8",
         cookie: undefined as string,
       };
-      if (cookieRequired) {
-        headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
-      }
+      
+      const cookie = await getCookie();
+      const ROBLOSECURITY = cookie.cookie;
+      headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+
       const response = await got.get(url, {
         throwHttpErrors: false,
         headers: headers,

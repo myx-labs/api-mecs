@@ -3,9 +3,9 @@ import got from "got";
 import config from "./config.js";
 import { AuditLogItem, AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
+import { getCookie } from "./cookies.js";
 
 const group = config.groups[0];
-const ROBLOSECURITY = config.credentials.roblox_audit;
 
 async function fetchRobloxURL(url: string, cookieRequired: boolean = false) {
   const headers = {
@@ -13,6 +13,8 @@ async function fetchRobloxURL(url: string, cookieRequired: boolean = false) {
     cookie: undefined as string,
   };
   if (cookieRequired) {
+    const cookie = await getCookie(true);
+    const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
   const response = await got
@@ -81,6 +83,16 @@ export async function getAuditLog(limit: number = 10) {
       } else {
         valid = !pass;
       }
+      // await addToRankingLogs(
+      //   item.actor.user.userId,
+      //   item.description.TargetId,
+      //   item.description.OldRoleSetId,
+      //   item.description.NewRoleSetId,
+      //   new Date(item.created),
+      //   valid,
+      //   undefined,
+      //   new Date()
+      // );
       const object = {
         name: item.description.TargetName,
         officer: item.actor.user.username,

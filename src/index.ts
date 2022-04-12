@@ -23,8 +23,8 @@ import {
   RobloxAPI_ApiArrayResponse,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
-import getCSRFToken from "./csrf.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
+import { loadCookies } from "./cookies.js";
 
 const requestCounter = {
   valid: 0 + config.stats.previousQueries,
@@ -224,6 +224,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
                 : false,
           },
           tests: testResults,
+          group: config.groups[0],
         };
         logPayload(req, payload);
         res.send(payload);
@@ -297,7 +298,7 @@ server.get("/session", async (req, res) => {
 });
 
 async function bootstrap() {
-  await getCSRFToken();
+  await loadCookies();
   const address = await server.listen(port);
   console.log(`Server listening at ${address}`);
 }
