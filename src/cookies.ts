@@ -59,7 +59,7 @@ export async function getCookie(audit = false, rank = false) {
   if (validCookies.length > 0) {
     const selectedIndex = Math.floor(Math.random() * validCookies.length);
     const selectedCookie = validCookies[selectedIndex];
-    console.log(`Using cookie ${selectedCookie.cookie}`);
+    // console.log(`Using cookie ${selectedCookie.cookie}`);
     return selectedCookie;
   } else {
     throw new Error("No valid cookies found for given requirements!");
