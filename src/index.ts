@@ -197,6 +197,10 @@ interface MembershipAction {
   };
   action: "Grant" | "Refusal";
   correct: boolean;
+  timestamps: {
+    action: Date;
+    review?: Date;
+  };
   data?: DefaultAPIResponse;
 }
 
@@ -204,6 +208,38 @@ interface AuditQueryParams {
   actorId: string;
   targetId: string;
   limit: string;
+}
+
+async function getRankingHistory(targetId: number) {
+  const rows = await getRankingLogs(undefined, undefined, targetId);
+  const logs: MembershipAction[] = [];
+  for (const item of rows) {
+    let valid = false;
+    const pass = item.review_pass;
+    if (parseInt(item.new_role_id) === group.rolesets.citizen) {
+      valid = pass;
+    } else {
+      valid = !pass;
+    }
+    logs.push({
+      officer: item.actor_id,
+      target: {
+        id: parseInt(item.target_id),
+        name: item.review_data.user.username,
+      },
+      action:
+        parseInt(item.new_role_id) === group.rolesets.citizen
+          ? "Grant"
+          : "Refusal",
+      correct: valid,
+      timestamps: {
+        action: item.action_timestamp,
+        review: item.review_timestamp,
+      },
+      data: item.review_data,
+    });
+  }
+  return logs;
 }
 
 server.get<{ Querystring: AuditQueryParams }>(
@@ -266,6 +302,10 @@ server.get<{ Querystring: AuditQueryParams }>(
               ? "Grant"
               : "Refusal",
           correct: valid,
+          timestamps: {
+            action: item.action_timestamp,
+            review: item.review_timestamp,
+          },
         });
       }
       decisions.percentage = (
@@ -355,6 +395,10 @@ async function getDecisionDataForOfficer(id: number) {
               ? "Grant"
               : "Refusal",
           correct: valid,
+          timestamps: {
+            action: item2.action_timestamp,
+            review: item2.review_timestamp,
+          },
         });
       }
     }
@@ -469,13 +513,14 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
         return getImmigrationUser(userParam, userId, userName);
       });
 
-      const [testResults, hccGamepassOwned] = await Promise.all([
+      const [testResults, hccGamepassOwned, history] = await Promise.all([
         limit(async () => user.getTestStatus(blacklistOnly)),
         user.getHCC().catch(() => false),
+        getRankingHistory(user.userId).catch(() => undefined),
       ]);
 
       if (testResults !== null && typeof testResults !== "undefined") {
-        const payload: DefaultAPIResponse = {
+        const payload = {
           user: {
             userId: user.userId,
             username: user.username,
@@ -488,6 +533,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
           },
           tests: testResults,
           group: group,
+          history: history,
         };
         logPayload(req, payload);
         res.send(payload);

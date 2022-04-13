@@ -51,7 +51,12 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
 export async function processAuditLogs(limit?: number) {
   let counter = 0;
   let nextCursor: string | undefined = undefined;
-  const existingLogs = await getRankingLogs();
+  const existingLogs = await getRankingLogs(
+    undefined,
+    undefined,
+    undefined,
+    true
+  );
   while (counter < limit || typeof limit === "undefined") {
     const page = await getAuditLogPage(nextCursor);
     for (const item of page.data.filter(
@@ -87,7 +92,7 @@ export async function processAuditLogs(limit?: number) {
           {
             user: {
               userId: immigrationUser.userId,
-              username: immigrationUser.username,
+              username: await immigrationUser.getUsername(),
               groupMembership: immigrationUser.groupMembership,
               hccGamepassOwned: hccGamepassOwned,
               exempt:
