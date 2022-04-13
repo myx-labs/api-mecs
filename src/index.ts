@@ -565,7 +565,10 @@ async function bootstrap() {
   await startDB();
   const address = await server.listen(port);
   console.log(`Server listening at ${address}`);
-  await processAuditLogs(100000);
+  if (config.flags.processAudit) {
+    console.log("Processing audit logs...");
+    await processAuditLogs();
+  }
 }
 
 await bootstrap();

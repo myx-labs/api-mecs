@@ -48,11 +48,11 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
   return response as AuditLogResponse;
 }
 
-export async function processAuditLogs(limit: number = 10) {
+export async function processAuditLogs(limit?: number) {
   let counter = 0;
   let nextCursor: string | undefined = undefined;
   const existingLogs = await getRankingLogs();
-  while (counter < limit) {
+  while (counter < limit || typeof limit === "undefined") {
     const page = await getAuditLogPage(nextCursor);
     for (const item of page.data.filter(
       (item) =>
@@ -109,6 +109,8 @@ export async function processAuditLogs(limit: number = 10) {
     }
     if (page.nextPageCursor) {
       nextCursor = page.nextPageCursor;
+    } else {
+      break;
     }
   }
 }
