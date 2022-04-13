@@ -39,7 +39,7 @@ export default {
   },
   flags: {
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",
-    processAudit: process.env.DISABLE_PENDING_PROCESSING === "true",
+    processAudit: process.env.ENABLE_AUDIT_PROCESSING === "true",
   },
   stats: {
     previousQueries: parseInt(process.env.PREVIOUS_QUERY_COUNT) || 0,
