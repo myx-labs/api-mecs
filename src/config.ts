@@ -11,6 +11,7 @@ export default {
         pending: 7475347,
         idc: 7476578,
         citizen: 7476582,
+        staff: 7979816,
       },
       gamepasses: {
         hcc: {

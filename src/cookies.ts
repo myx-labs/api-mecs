@@ -33,13 +33,15 @@ export async function loadCookies() {
         rank: item.rank ? true : false,
         csrf: await getCSRFToken(item.cookie),
       };
-      //   console.log(cookie);
+      // console.log(cookie);
       cache.push(cookie);
     }
     console.log(`${cache.length} cookies loaded!`);
   } catch (error) {
     console.error(error);
-    throw new Error("Unable to load cookies.");
+    throw new Error(
+      "Unable to load cookies; cookies.json might not exist at project root."
+    );
   }
 }
 

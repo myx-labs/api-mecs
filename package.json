@@ -1,6 +1,6 @@
 {
   "name": "myx-mecs-api",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "",
   "type": "module",
   "exports": "./dist/index.js",
@@ -22,6 +22,7 @@
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
+    "@types/pg": "^8.6.5",
     "nodemon": "^2.0.15",
     "typescript": "^4.6.3"
   },
@@ -33,6 +34,7 @@
     "fastify-cors": "^6.0.3",
     "fuse.js": "^6.5.3",
     "got": "^12.0.3",
-    "p-limit": "^4.0.0"
+    "p-limit": "^4.0.0",
+    "pg": "^8.7.3"
   }
 }

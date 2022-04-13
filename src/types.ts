@@ -1,10 +1,22 @@
+export interface RobloxAPI_GroupRolesetUser {
+  buildersClubMembershipType?: string;
+  userId?: number;
+  username?: string;
+  displayName?: string;
+}
+
+export interface RobloxAPI_GroupRolesetUserResponse {
+  previousPageCursor: string | null;
+  nextPageCursor: string | null;
+  data: RobloxAPI_GroupRolesetUser[];
+}
+
 export interface RobloxAPI_MultiGetUserByNameResponse {
   requestedUsername?: string;
   id?: number;
   name?: string;
   displayName?: string;
 }
-
 export interface RobloxAPI_ApiArrayResponse {
   data?: RobloxAPI_MultiGetUserByNameResponse[];
 }
@@ -49,7 +61,9 @@ export interface IndividualTest {
   };
 }
 
-export type CombinedTestResults = Record<string, IndividualTest>;
+export interface TestStatus {
+  [name: string]: IndividualTest;
+}
 
 export interface GroupData {
   id: number;
@@ -78,7 +92,7 @@ export interface DefaultAPIResponse {
     hccGamepassOwned?: boolean;
     exempt: boolean;
   };
-  tests: CombinedTestResults;
+  tests: TestStatus;
   group?: GroupData;
 }
 

@@ -8,10 +8,10 @@ import {
   RobloxAPI_Group_ApiArrayResponse,
   RobloxAPI_Group_GroupMembershipResponse,
   RankResponse,
+  TestStatus,
 } from "./types.js";
 
 // Functions
-import getCSRFToken from "./csrf.js";
 import {
   getBlacklistedGroupIDs,
   getBlacklistedUserIDs,
@@ -27,10 +27,6 @@ const array_rolesets = Object.values(rolesets);
 interface cachedResponse {
   url: string;
   response: Response;
-}
-
-interface TestStatus {
-  [name: string]: IndividualTest;
 }
 
 export default class ImmigrationUser {
@@ -439,7 +435,7 @@ export default class ImmigrationUser {
         "content-type": "application/json;charset=UTF-8",
         cookie: undefined as string,
       };
-      
+
       const cookie = await getCookie();
       const ROBLOSECURITY = cookie.cookie;
       headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;

@@ -6,6 +6,8 @@ import fastify, { FastifyRequest } from "fastify";
 import pLimit from "p-limit";
 import fastifyCors from "fastify-cors";
 
+const origin = "https://myx.yan.gg";
+
 // Classes
 import ImmigrationUser from "./ImmigrationUser.js";
 import config from "./config.js";
@@ -25,12 +27,16 @@ import {
 } from "./types.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 import { loadCookies } from "./cookies.js";
+import { getRankingLogs, startDB } from "./postgres.js";
+import { getMembershipStaff, processAuditLogs } from "./AuditAccuracy.js";
+import { mean, mode, median } from "./mathUtils.js";
 
 const requestCounter = {
   valid: 0 + config.stats.previousQueries,
 };
 
 const sessionStart = new Date();
+const group = config.groups[0];
 
 // Variables
 
@@ -183,6 +189,263 @@ server.get("/blacklist/users", async (req, res) => {
   }
 });
 
+interface MembershipAction {
+  officer?: string;
+  target: {
+    name: string;
+    id: number;
+  };
+  action: "Grant" | "Refusal";
+  correct: boolean;
+  data?: DefaultAPIResponse;
+}
+
+interface AuditQueryParams {
+  actorId: string;
+  targetId: string;
+  limit: string;
+}
+
+server.get<{ Querystring: AuditQueryParams }>(
+  "/audit/accuracy",
+  async (req, res) => {
+    try {
+      let actorId: number = undefined;
+      let targetId: number = undefined;
+      let limit: number = undefined;
+
+      if (req.query.actorId) {
+        const parsed = parseInt(req.query.actorId);
+        if (parsed) {
+          actorId = parsed;
+        }
+      }
+
+      if (req.query.targetId) {
+        const parsed = parseInt(req.query.targetId);
+        if (parsed) {
+          targetId = parsed;
+        }
+      }
+
+      if (req.query.limit) {
+        const parsed = parseInt(req.query.limit);
+        if (parsed) {
+          limit = parsed;
+        }
+      }
+
+      const rows = await getRankingLogs(limit, actorId, targetId);
+
+      const decisions = {
+        correct: 0,
+        total: 0,
+        percentage: null as string,
+        actions: [] as MembershipAction[],
+      };
+      for (const item of rows) {
+        let valid = false;
+        const pass = item.review_pass;
+        if (parseInt(item.new_role_id) === group.rolesets.citizen) {
+          valid = pass;
+        } else {
+          valid = !pass;
+        }
+        if (valid) {
+          decisions.correct++;
+        }
+        decisions.total++;
+        decisions.actions.push({
+          officer: item.actor_id,
+          target: {
+            id: parseInt(item.target_id),
+            name: item.review_data.user.username,
+          },
+          action:
+            parseInt(item.new_role_id) === group.rolesets.citizen
+              ? "Grant"
+              : "Refusal",
+          correct: valid,
+        });
+      }
+      decisions.percentage = (
+        (decisions.correct / decisions.total) *
+        100
+      ).toFixed(2);
+      res.send(decisions);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500);
+        res.send({ error: error.message });
+      } else {
+        res.status(500);
+        res.send({ error: "Unknown error occured" });
+      }
+    }
+  }
+);
+
+async function getDecisionDataForOfficer(id: number) {
+  const [rows, rows2] = await Promise.all([
+    getRankingLogs(undefined, id, undefined, true),
+    getRankingLogs(5, id, undefined),
+  ]);
+  if (rows.length === 0) {
+    throw new Error("No records for this actor");
+  }
+  const decisions = {
+    dar: {
+      percentage: null as number,
+      data: {
+        correct: 0,
+        total: 0,
+      },
+    },
+
+    atbd: {
+      data: [] as number[],
+      mtbd: {
+        mean: null as number,
+        mode: null as number,
+        median: null as number,
+      },
+    },
+    last5: [] as MembershipAction[],
+  };
+
+  rows.forEach((item, index) => {
+    // Average Time Between Decisions (ATBD) calculation
+    // Includes Mean, Mode, and Median Times Between Decisions (MTBD)
+    const previousRecord = rows[index - 1];
+    if (previousRecord) {
+      const msBetween = Math.abs(
+        item.action_timestamp.getTime() -
+          previousRecord.action_timestamp.getTime()
+      );
+      const secondsBetween = msBetween / 1000;
+      decisions.atbd.data.push(secondsBetween);
+    }
+
+    // Decision Accuracy Rate (DAR) calculation
+    let valid = false;
+
+    const pass = item.review_pass;
+    if (parseInt(item.new_role_id) === group.rolesets.citizen) {
+      valid = pass;
+    } else {
+      valid = !pass;
+    }
+    if (valid) {
+      decisions.dar.data.correct++;
+    }
+    decisions.dar.data.total++;
+    if (decisions.last5.length < 5) {
+      const item2 = rows2.find(
+        (item2) =>
+          item2.action_timestamp.getTime() === item.action_timestamp.getTime()
+      );
+      if (item2) {
+        decisions.last5.push({
+          target: {
+            id: parseInt(item2.target_id),
+            name: item2.review_data.user.username,
+          },
+          action:
+            parseInt(item2.new_role_id) === group.rolesets.citizen
+              ? "Grant"
+              : "Refusal",
+          correct: valid,
+        });
+      }
+    }
+  });
+
+  decisions.atbd.mtbd.mean = mean(decisions.atbd.data);
+  decisions.atbd.mtbd.mode = mode(decisions.atbd.data)[0];
+  decisions.atbd.mtbd.median = median(decisions.atbd.data);
+
+  decisions.dar.percentage =
+    (decisions.dar.data.correct / decisions.dar.data.total) * 100;
+
+  if (rows.length < 2) {
+    decisions.atbd = undefined;
+  } else {
+    decisions.atbd.data = undefined;
+  }
+
+  return decisions;
+}
+
+interface AuditDecisionData {
+  dar: {
+    percentage: number;
+    data: {
+      correct: number;
+      total: number;
+    };
+  };
+  atbd: {
+    data: number[];
+    mtbd: {
+      mean: number;
+      mode: number;
+      median: number;
+    };
+  };
+  last5: MembershipAction[];
+}
+
+server.get("/audit/staff", async (req, res) => {
+  try {
+    const officers = await getMembershipStaff();
+    const promises = officers.map(async (item) => ({
+      officer: {
+        id: item.userId,
+        name: item.username,
+      },
+      decisions: await getDecisionDataForOfficer(item.userId).catch(
+        () => undefined as AuditDecisionData
+      ),
+    }));
+    const data = await Promise.all(promises);
+    const filtered = data.filter(
+      (item) => typeof item.decisions !== "undefined"
+    );
+    filtered.sort((a, z) =>
+      z.decisions.dar.data.total > a.decisions.dar.data.total ? 1 : -1
+    );
+    res.send(filtered);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500);
+      res.send({ error: error.message });
+    } else {
+      res.status(500);
+      res.send({ error: "Unknown error occured" });
+    }
+  }
+});
+
+server.get<{ Params: userParams }>("/audit/staff/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (id) {
+      const decisions = await getDecisionDataForOfficer(id);
+      res.send(decisions);
+    } else {
+      throw new Error("Invalid ID");
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500);
+      res.send({ error: error.message });
+    } else {
+      res.status(500);
+      res.send({ error: "Unknown error occured" });
+    }
+  }
+});
+
 server.get<{ Params: userParams; Querystring: userParams2 }>(
   "/user/:id",
   async (req, res) => {
@@ -196,7 +459,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
         throw new Error("User parameter is not valid.");
       }
       const limit = (() => {
-        if (req.headers.origin === "https://mys-mecs.yan.gg") {
+        if (req.headers.origin === origin) {
           console.log("Manual limit in use");
           return manual_limit;
         }
@@ -224,7 +487,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
                 : false,
           },
           tests: testResults,
-          group: config.groups[0],
+          group: group,
         };
         logPayload(req, payload);
         res.send(payload);
@@ -255,7 +518,7 @@ server.post<{ Params: userParams; Querystring: userParams2 }>(
         throw new Error("User parameter is not valid.");
       }
       const limit = (() => {
-        if (req.headers.origin === "https://mys-mecs.yan.gg") {
+        if (req.headers.origin === origin) {
           console.log("Manual limit in use");
           return manual_limit;
         }
@@ -299,8 +562,10 @@ server.get("/session", async (req, res) => {
 
 async function bootstrap() {
   await loadCookies();
+  await startDB();
   const address = await server.listen(port);
   console.log(`Server listening at ${address}`);
+  await processAuditLogs(100000);
 }
 
 await bootstrap();

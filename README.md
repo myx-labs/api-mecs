@@ -7,9 +7,10 @@ This repository hosts the source code for the Membership Eligibility Criteria Sy
 ## Requirements
 
 - Node.js v16+
+- Postgres database
 - PNPM package manager `npm i -g pnpm`
-- Google Cloud API authentication credentials (in JSON string format)
-- Roblox account .ROBLOSECURITY cookie (recommended to create a new dedicated account for security)
+- Google Cloud API service account credentials (in JSON string format)
+- Roblox account .ROBLOSECURITY cookie (recommended to create new dedicated accounts for security)
 - Discord webhook URL (for successful request logging)
 
 ## Setup
@@ -19,8 +20,9 @@ This repository hosts the source code for the Membership Eligibility Criteria Sy
 - Create a `cookies.json` file and configure based on `cookies.example.json`
 - Configure the Roblox group and roleset IDs in `src/config.ts`
 - Install dependencies with `pnpm i`
-- Build with `pnpm build`
-- Start with `node dist/index.js`
+- Develop with automatic reload by running `pnpm dev`
+- Build by running `pnpm build`
+- Start by running `node dist/index.js`
 
 ## Licence
 

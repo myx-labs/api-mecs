@@ -1,22 +1,25 @@
 import got from "got";
 
 import config from "./config.js";
-import { AuditLogItem, AuditLogResponse } from "./AuditTypes.js";
+import { AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
 import { getCookie } from "./cookies.js";
+import { addToRankingLogs, getRankingLogs } from "./postgres.js";
+import { RobloxAPI_GroupRolesetUserResponse } from "./types.js";
 
 const group = config.groups[0];
 
-async function fetchRobloxURL(url: string, cookieRequired: boolean = false) {
+async function fetchRobloxURL(
+  url: string,
+  auditCookieRequired: boolean = false
+) {
   const headers = {
     "content-type": "application/json;charset=UTF-8",
     cookie: undefined as string,
   };
-  if (cookieRequired) {
-    const cookie = await getCookie(true);
-    const ROBLOSECURITY = cookie.cookie;
-    headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
-  }
+  const cookie = await getCookie(auditCookieRequired);
+  const ROBLOSECURITY = cookie.cookie;
+  headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   const response = await got
     .get(url, {
       throwHttpErrors: false,
@@ -24,6 +27,13 @@ async function fetchRobloxURL(url: string, cookieRequired: boolean = false) {
     })
     .json();
   return response;
+}
+
+export async function getMembershipStaff() {
+  const response = (await fetchRobloxURL(
+    `https://groups.roblox.com/v1/groups/${group.id}/roles/${group.rolesets.staff}/users?sortOrder=Asc&limit=100`
+  )) as RobloxAPI_GroupRolesetUserResponse;
+  return response.data;
 }
 
 async function getAuditLogPage(cursor?: string, userId?: number) {
@@ -38,72 +48,67 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
   return response as AuditLogResponse;
 }
 
-export async function getAuditLog(limit: number = 10) {
-  const logs: AuditLogItem[] = [];
+export async function processAuditLogs(limit: number = 10) {
+  let counter = 0;
   let nextCursor: string | undefined = undefined;
-
-  while (logs.length < limit) {
+  const existingLogs = await getRankingLogs();
+  while (counter < limit) {
     const page = await getAuditLogPage(nextCursor);
-    for (const item of page.data) {
-      if (
-        item.description.NewRoleSetId === group.rolesets.citizen ||
-        item.description.NewRoleSetId === group.rolesets.idc
-      ) {
-        if (logs.length < limit) {
-          logs.push(item);
-        } else {
-          break;
-        }
+    for (const item of page.data.filter(
+      (item) =>
+        !existingLogs.some(
+          (item2) =>
+            item.actor.user.userId === parseInt(item2.actor_id) &&
+            item.description.TargetId === parseInt(item2.target_id) &&
+            item.description.OldRoleSetId === parseInt(item2.old_role_id) &&
+            item.description.NewRoleSetId === parseInt(item2.new_role_id) &&
+            new Date(item.created).getTime() ===
+              item2.action_timestamp.getTime()
+        ) &&
+        (item.description.NewRoleSetId === group.rolesets.citizen ||
+          item.description.NewRoleSetId === group.rolesets.idc)
+    )) {
+      try {
+        const immigrationUser = new ImmigrationUser(item.description.TargetId);
+        const [[pass, data], hccGamepassOwned] = await Promise.all([
+          immigrationUser.criteriaPassing(
+            item.description.OldRoleSetId === group.rolesets.citizen
+          ),
+          immigrationUser.getHCC().catch(() => false),
+        ]);
+        await addToRankingLogs(
+          item.actor.user.userId,
+          item.description.TargetId,
+          item.description.OldRoleSetId,
+          item.description.NewRoleSetId,
+          new Date(item.created),
+          new Date(),
+          pass,
+          {
+            user: {
+              userId: immigrationUser.userId,
+              username: immigrationUser.username,
+              groupMembership: immigrationUser.groupMembership,
+              hccGamepassOwned: hccGamepassOwned,
+              exempt:
+                immigrationUser.groupMembership != null
+                  ? immigrationUser.isExempt(
+                      immigrationUser.groupMembership.role.id
+                    )
+                  : false,
+            },
+            tests: data,
+            group: group,
+          }
+        );
+        counter++;
+        console.log(counter);
+      } catch (error) {
+        console.error(error);
       }
     }
     if (page.nextPageCursor) {
       nextCursor = page.nextPageCursor;
     }
   }
-
-  interface AuditResultItem {
-    name: string;
-    officer: string;
-    previousRank: string;
-    newRank: string;
-    timestamp: number;
-    valid: boolean;
-  }
-
-  const data: AuditResultItem[] = [];
-  for (const item of logs) {
-    try {
-      let valid = false;
-      const immigrationUser = new ImmigrationUser(item.description.TargetId);
-      const [pass] = await immigrationUser.criteriaPassing(
-        item.description.OldRoleSetId === group.rolesets.citizen
-      );
-      if (item.description.NewRoleSetId === group.rolesets.citizen) {
-        valid = pass;
-      } else {
-        valid = !pass;
-      }
-      // await addToRankingLogs(
-      //   item.actor.user.userId,
-      //   item.description.TargetId,
-      //   item.description.OldRoleSetId,
-      //   item.description.NewRoleSetId,
-      //   new Date(item.created),
-      //   valid,
-      //   undefined,
-      //   new Date()
-      // );
-      const object = {
-        name: item.description.TargetName,
-        officer: item.actor.user.username,
-        previousRank: item.description.OldRoleSetName,
-        newRank: item.description.NewRoleSetName,
-        timestamp: new Date(item.created).getTime(),
-        valid: valid,
-      };
-      data.push(object);
-    } catch (error) {}
-  }
-
-  return data;
 }
