@@ -651,7 +651,10 @@ async function bootstrap() {
   console.log(`Server listening at ${address}`);
   if (config.flags.processAudit) {
     console.log("Processing audit logs...");
-    await processAuditLogs();
+    await Promise.all([
+      processAuditLogs(undefined, false),
+      processAuditLogs(undefined, true),
+    ]);
   }
 }
 

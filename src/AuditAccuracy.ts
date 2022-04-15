@@ -53,32 +53,42 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
   return response as AuditLogResponse;
 }
 
-export async function processAuditLogs(limit?: number) {
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function processAuditLogs(limit?: number, onlyNew = false) {
   let counter = 0;
   let nextCursor: string | undefined = undefined;
-  const cache = await getCache();
-  if (typeof cache.lastPagingCursor === "string") {
-    console.log(`Loading cached paging cursor: ${cache.lastPagingCursor}`);
-    nextCursor = cache.lastPagingCursor;
+  if (!onlyNew) {
+    const cache = await getCache();
+    if (typeof cache.lastPagingCursor === "string") {
+      console.log(`Loading cached paging cursor: ${cache.lastPagingCursor}`);
+      nextCursor = cache.lastPagingCursor;
+    }
   }
   const range = await getActionTimestampRange();
-  console.log(`Processing logs outside of given range`);
-  console.log(range);
+  console.log(
+    `Processing logs with range ${range.latest.toDateString()} - ${range.oldest.toDateString()}, onlyNew = ${onlyNew}`
+  );
   while (counter < limit || typeof limit === "undefined") {
-    process.stdout.write(
-      `Next cursor: ${nextCursor}, ${counter} logs processed\r`
+    console.log(
+      `Next cursor: ${nextCursor}, onlyNew: ${onlyNew}, ${counter} logs processed`
     );
     const page = await getAuditLogPage(nextCursor);
-    await setPagingCursor(nextCursor);
+    if (!onlyNew) {
+      await setPagingCursor(nextCursor);
+    }
     const filteredPage = page.data.filter((item) => {
       const timestamp = new Date(item.created).getTime();
-      const inrange =
-        timestamp <= range.latest.getTime() &&
-        timestamp >= range.oldest.getTime();
       const withinRolesetScope =
         item.description.NewRoleSetId === group.rolesets.citizen ||
         item.description.NewRoleSetId === group.rolesets.idc;
-      return !inrange && withinRolesetScope;
+      let timeRange = timestamp < range.oldest.getTime();
+      if (onlyNew) {
+        timeRange = timestamp > range.latest.getTime();
+      }
+      return timeRange && withinRolesetScope;
     });
     for (const item of filteredPage) {
       try {
@@ -120,9 +130,20 @@ export async function processAuditLogs(limit?: number) {
       }
     }
     if (page.nextPageCursor) {
-      nextCursor = page.nextPageCursor;
+      if (!onlyNew) {
+        nextCursor = page.nextPageCursor;
+      } else {
+        if (filteredPage.length === 0) {
+          console.log(`Breaking loop for new logs`);
+          break;
+        }
+      }
     } else {
       break;
     }
+  }
+  if (onlyNew) {
+    await delay(3000);
+    await processAuditLogs(undefined, true);
   }
 }
