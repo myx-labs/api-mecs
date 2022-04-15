@@ -27,7 +27,14 @@ import {
 } from "./types.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 import { loadCookies } from "./cookies.js";
-import { getRankingLogs, startDB } from "./postgres.js";
+import {
+  getAggregateActorData,
+  getDecisionValues,
+  getDistinctActorIds,
+  getMTBD,
+  getRankingLogs,
+  startDB,
+} from "./postgres.js";
 import { getMembershipStaff, processAuditLogs } from "./AuditAccuracy.js";
 import { mean, mode, median } from "./mathUtils.js";
 
@@ -210,6 +217,25 @@ interface AuditQueryParams {
   limit: string;
 }
 
+interface AuditDecisionData {
+  dar: {
+    percentage: number;
+    data: {
+      correct: number;
+      total: number;
+    };
+  };
+  atbd: {
+    data?: number[];
+    mtbd: {
+      mean?: number;
+      mode: number;
+      median?: number;
+    };
+  };
+  last5?: MembershipAction[];
+}
+
 async function getRankingHistory(targetId: number) {
   const rows = await getRankingLogs(undefined, undefined, targetId);
   const logs: MembershipAction[] = [];
@@ -325,17 +351,65 @@ server.get<{ Querystring: AuditQueryParams }>(
   }
 );
 
+async function getDecisionDataForAllOfficers() {
+  const actorData = await getAggregateActorData();
+
+  return actorData.map((data) => {
+    const darData = data.dar;
+    const mtbdData = data.mtbd;
+    const decisions = {
+      dar: {
+        percentage: 0,
+        data: {
+          correct: 0,
+          total: 0,
+        },
+      },
+
+      atbd: {
+        data: [] as number[],
+        mtbd: {
+          mean: null as number,
+          mode: null as number,
+          median: null as number,
+        },
+      },
+      last5: [] as MembershipAction[],
+    };
+
+    decisions.dar.data.correct = darData.correct;
+    decisions.dar.data.total = darData.total;
+    decisions.dar.percentage =
+      (decisions.dar.data.correct / decisions.dar.data.total) * 100;
+
+    if (typeof mtbdData !== "number") {
+      decisions.atbd = undefined;
+    } else {
+      // decisions.atbd.mtbd.mean = mean(decisions.atbd.data);
+      decisions.atbd.mtbd.mode = mtbdData;
+      // decisions.atbd.mtbd.median = median(decisions.atbd.data);
+    }
+    return {
+      id: data.actorId,
+      decisions: decisions,
+    };
+  });
+}
+
 async function getDecisionDataForOfficer(id: number) {
-  const [rows, rows2] = await Promise.all([
-    getRankingLogs(undefined, id, undefined, true),
+  const [darData, mtbdData, rows2] = await Promise.all([
+    getDecisionValues(id),
+    getMTBD(id),
     getRankingLogs(5, id, undefined),
   ]);
-  if (rows.length === 0) {
+
+  if (darData.total === 0 || darData === null) {
     throw new Error("No records for this actor");
   }
+
   const decisions = {
     dar: {
-      percentage: null as number,
+      percentage: 0,
       data: {
         correct: 0,
         total: 0,
@@ -353,103 +427,67 @@ async function getDecisionDataForOfficer(id: number) {
     last5: [] as MembershipAction[],
   };
 
-  rows.forEach((item, index) => {
-    // Average Time Between Decisions (ATBD) calculation
-    // Includes Mean, Mode, and Median Times Between Decisions (MTBD)
-    const previousRecord = rows[index - 1];
-    if (previousRecord) {
-      const msBetween = Math.abs(
-        item.action_timestamp.getTime() -
-          previousRecord.action_timestamp.getTime()
-      );
-      const secondsBetween = msBetween / 1000;
-      decisions.atbd.data.push(secondsBetween);
-    }
-
-    // Decision Accuracy Rate (DAR) calculation
+  rows2.forEach((item2) => {
     let valid = false;
 
-    const pass = item.review_pass;
-    if (parseInt(item.new_role_id) === group.rolesets.citizen) {
+    const pass = item2.review_pass;
+    if (parseInt(item2.new_role_id) === group.rolesets.citizen) {
       valid = pass;
     } else {
       valid = !pass;
     }
-    if (valid) {
-      decisions.dar.data.correct++;
-    }
-    decisions.dar.data.total++;
-    if (decisions.last5.length < 5) {
-      const item2 = rows2.find(
-        (item2) =>
-          item2.action_timestamp.getTime() === item.action_timestamp.getTime()
-      );
-      if (item2) {
-        decisions.last5.push({
-          target: {
-            id: parseInt(item2.target_id),
-            name: item2.review_data.user.username,
-          },
-          action:
-            parseInt(item2.new_role_id) === group.rolesets.citizen
-              ? "Grant"
-              : "Refusal",
-          correct: valid,
-          timestamps: {
-            action: item2.action_timestamp,
-            review: item2.review_timestamp,
-          },
-        });
-      }
-    }
+    decisions.last5.push({
+      target: {
+        id: parseInt(item2.target_id),
+        name: item2.review_data.user.username,
+      },
+      action:
+        parseInt(item2.new_role_id) === group.rolesets.citizen
+          ? "Grant"
+          : "Refusal",
+      correct: valid,
+      timestamps: {
+        action: item2.action_timestamp,
+        review: item2.review_timestamp,
+      },
+    });
   });
 
-  decisions.atbd.mtbd.mean = mean(decisions.atbd.data);
-  decisions.atbd.mtbd.mode = mode(decisions.atbd.data)[0];
-  decisions.atbd.mtbd.median = median(decisions.atbd.data);
-
+  decisions.dar.data.correct = darData.correct;
+  decisions.dar.data.total = darData.total;
   decisions.dar.percentage =
     (decisions.dar.data.correct / decisions.dar.data.total) * 100;
 
-  if (rows.length < 2) {
+  if (typeof mtbdData !== "number") {
     decisions.atbd = undefined;
   } else {
-    decisions.atbd.data = undefined;
+    // decisions.atbd.mtbd.mean = mean(decisions.atbd.data);
+    decisions.atbd.mtbd.mode = mtbdData;
+    // decisions.atbd.mtbd.median = median(decisions.atbd.data);
   }
 
   return decisions;
 }
 
-interface AuditDecisionData {
-  dar: {
-    percentage: number;
-    data: {
-      correct: number;
-      total: number;
-    };
-  };
-  atbd: {
-    data: number[];
-    mtbd: {
-      mean: number;
-      mode: number;
-      median: number;
-    };
-  };
-  last5: MembershipAction[];
+async function preloadDecisionData() {
+  const decisions = await getDecisionDataForAllOfficers();
+  return decisions;
 }
 
 server.get("/audit/staff", async (req, res) => {
   try {
-    const officers = await getMembershipStaff();
+    const [officers, decisionData] = await Promise.all([
+      getMembershipStaff(),
+      preloadDecisionData(),
+    ]);
     const promises = officers.map(async (item) => ({
       officer: {
         id: item.userId,
         name: item.username,
       },
-      decisions: await getDecisionDataForOfficer(item.userId).catch(
-        () => undefined as AuditDecisionData
-      ),
+      decisions:
+        decisionData.find((item2) => item2.id === item.userId)?.decisions ||
+        undefined,
     }));
     const data = await Promise.all(promises);
     const filtered = data.filter(

@@ -10,7 +10,7 @@ This repository hosts the source code for the Membership Eligibility Criteria Sy
 - Postgres database
 - PNPM package manager `npm i -g pnpm`
 - Google Cloud API service account credentials (in JSON string format)
-- Roblox account .ROBLOSECURITY cookie (recommended to create new dedicated accounts for security)
+- Roblox account .ROBLOSECURITY cookies (recommended to create new dedicated accounts for security)
 - Discord webhook URL (for successful request logging)
 
 ## Setup

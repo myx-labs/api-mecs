@@ -1,6 +1,12 @@
+import config from "./config.js";
 import pkg from "pg";
 import { DefaultAPIResponse } from "./types";
 const { Pool } = pkg;
+
+import {
+  parse as parseIsoDuration,
+  toSeconds as durationToSeconds,
+} from "iso8601-duration";
 
 const pool = new Pool();
 
@@ -29,6 +35,168 @@ interface PGLogItem {
   review_data: DefaultAPIResponse | null;
 }
 
+interface PGAuditCount {
+  correct: string;
+  total: string;
+}
+
+interface PGModeTimeBetweenDecisions {
+  mtbd: any;
+}
+
+interface PGActorIds {
+  actor_id: string;
+}
+
+interface PGAggregateData {
+  actor_id: string;
+  total: string;
+  correct: string;
+  mtbd: any;
+}
+
+interface PGTimestampRange {
+  action_timestamp: Date;
+}
+
+export async function getDistinctActorIds() {
+  let query = `SELECT DISTINCT actor_id FROM ${table}`;
+  const response = await pool.query<PGActorIds>(query);
+  return response.rows.map((item) => parseInt(item.actor_id));
+}
+
+export async function getActionTimestampRange() {
+  let query = `
+    (SELECT action_timestamp
+    FROM ${table}
+    ORDER BY action_timestamp DESC
+    LIMIT 1)
+    
+    UNION ALL
+    
+    (SELECT action_timestamp
+    FROM ${table}
+    ORDER BY action_timestamp ASC    
+    LIMIT 1)
+  `;
+  const response = await pool.query<PGTimestampRange>(query);
+  const rows = response.rows;
+  const latest = rows[0].action_timestamp;
+  const oldest = rows[1].action_timestamp;
+  return {
+    latest,
+    oldest,
+  };
+}
+
+export async function getAggregateActorData() {
+  let query = `
+      SELECT 
+        ${table}.actor_id, 
+        COUNT(*) as total, 
+        COUNT(
+          CASE WHEN (
+            review_pass = true 
+            AND new_role_id = 7476582
+          ) 
+          OR (
+            review_pass = false 
+            AND new_role_id = 7476578
+          ) THEN 1 ELSE null END
+        ) AS correct, 
+        mtbd_table.mtbd 
+      FROM 
+        ${table} 
+        LEFT JOIN (
+          SELECT 
+            actor_id, 
+            mode() WITHIN GROUP (
+              ORDER BY 
+                difference_action_timestamp
+            ) AS mtbd 
+          FROM 
+            (
+              SELECT 
+                actor_id, 
+                action_timestamp - LAG(action_timestamp) OVER (
+                  ORDER BY 
+                    action_timestamp
+                ) AS difference_action_timestamp 
+              FROM 
+                ${table}
+            ) AS mtbdTable 
+          GROUP BY 
+            actor_id
+        ) as mtbd_table ON ${table}.actor_id = mtbd_table.actor_id 
+      GROUP BY 
+        ${table}.actor_id, 
+        mtbd_table.mtbd 
+      ORDER BY 
+        total DESC;
+
+  `;
+  const response = await pool.query<PGAggregateData>(query);
+  return response.rows.map((item) => ({
+    actorId: parseInt(item.actor_id),
+    dar: {
+      total: parseInt(item.total),
+      correct: parseInt(item.correct),
+    },
+    mtbd: durationToSeconds(parseIsoDuration(item.mtbd.toISOString())) || null,
+  }));
+}
+
+export async function getMTBD(actorId: number) {
+  let query = `
+    SELECT 
+      mode() WITHIN GROUP (
+        ORDER BY 
+          difference_action_timestamp
+      ) AS mtbd 
+    FROM 
+      (
+        SELECT 
+          action_timestamp - LAG(action_timestamp) OVER (
+            ORDER BY 
+              action_timestamp
+          ) AS difference_action_timestamp 
+        FROM 
+          ${table} 
+        WHERE 
+          actor_id = $1
+      ) AS mtbdTable
+  `;
+  let values: any[] = [actorId];
+  const response = await pool.query<PGModeTimeBetweenDecisions>(query, values);
+  if (response.rows.length === 0) {
+    return null;
+  }
+  const item = response.rows[0];
+  // console.dir(item.mtbd, { depth: null });
+  if (item.mtbd) {
+    return durationToSeconds(parseIsoDuration(item.mtbd.toISOString()));
+  }
+  return null;
+}
+
+export async function getDecisionValues(actorId: number) {
+  const group = config.groups[0];
+  const rolesets = group.rolesets;
+  let query = `SELECT (SELECT COUNT(*) FROM ${table} WHERE actor_id = $3 AND ((review_pass = true AND new_role_id = $1) OR (review_pass = false AND new_role_id = $2))) as correct, COUNT(*) as total FROM ${table} WHERE actor_id = $3`;
+  let values: any[] = [rolesets.citizen, rolesets.idc, actorId];
+  const response = await pool.query<PGAuditCount>(query, values);
+  if (response.rows.length === 0) {
+    return null;
+  }
+  const item = response.rows[0];
+  const correct = parseInt(item.correct);
+  const total = parseInt(item.total);
+  return {
+    correct,
+    total,
+  };
+}
+
 export async function getRankingLogs(
   limit?: number,
   actorId?: number,
@@ -42,24 +210,29 @@ export async function getRankingLogs(
   }
 
   let query = `SELECT ${scope} FROM ${table} ORDER BY action_timestamp DESC`;
+  let values: any[] = [];
 
   if (limit) {
     if (limit > 0) {
       if (limit && actorId) {
-        query = `SELECT ${scope} FROM ${table} WHERE actor_id = '${actorId}' ORDER BY action_timestamp DESC LIMIT ${limit}`;
+        query = `SELECT ${scope} FROM ${table} WHERE actor_id = $1 ORDER BY action_timestamp DESC LIMIT ${limit}`;
+        values = [actorId];
       } else if (limit && targetId) {
-        query = `SELECT ${scope} FROM ${table} WHERE target_id = '${targetId}' ORDER BY action_timestamp DESC LIMIT ${limit}`;
+        query = `SELECT ${scope} FROM ${table} WHERE target_id = $1 ORDER BY action_timestamp DESC LIMIT ${limit}`;
+        values = [targetId];
       } else {
         query = `SELECT ${scope} FROM ${table} ORDER BY action_timestamp DESC LIMIT ${limit}`;
       }
     }
   } else if (actorId) {
-    query = `SELECT ${scope} FROM ${table} WHERE actor_id = '${actorId}' ORDER BY action_timestamp DESC`;
+    query = `SELECT ${scope} FROM ${table} WHERE actor_id = $1 ORDER BY action_timestamp DESC`;
+    values = [actorId];
   } else if (targetId) {
-    query = `SELECT ${scope} FROM ${table} WHERE target_id = '${targetId}' ORDER BY action_timestamp DESC`;
+    query = `SELECT ${scope} FROM ${table} WHERE target_id = $1 ORDER BY action_timestamp DESC`;
+    values = [targetId];
   }
-  
-  const response = await pool.query<PGLogItem>(query);
+
+  const response = await pool.query<PGLogItem>(query, values);
   return response.rows;
 }
 

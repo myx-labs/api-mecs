@@ -4,8 +4,13 @@ import config from "./config.js";
 import { AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
 import { getCookie } from "./cookies.js";
-import { addToRankingLogs, getRankingLogs } from "./postgres.js";
+import {
+  addToRankingLogs,
+  getActionTimestampRange,
+  getRankingLogs,
+} from "./postgres.js";
 import { RobloxAPI_GroupRolesetUserResponse } from "./types.js";
+import { getCache, setPagingCursor } from "./cache.js";
 
 const group = config.groups[0];
 
@@ -51,28 +56,31 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
 export async function processAuditLogs(limit?: number) {
   let counter = 0;
   let nextCursor: string | undefined = undefined;
-  const existingLogs = await getRankingLogs(
-    undefined,
-    undefined,
-    undefined,
-    true
-  );
+  const cache = await getCache();
+  if (typeof cache.lastPagingCursor === "string") {
+    console.log(`Loading cached paging cursor: ${cache.lastPagingCursor}`);
+    nextCursor = cache.lastPagingCursor;
+  }
+  const range = await getActionTimestampRange();
+  console.log(`Processing logs outside of range`);
+  console.log(range);
   while (counter < limit || typeof limit === "undefined") {
+    process.stdout.write(
+      `Next cursor: ${nextCursor}, ${counter} logs processed\r`
+    );
     const page = await getAuditLogPage(nextCursor);
-    for (const item of page.data.filter(
-      (item) =>
-        !existingLogs.some(
-          (item2) =>
-            item.actor.user.userId === parseInt(item2.actor_id) &&
-            item.description.TargetId === parseInt(item2.target_id) &&
-            item.description.OldRoleSetId === parseInt(item2.old_role_id) &&
-            item.description.NewRoleSetId === parseInt(item2.new_role_id) &&
-            new Date(item.created).getTime() ===
-              item2.action_timestamp.getTime()
-        ) &&
-        (item.description.NewRoleSetId === group.rolesets.citizen ||
-          item.description.NewRoleSetId === group.rolesets.idc)
-    )) {
+    await setPagingCursor(nextCursor);
+    const filteredPage = page.data.filter((item) => {
+      const timestamp = new Date(item.created).getTime();
+      const inrange =
+        timestamp <= range.latest.getTime() &&
+        timestamp >= range.oldest.getTime();
+      const withinRolesetScope =
+        item.description.NewRoleSetId === group.rolesets.citizen ||
+        item.description.NewRoleSetId === group.rolesets.idc;
+      return !inrange && withinRolesetScope;
+    });
+    for (const item of filteredPage) {
       try {
         const immigrationUser = new ImmigrationUser(item.description.TargetId);
         const [[pass, data], hccGamepassOwned] = await Promise.all([

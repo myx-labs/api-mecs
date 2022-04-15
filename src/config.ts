@@ -38,6 +38,7 @@ export default {
     },
   },
   flags: {
+    loadCache: process.env.LOAD_FROM_CACHE === "true",
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",
     processAudit: process.env.ENABLE_AUDIT_PROCESSING === "true",
   },
