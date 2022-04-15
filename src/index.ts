@@ -23,6 +23,7 @@ const webhookClient = new WebhookClient({
 import {
   DefaultAPIResponse,
   RobloxAPI_ApiArrayResponse,
+  RobloxAPI_GroupRolesetUser,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
@@ -197,7 +198,8 @@ server.get("/blacklist/users", async (req, res) => {
 });
 
 interface MembershipAction {
-  officer?: string;
+  officer?: number;
+  officerName?: string;
   target: {
     name: string;
     id: number;
@@ -248,7 +250,11 @@ async function getRankingHistory(targetId: number) {
       valid = !pass;
     }
     logs.push({
-      officer: item.actor_id,
+      officer: parseInt(item.actor_id),
+      officerName:
+        membershipStaffCache.find(
+          (cacheItem) => cacheItem.userId === parseInt(item.actor_id)
+        )?.displayName || undefined,
       target: {
         id: parseInt(item.target_id),
         name: item.review_data.user.username,
@@ -318,7 +324,11 @@ server.get<{ Querystring: AuditQueryParams }>(
         }
         decisions.total++;
         decisions.actions.push({
-          officer: item.actor_id,
+          officer: parseInt(item.actor_id),
+          officerName:
+            membershipStaffCache.find(
+              (cacheItem) => cacheItem.userId === parseInt(item.actor_id)
+            )?.displayName || undefined,
           target: {
             id: parseInt(item.target_id),
             name: item.review_data.user.username,
@@ -474,12 +484,15 @@ async function preloadDecisionData() {
   return decisions;
 }
 
+let membershipStaffCache: RobloxAPI_GroupRolesetUser[] = [];
+
 server.get("/audit/staff", async (req, res) => {
   try {
     const [officers, decisionData] = await Promise.all([
       getMembershipStaff(),
       preloadDecisionData(),
     ]);
+    membershipStaffCache = officers;
     const promises = officers.map(async (item) => ({
       officer: {
         id: item.userId,

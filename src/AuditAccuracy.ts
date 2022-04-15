@@ -4,11 +4,7 @@ import config from "./config.js";
 import { AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
 import { getCookie } from "./cookies.js";
-import {
-  addToRankingLogs,
-  getActionTimestampRange,
-  getRankingLogs,
-} from "./postgres.js";
+import { addToRankingLogs, getActionTimestampRange } from "./postgres.js";
 import { RobloxAPI_GroupRolesetUserResponse } from "./types.js";
 import { getCache, setPagingCursor } from "./cache.js";
 
