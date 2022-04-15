@@ -31,13 +31,11 @@ import { loadCookies } from "./cookies.js";
 import {
   getAggregateActorData,
   getDecisionValues,
-  getDistinctActorIds,
   getMTBD,
   getRankingLogs,
   startDB,
 } from "./postgres.js";
 import { getMembershipStaff, processAuditLogs } from "./AuditAccuracy.js";
-import { mean, mode, median } from "./mathUtils.js";
 
 const requestCounter = {
   valid: 0 + config.stats.previousQueries,
@@ -254,7 +252,7 @@ async function getRankingHistory(targetId: number) {
       officerName:
         membershipStaffCache.find(
           (cacheItem) => cacheItem.userId === parseInt(item.actor_id)
-        )?.displayName || undefined,
+        )?.username || undefined,
       target: {
         id: parseInt(item.target_id),
         name: item.review_data.user.username,
@@ -328,7 +326,7 @@ server.get<{ Querystring: AuditQueryParams }>(
           officerName:
             membershipStaffCache.find(
               (cacheItem) => cacheItem.userId === parseInt(item.actor_id)
-            )?.displayName || undefined,
+            )?.username || undefined,
           target: {
             id: parseInt(item.target_id),
             name: item.review_data.user.username,
