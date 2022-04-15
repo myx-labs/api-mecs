@@ -62,7 +62,7 @@ export async function processAuditLogs(limit?: number) {
     nextCursor = cache.lastPagingCursor;
   }
   const range = await getActionTimestampRange();
-  console.log(`Processing logs outside of range`);
+  console.log(`Processing logs outside of given range`);
   console.log(range);
   while (counter < limit || typeof limit === "undefined") {
     process.stdout.write(
@@ -115,7 +115,6 @@ export async function processAuditLogs(limit?: number) {
           }
         );
         counter++;
-        console.log(counter);
       } catch (error) {
         console.error(error);
       }
