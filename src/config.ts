@@ -7,6 +7,9 @@ export default {
   groups: [
     {
       id: 1143446,
+      subgroups: {
+        membership: 5231965,
+      },
       rolesets: {
         pending: 7475347,
         idc: 7476578,

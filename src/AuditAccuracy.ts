@@ -5,7 +5,10 @@ import { AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
 import { getCookie } from "./cookies.js";
 import { addToRankingLogs, getActionTimestampRange } from "./postgres.js";
-import { RobloxAPI_GroupRolesetUserResponse } from "./types.js";
+import {
+  RobloxAPI_GroupRolesetUserResponse,
+  RobloxAPI_GroupUsersResponse,
+} from "./types.js";
 import { getCache, setPagingCursor } from "./cache.js";
 
 const group = config.groups[0];
@@ -28,6 +31,13 @@ async function fetchRobloxURL(
     })
     .json();
   return response;
+}
+
+export async function getMembershipGroupStaff() {
+  const response = (await fetchRobloxURL(
+    `https://groups.roblox.com/v1/groups/${group.subgroups.membership}/users?sortOrder=Asc&limit=100`
+  )) as RobloxAPI_GroupUsersResponse;
+  return response.data;
 }
 
 export async function getMembershipStaff() {

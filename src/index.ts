@@ -24,18 +24,24 @@ import {
   DefaultAPIResponse,
   RobloxAPI_ApiArrayResponse,
   RobloxAPI_GroupRolesetUser,
+  RobloxAPI_GroupUserItem,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
 import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
 import { loadCookies } from "./cookies.js";
 import {
   getAggregateActorData,
+  getAggregateData,
   getDecisionValues,
   getMTBD,
   getRankingLogs,
   startDB,
 } from "./postgres.js";
-import { getMembershipStaff, processAuditLogs } from "./AuditAccuracy.js";
+import {
+  getMembershipGroupStaff,
+  getMembershipStaff,
+  processAuditLogs,
+} from "./AuditAccuracy.js";
 
 const requestCounter = {
   valid: 0 + config.stats.previousQueries,
@@ -251,8 +257,8 @@ async function getRankingHistory(targetId: number) {
       officer: parseInt(item.actor_id),
       officerName:
         membershipStaffCache.find(
-          (cacheItem) => cacheItem.userId === parseInt(item.actor_id)
-        )?.username || undefined,
+          (cacheItem) => cacheItem.user.userId === parseInt(item.actor_id)
+        )?.user?.username || undefined,
       target: {
         id: parseInt(item.target_id),
         name: item.review_data.user.username,
@@ -301,52 +307,8 @@ server.get<{ Querystring: AuditQueryParams }>(
         }
       }
 
-      const rows = await getRankingLogs(limit, actorId, targetId);
-
-      const decisions = {
-        correct: 0,
-        total: 0,
-        percentage: null as string,
-        actions: [] as MembershipAction[],
-      };
-      for (const item of rows) {
-        let valid = false;
-        const pass = item.review_pass;
-        if (parseInt(item.new_role_id) === group.rolesets.citizen) {
-          valid = pass;
-        } else {
-          valid = !pass;
-        }
-        if (valid) {
-          decisions.correct++;
-        }
-        decisions.total++;
-        decisions.actions.push({
-          officer: parseInt(item.actor_id),
-          officerName:
-            membershipStaffCache.find(
-              (cacheItem) => cacheItem.userId === parseInt(item.actor_id)
-            )?.username || undefined,
-          target: {
-            id: parseInt(item.target_id),
-            name: item.review_data.user.username,
-          },
-          action:
-            parseInt(item.new_role_id) === group.rolesets.citizen
-              ? "Grant"
-              : "Refusal",
-          correct: valid,
-          timestamps: {
-            action: item.action_timestamp,
-            review: item.review_timestamp,
-          },
-        });
-      }
-      decisions.percentage = (
-        (decisions.correct / decisions.total) *
-        100
-      ).toFixed(2);
-      res.send(decisions);
+      const data = await getAggregateData();
+      res.send(data);
     } catch (error) {
       if (error instanceof Error) {
         res.status(500);
@@ -482,23 +444,23 @@ async function preloadDecisionData() {
   return decisions;
 }
 
-let membershipStaffCache: RobloxAPI_GroupRolesetUser[] = [];
+let membershipStaffCache: RobloxAPI_GroupUserItem[] = [];
 
 server.get("/audit/staff", async (req, res) => {
   try {
     const [officers, decisionData] = await Promise.all([
-      getMembershipStaff(),
+      getMembershipGroupStaff(),
       preloadDecisionData(),
     ]);
     membershipStaffCache = officers;
     const promises = officers.map(async (item) => ({
       officer: {
-        id: item.userId,
-        name: item.username,
+        id: item.user.userId,
+        name: item.user.username,
       },
       decisions:
-        decisionData.find((item2) => item2.id === item.userId)?.decisions ||
-        undefined,
+        decisionData.find((item2) => item2.id === item.user.userId)
+          ?.decisions || undefined,
     }));
     const data = await Promise.all(promises);
     const filtered = data.filter(

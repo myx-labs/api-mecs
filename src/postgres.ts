@@ -48,8 +48,15 @@ interface PGActorIds {
   actor_id: string;
 }
 
-interface PGAggregateData {
+interface PGAggregateActorData {
   actor_id: string;
+  total: string;
+  correct: string;
+  mtbd: any;
+}
+
+interface PGAggregateData {
+  actors: string;
   total: string;
   correct: string;
   mtbd: any;
@@ -86,6 +93,59 @@ export async function getActionTimestampRange() {
   return {
     latest,
     oldest,
+  };
+}
+
+const group = config.groups[0];
+
+export async function getAggregateData() {
+  let query = `
+      SELECT 
+        COUNT(DISTINCT actor_id) as actors, 
+        COUNT(*) as total, 
+        COUNT(
+          CASE WHEN (
+            review_pass = true 
+            AND new_role_id = ${group.rolesets.citizen}
+          ) 
+          OR (
+            review_pass = false 
+            AND new_role_id = ${group.rolesets.idc}
+          ) THEN 1 ELSE null END
+        ) AS correct, 
+        (
+          SELECT 
+            mode() WITHIN GROUP (
+              ORDER BY 
+                difference_action_timestamp
+            ) AS mtbd 
+          FROM 
+            (
+              SELECT 
+                action_timestamp - LAG(action_timestamp) OVER (
+                  ORDER BY 
+                    action_timestamp
+                ) AS difference_action_timestamp 
+              FROM 
+              ${table}
+            ) AS mtbdTable
+        ) as mtbd 
+      FROM 
+        ${table}
+  `;
+  const [response, timestampRange] = await Promise.all([
+    pool.query<PGAggregateData>(query),
+    getActionTimestampRange(),
+  ]);
+  const item = response.rows[0];
+  return {
+    actors: parseInt(item.actors),
+    dar: {
+      total: parseInt(item.total),
+      correct: parseInt(item.correct),
+    },
+    mtbd: durationToSeconds(parseIsoDuration(item.mtbd.toISOString())) || null,
+    timeRange: timestampRange,
   };
 }
 
@@ -135,7 +195,7 @@ export async function getAggregateActorData() {
         total DESC;
 
   `;
-  const response = await pool.query<PGAggregateData>(query);
+  const response = await pool.query<PGAggregateActorData>(query);
   return response.rows.map((item) => ({
     actorId: parseInt(item.actor_id),
     dar: {
@@ -253,7 +313,7 @@ export async function addToRankingLogs(
   const count = parseInt(countResponse.rows[0].count);
   if (count === 0) {
     await pool.query(
-      "INSERT INTO mecs.action_log(actor_id, target_id, old_role_id, new_role_id, action_timestamp, review_timestamp, review_pass, review_data) VALUES($1, $2, $3, $4, $5, $6, $7, $8)",
+      `INSERT INTO ${table}(actor_id, target_id, old_role_id, new_role_id, action_timestamp, review_timestamp, review_pass, review_data) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
         actorId,
         targetId,

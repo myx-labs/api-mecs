@@ -5,6 +5,22 @@ export interface RobloxAPI_GroupRolesetUser {
   displayName?: string;
 }
 
+export interface RobloxAPI_GroupRolesetUserRole {
+  id?: number;
+  name?: string;
+  rank?: number;
+}
+
+export interface RobloxAPI_GroupUserItem {
+  user?: RobloxAPI_GroupRolesetUser;
+  role?: RobloxAPI_GroupRolesetUserRole;
+}
+
+export interface RobloxAPI_GroupUsersResponse {
+  previousPageCursor: string | null;
+  nextPageCursor: string | null;
+  data: RobloxAPI_GroupUserItem[];
+}
 export interface RobloxAPI_GroupRolesetUserResponse {
   previousPageCursor: string | null;
   nextPageCursor: string | null;
