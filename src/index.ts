@@ -4,7 +4,7 @@ config_env();
 import got from "got";
 import fastify, { FastifyRequest } from "fastify";
 import pLimit from "p-limit";
-import fastifyCors from "fastify-cors";
+import fastifyCors from "@fastify/cors";
 
 const origin = "https://myx.yan.gg";
 
