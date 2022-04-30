@@ -7,21 +7,21 @@ specifiers:
   '@types/pg': ^8.6.5
   discord.js: ^13.6.0
   dotenv-safe: ^8.2.0
-  fastify: ^3.28.0
+  fastify: ^3.29.0
   fuse.js: ^6.5.3
   got: ^12.0.4
   iso8601-duration: ^2.1.1
-  nodemon: ^2.0.15
+  nodemon: ^2.0.16
   p-limit: ^4.0.0
   pg: ^8.7.3
-  typescript: ^4.6.3
+  typescript: ^4.6.4
 
 dependencies:
   '@fastify/cors': 7.0.0
   '@googleapis/docs': 0.4.1
   discord.js: 13.6.0
   dotenv-safe: 8.2.0
-  fastify: 3.28.0
+  fastify: 3.29.0
   fuse.js: 6.5.3
   got: 12.0.4
   iso8601-duration: 2.1.1
@@ -31,8 +31,8 @@ dependencies:
 devDependencies:
   '@types/dotenv-safe': 8.1.2
   '@types/pg': 8.6.5
-  nodemon: 2.0.15
-  typescript: 4.6.3
+  nodemon: 2.0.16
+  typescript: 4.6.4
 
 packages:
 
@@ -63,6 +63,10 @@ packages:
     dependencies:
       fastify-plugin: 3.0.1
       vary: 1.1.2
+    dev: false
+
+  /@fastify/error/2.0.0:
+    resolution: {integrity: sha512-wI3fpfDT0t7p8E6dA2eTECzzOd+bZsZCJ2Hcv+Onn2b7ZwK3RwD27uW2QDaMtQhAfWQQP+WNK7nKf0twLsBf9w==}
     dev: false
 
   /@googleapis/docs/0.4.1:
@@ -109,7 +113,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 17.0.29
+      '@types/node': 17.0.30
       '@types/responselike': 1.0.0
     dev: false
 
@@ -130,23 +134,23 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 17.0.29
+      '@types/node': 17.0.30
     dev: false
 
   /@types/node-fetch/2.6.1:
     resolution: {integrity: sha512-oMqjURCaxoSIsHSr1E47QHzbmzNR5rK8McHuNb11BOM9cHcIK3Avy0s/b2JlXHoQGTYS3NsvWzV1M0iK7l0wbA==}
     dependencies:
-      '@types/node': 17.0.29
+      '@types/node': 17.0.30
       form-data: 3.0.1
     dev: false
 
-  /@types/node/17.0.29:
-    resolution: {integrity: sha512-tx5jMmMFwx7wBwq/V7OohKDVb/JwJU5qCVkeLMh1//xycAJ/ESuw9aJ9SEtlCZDYi2pBfe4JkisSoAtbOsBNAA==}
+  /@types/node/17.0.30:
+    resolution: {integrity: sha512-oNBIZjIqyHYP8VCNAV9uEytXVeXG2oR0w9lgAXro20eugRQfY002qr3CUl6BAe+Yf/z3CRjPdz27Pu6WWtuSRw==}
 
   /@types/pg/8.6.5:
     resolution: {integrity: sha512-tOkGtAqRVkHa/PVZicq67zuujI4Oorfglsr2IbKofDwBSysnaqSx7W1mDqFqdkGE6Fbgh+PZAl0r/BWON/mozw==}
     dependencies:
-      '@types/node': 17.0.29
+      '@types/node': 17.0.30
       pg-protocol: 1.5.0
       pg-types: 2.2.0
     dev: true
@@ -154,13 +158,13 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 17.0.29
+      '@types/node': 17.0.30
     dev: false
 
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 17.0.29
+      '@types/node': 17.0.30
     dev: false
 
   /abbrev/1.1.1:
@@ -611,22 +615,18 @@ packages:
     resolution: {integrity: sha512-dtm4QZH9nZtcDt8qJiOH9fcQd1NAgi+K1O2DbE6GG1PPCK/BWfOH3idCTRQ4ImXRUOyopDEgDEnVEE7Y/2Wrig==}
     dev: false
 
-  /fastify-error/0.3.1:
-    resolution: {integrity: sha512-oCfpcsDndgnDVgiI7bwFKAun2dO+4h84vBlkWsWnz/OUK9Reff5UFoFl241xTiLeHWX/vU9zkDVXqYUxjOwHcQ==}
-    dev: false
-
   /fastify-plugin/3.0.1:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
     dev: false
 
-  /fastify/3.28.0:
-    resolution: {integrity: sha512-LAQtGllpkRe8L6Tpf3zdbvXzXFOrgaWV3Tbvp3xMv9ngcr9zht9U2/mo5zq9qp9kplSiBJ0w43aVAMqv6PBMbw==}
+  /fastify/3.29.0:
+    resolution: {integrity: sha512-zXSiDTdHJCHcmDrSje1f1RfzTmUTjMtHnPhh6cdokgfHhloQ+gy0Du+KlEjwTbcNC3Djj4GAsBzl6KvfI9Ah2g==}
     dependencies:
       '@fastify/ajv-compiler': 1.1.0
+      '@fastify/error': 2.0.0
       abstract-logging: 2.0.1
       avvio: 7.2.5
       fast-json-stringify: 2.7.13
-      fastify-error: 0.3.1
       find-my-way: 4.5.1
       flatstr: 1.0.12
       light-my-request: 4.9.0
@@ -1171,8 +1171,8 @@ packages:
     engines: {node: '>= 6.13.0'}
     dev: false
 
-  /nodemon/2.0.15:
-    resolution: {integrity: sha512-gdHMNx47Gw7b3kWxJV64NI+Q5nfl0y5DgDbiVtShiwa7Z0IZ07Ll4RLFo6AjrhzMtoEZn5PDE3/c2AbVsiCkpA==}
+  /nodemon/2.0.16:
+    resolution: {integrity: sha512-zsrcaOfTWRuUzBn3P44RDliLlp263Z/76FPoHFr3cFFkOz0lTPAcIw8dCzfdVIx/t3AtDYCZRCDkoCojJqaG3w==}
     engines: {node: '>=8.10.0'}
     hasBin: true
     requiresBuild: true
@@ -1625,8 +1625,8 @@ packages:
       is-typedarray: 1.0.0
     dev: true
 
-  /typescript/4.6.3:
-    resolution: {integrity: sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==}
+  /typescript/4.6.4:
+    resolution: {integrity: sha512-9ia/jWHIEbo49HfjrLGfKbZSuWo9iTMwXO+Ca3pRsSpbsMbc7/IU8NKdCZVRRBafVPGnoJeFL76ZOAA84I9fEg==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true

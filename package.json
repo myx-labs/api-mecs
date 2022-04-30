@@ -23,15 +23,15 @@
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
     "@types/pg": "^8.6.5",
-    "nodemon": "^2.0.15",
-    "typescript": "^4.6.3"
+    "nodemon": "^2.0.16",
+    "typescript": "^4.6.4"
   },
   "dependencies": {
+    "@fastify/cors": "^7.0.0",
     "@googleapis/docs": "^0.4.1",
     "discord.js": "^13.6.0",
     "dotenv-safe": "^8.2.0",
-    "fastify": "^3.28.0",
-    "@fastify/cors": "^7.0.0",
+    "fastify": "^3.29.0",
     "fuse.js": "^6.5.3",
     "got": "^12.0.4",
     "iso8601-duration": "^2.1.1",
