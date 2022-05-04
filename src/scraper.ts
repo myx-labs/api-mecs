@@ -106,7 +106,10 @@ export function processReasonString(reason: string, name?: string) {
     names.push({ name: name });
   }
 
-  const nameFuse = new Fuse(names, { keys: ["name", "displayName"] });
+  const nameFuse = new Fuse(names, {
+    keys: ["name", "displayName"],
+    fieldNormWeight: 0,
+  });
 
   reason = cleanup(reason);
 
