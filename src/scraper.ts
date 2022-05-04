@@ -108,7 +108,8 @@ export function processReasonString(reason: string, name?: string) {
 
   const nameFuse = new Fuse(names, {
     keys: ["name", "displayName"],
-    fieldNormWeight: 0,
+    // must declare fieldNormWeight until https://github.com/krisk/Fuse/pull/648 is resolved
+    fieldNormWeight: 1,
   });
 
   reason = cleanup(reason);
