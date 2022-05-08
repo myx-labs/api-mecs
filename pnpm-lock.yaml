@@ -8,7 +8,7 @@ specifiers:
   discord.js: ^13.6.0
   dotenv-safe: ^8.2.0
   fastify: ^3.29.0
-  fuse.js: ^6.6.0
+  fuse.js: ^6.6.1
   got: ^12.0.4
   iso8601-duration: ^2.1.1
   nodemon: ^2.0.16
@@ -22,7 +22,7 @@ dependencies:
   discord.js: 13.6.0
   dotenv-safe: 8.2.0
   fastify: 3.29.0
-  fuse.js: 6.6.0
+  fuse.js: 6.6.1
   got: 12.0.4
   iso8601-duration: 2.1.1
   p-limit: 4.0.0
@@ -44,7 +44,7 @@ packages:
       discord-api-types: 0.26.1
       ts-mixer: 6.0.1
       tslib: 2.4.0
-      zod: 3.14.4
+      zod: 3.15.1
     dev: false
 
   /@discordjs/collection/0.4.0:
@@ -416,8 +416,8 @@ packages:
       delayed-stream: 1.0.0
     dev: false
 
-  /compress-brotli/1.3.6:
-    resolution: {integrity: sha512-au99/GqZtUtiCBliqLFbWlhnCxn+XSYjwZ77q6mKN4La4qOXDoLVPZ50iXr0WmAyMxl8yqoq3Yq4OeQNPPkyeQ==}
+  /compress-brotli/1.3.8:
+    resolution: {integrity: sha512-lVcQsjhxhIXsuupfy9fmZUFtAIdBmXA7EGY6GBdgZ++qkM9zG4YFT8iU7FoBxzryNDMOpD1HIFHUSX4D87oqhQ==}
     engines: {node: '>= 12'}
     dependencies:
       '@types/json-buffer': 3.0.0
@@ -440,8 +440,8 @@ packages:
       xdg-basedir: 4.0.0
     dev: true
 
-  /cookie/0.4.2:
-    resolution: {integrity: sha512-aSWTXFzaKWkvHO1Ny/s+ePFpvKsPnjc551iI41v3ny/ow6tBG5Vd+FuqGNhh1LxOmVzOlGUriIlOaokOvhaStA==}
+  /cookie/0.5.0:
+    resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
     engines: {node: '>= 0.6'}
     dev: false
 
@@ -629,7 +629,7 @@ packages:
       fast-json-stringify: 2.7.13
       find-my-way: 4.5.1
       flatstr: 1.0.12
-      light-my-request: 4.9.0
+      light-my-request: 4.10.1
       pino: 6.14.0
       process-warning: 1.0.0
       proxy-addr: 2.0.7
@@ -707,8 +707,8 @@ packages:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
     dev: false
 
-  /fuse.js/6.6.0:
-    resolution: {integrity: sha512-4CvUk6GBo1b00xIcCLEoHQX3xwaYIwUX0lD8hDaYUavvSgE8aaySe9Z+fb4bdvzXXbYUfrllwN34U3wwUsG+oA==}
+  /fuse.js/6.6.1:
+    resolution: {integrity: sha512-3PXxXYsdKm68JHY6o2I9gIY+z9LcPs/ROITSzwFZyo0McjShwPFJU2i81Iu4h4si5X7JrrgXtOLDkeiTjdnWFQ==}
     engines: {node: '>=10'}
     dev: false
 
@@ -1068,7 +1068,7 @@ packages:
   /keyv/4.2.2:
     resolution: {integrity: sha512-uYS0vKTlBIjNCAUqrjlxmruxOEiZxZIHXyp32sdcGmP+ukFrmWUnE//RcPXJH3Vxrni1H2gsQbjHE0bH7MtMQQ==}
     dependencies:
-      compress-brotli: 1.3.6
+      compress-brotli: 1.3.8
       json-buffer: 3.0.1
     dev: false
 
@@ -1079,11 +1079,11 @@ packages:
       package-json: 6.5.0
     dev: true
 
-  /light-my-request/4.9.0:
-    resolution: {integrity: sha512-b1U3z4OVPoO/KanT14NRkXMr9rRtXAiq0ORqNrqhDyb5bGkZjAdEc6GRN1GWCfgaLBG+aq73qkCLDNeB3c2sLw==}
+  /light-my-request/4.10.1:
+    resolution: {integrity: sha512-l+zWk0HXGhGzY7IYTZnYEqIpj3Mpcyk2f8+FkKUyREywvaiWCf2jyQVxpasKRsploY/nVpoqTlxx72CIeQNcIQ==}
     dependencies:
       ajv: 8.11.0
-      cookie: 0.4.2
+      cookie: 0.5.0
       process-warning: 1.0.0
       set-cookie-parser: 2.4.8
     dev: false
@@ -1758,6 +1758,6 @@ packages:
     engines: {node: '>=12.20'}
     dev: false
 
-  /zod/3.14.4:
-    resolution: {integrity: sha512-U9BFLb2GO34Sfo9IUYp0w3wJLlmcyGoMd75qU9yf+DrdGA4kEx6e+l9KOkAlyUO0PSQzZCa3TR4qVlcmwqSDuw==}
+  /zod/3.15.1:
+    resolution: {integrity: sha512-WAdjcoOxa4S9oc/u7fTbC3CC7uVqptLLU0LKqS8RDBOrCXp2t5avM8BUfgNVZJymGWAx6SEUYxWPPoYuQ5rgwQ==}
     dev: false
