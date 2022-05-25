@@ -72,8 +72,8 @@ export interface IndividualTest {
   };
   metadata?: any;
   descriptions?: {
-    pass: string;
-    current: string;
+    pass: string | null;
+    current: string | null;
   };
 }
 

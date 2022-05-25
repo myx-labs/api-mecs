@@ -19,7 +19,7 @@ async function fetchRobloxURL(
 ) {
   const headers = {
     "content-type": "application/json;charset=UTF-8",
-    cookie: undefined as string,
+    cookie: undefined as string | undefined,
   };
   const cookie = await getCookie(auditCookieRequired);
   const ROBLOSECURITY = cookie.cookie;
@@ -77,7 +77,7 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
   console.log(
     `Processing logs with range ${range.latest.toDateString()} - ${range.oldest.toDateString()}, onlyNew = ${onlyNew}`
   );
-  while (counter < limit || typeof limit === "undefined") {
+  while (typeof limit !== "undefined" ? counter < limit : true) {
     console.log(
       `Next cursor: ${nextCursor}, onlyNew: ${onlyNew}, ${counter} logs processed`
     );
@@ -105,32 +105,37 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
           ),
           immigrationUser.getHCC().catch(() => false),
         ]);
-        await addToRankingLogs(
-          item.actor.user.userId,
-          item.description.TargetId,
-          item.description.OldRoleSetId,
-          item.description.NewRoleSetId,
-          new Date(item.created),
-          new Date(),
-          pass,
-          {
-            user: {
-              userId: immigrationUser.userId,
-              username: await immigrationUser.getUsername(),
-              groupMembership: immigrationUser.groupMembership,
-              hccGamepassOwned: hccGamepassOwned,
-              exempt:
-                immigrationUser.groupMembership != null
-                  ? immigrationUser.isExempt(
-                      immigrationUser.groupMembership.role.id
-                    )
-                  : false,
-            },
-            tests: data,
-            group: group,
-          }
-        );
-        counter++;
+
+        if (typeof immigrationUser.groupMembership?.role?.id !== "undefined") {
+          await addToRankingLogs(
+            item.actor.user.userId,
+            item.description.TargetId,
+            item.description.OldRoleSetId,
+            item.description.NewRoleSetId,
+            new Date(item.created),
+            new Date(),
+            pass,
+            {
+              user: {
+                userId: immigrationUser.userId,
+                username:
+                  (await immigrationUser.getUsername()) ||
+                  immigrationUser.userId.toString(),
+                groupMembership: immigrationUser.groupMembership,
+                hccGamepassOwned: hccGamepassOwned,
+                exempt:
+                  immigrationUser.groupMembership != null
+                    ? immigrationUser.isExempt(
+                        immigrationUser.groupMembership.role.id
+                      )
+                    : false,
+              },
+              tests: data,
+              group: group,
+            }
+          );
+          counter++;
+        }
       } catch (error) {
         console.error(error);
       }

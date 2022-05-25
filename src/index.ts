@@ -78,34 +78,45 @@ function isEmpty(text: string) {
 async function getImmigrationUser(
   userParam: string,
   userId: number,
-  userName: string
+  userName?: string
 ) {
   if (Number.isNaN(userId)) {
-    const response = await got(`https://users.roblox.com/v1/usernames/users`, {
-      throwHttpErrors: false,
-      method: "POST",
-      json: {
-        usernames: [userParam],
-        excludeBannedUsers: true,
-      },
-      headers: {
-        "content-type": "application/json",
-        accept: "application/json",
-      },
-      responseType: "json",
-    });
+    const response = await got<any>(
+      `https://users.roblox.com/v1/usernames/users`,
+      {
+        throwHttpErrors: false,
+        method: "POST",
+        json: {
+          usernames: [userParam],
+          excludeBannedUsers: true,
+        },
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+        responseType: "json",
+      }
+    );
     if (response) {
       if (response.statusCode === 200) {
         const json: RobloxAPI_ApiArrayResponse = response.body;
-        if (json.data.length !== 0) {
-          json.data.forEach((element: RobloxAPI_MultiGetUserByNameResponse) => {
-            if (element.requestedUsername === userParam) {
-              userName = element.name;
-              userId = element.id;
-            }
-          });
-        } else {
-          throw new Error("No user found with that username!");
+        if (json.data) {
+          if (json.data.length !== 0) {
+            json.data.forEach(
+              (element: RobloxAPI_MultiGetUserByNameResponse) => {
+                if (element.requestedUsername === userParam) {
+                  if (element.name && element.id) {
+                    userName = element.name;
+                    userId = element.id;
+                  } else {
+                    throw new Error("Unable to get name and ID of user!");
+                  }
+                }
+              }
+            );
+          } else {
+            throw new Error("No user found with that username!");
+          }
         }
       } else {
         console.error(response);
@@ -231,15 +242,16 @@ interface AuditDecisionData {
       total: number;
     };
   };
-  atbd: {
-    data?: number[];
+  atbd?: {
+    data: number[];
     mtbd: {
-      mean?: number;
-      mode: number;
-      median?: number;
+      mean: number | null;
+      mode: number | null;
+      median: number | null;
     };
   };
-  last5?: MembershipAction[];
+
+  last5: MembershipAction[];
 }
 
 async function getRankingHistory(targetId: number) {
@@ -248,78 +260,56 @@ async function getRankingHistory(targetId: number) {
   for (const item of rows) {
     let valid = false;
     const pass = item.review_pass;
-    if (parseInt(item.new_role_id) === group.rolesets.citizen) {
-      valid = pass;
-    } else {
-      valid = !pass;
+    if (
+      pass !== null &&
+      item.review_data !== null &&
+      item.review_timestamp !== null
+    ) {
+      if (parseInt(item.new_role_id) === group.rolesets.citizen) {
+        valid = pass;
+      } else {
+        valid = !pass;
+      }
+      logs.push({
+        officer: parseInt(item.actor_id),
+        officerName:
+          membershipStaffCache.find(
+            (cacheItem) => cacheItem.user?.userId === parseInt(item.actor_id)
+          )?.user?.username || undefined,
+        target: {
+          id: parseInt(item.target_id),
+          name: item.review_data.user.username,
+        },
+        action:
+          parseInt(item.new_role_id) === group.rolesets.citizen
+            ? "Grant"
+            : "Refusal",
+        correct: valid,
+        timestamps: {
+          action: item.action_timestamp,
+          review: item.review_timestamp,
+        },
+        data: item.review_data,
+      });
     }
-    logs.push({
-      officer: parseInt(item.actor_id),
-      officerName:
-        membershipStaffCache.find(
-          (cacheItem) => cacheItem.user.userId === parseInt(item.actor_id)
-        )?.user?.username || undefined,
-      target: {
-        id: parseInt(item.target_id),
-        name: item.review_data.user.username,
-      },
-      action:
-        parseInt(item.new_role_id) === group.rolesets.citizen
-          ? "Grant"
-          : "Refusal",
-      correct: valid,
-      timestamps: {
-        action: item.action_timestamp,
-        review: item.review_timestamp,
-      },
-      data: item.review_data,
-    });
   }
   return logs;
 }
 
-server.get<{ Querystring: AuditQueryParams }>(
-  "/audit/accuracy",
-  async (req, res) => {
-    try {
-      let actorId: number = undefined;
-      let targetId: number = undefined;
-      let limit: number = undefined;
-
-      if (req.query.actorId) {
-        const parsed = parseInt(req.query.actorId);
-        if (parsed) {
-          actorId = parsed;
-        }
-      }
-
-      if (req.query.targetId) {
-        const parsed = parseInt(req.query.targetId);
-        if (parsed) {
-          targetId = parsed;
-        }
-      }
-
-      if (req.query.limit) {
-        const parsed = parseInt(req.query.limit);
-        if (parsed) {
-          limit = parsed;
-        }
-      }
-
-      const data = await getAggregateData();
-      res.send(data);
-    } catch (error) {
-      if (error instanceof Error) {
-        res.status(500);
-        res.send({ error: error.message });
-      } else {
-        res.status(500);
-        res.send({ error: "Unknown error occured" });
-      }
+server.get("/audit/accuracy", async (req, res) => {
+  try {
+    const data = await getAggregateData();
+    res.send(data);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500);
+      res.send({ error: error.message });
+    } else {
+      res.status(500);
+      res.send({ error: "Unknown error occured" });
     }
   }
-);
+});
 
 async function getDecisionDataForAllOfficers() {
   const actorData = await getAggregateActorData();
@@ -339,13 +329,14 @@ async function getDecisionDataForAllOfficers() {
       atbd: {
         data: [] as number[],
         mtbd: {
-          mean: null as number,
-          mode: null as number,
-          median: null as number,
+          mean: null as number | null,
+          mode: null as number | null,
+          median: null as number | null,
         },
       },
+
       last5: [] as MembershipAction[],
-    };
+    } as AuditDecisionData;
 
     decisions.dar.data.correct = darData.correct;
     decisions.dar.data.total = darData.total;
@@ -356,7 +347,7 @@ async function getDecisionDataForAllOfficers() {
       decisions.atbd = undefined;
     } else {
       // decisions.atbd.mtbd.mean = mean(decisions.atbd.data);
-      decisions.atbd.mtbd.mode = mtbdData;
+      if (decisions.atbd) decisions.atbd.mtbd.mode = mtbdData;
       // decisions.atbd.mtbd.median = median(decisions.atbd.data);
     }
     return {
@@ -373,7 +364,7 @@ async function getDecisionDataForOfficer(id: number) {
     getRankingLogs(5, id, undefined),
   ]);
 
-  if (darData.total === 0 || darData === null) {
+  if (darData?.total === 0 || darData === null) {
     throw new Error("No records for this actor");
   }
 
@@ -389,38 +380,41 @@ async function getDecisionDataForOfficer(id: number) {
     atbd: {
       data: [] as number[],
       mtbd: {
-        mean: null as number,
-        mode: null as number,
-        median: null as number,
+        mean: null as number | null,
+        mode: null as number | null,
+        median: null as number | null,
       },
     },
     last5: [] as MembershipAction[],
-  };
+  } as AuditDecisionData;
 
   rows2.forEach((item2) => {
     let valid = false;
 
     const pass = item2.review_pass;
-    if (parseInt(item2.new_role_id) === group.rolesets.citizen) {
-      valid = pass;
-    } else {
-      valid = !pass;
+
+    if (pass !== null && item2.review_data && item2.review_timestamp) {
+      if (parseInt(item2.new_role_id) === group.rolesets.citizen) {
+        valid = pass;
+      } else {
+        valid = !pass;
+      }
+      decisions.last5.push({
+        target: {
+          id: parseInt(item2.target_id),
+          name: item2.review_data.user.username,
+        },
+        action:
+          parseInt(item2.new_role_id) === group.rolesets.citizen
+            ? "Grant"
+            : "Refusal",
+        correct: valid,
+        timestamps: {
+          action: item2.action_timestamp,
+          review: item2.review_timestamp,
+        },
+      });
     }
-    decisions.last5.push({
-      target: {
-        id: parseInt(item2.target_id),
-        name: item2.review_data.user.username,
-      },
-      action:
-        parseInt(item2.new_role_id) === group.rolesets.citizen
-          ? "Grant"
-          : "Refusal",
-      correct: valid,
-      timestamps: {
-        action: item2.action_timestamp,
-        review: item2.review_timestamp,
-      },
-    });
   });
 
   decisions.dar.data.correct = darData.correct;
@@ -429,10 +423,10 @@ async function getDecisionDataForOfficer(id: number) {
     (decisions.dar.data.correct / decisions.dar.data.total) * 100;
 
   if (typeof mtbdData !== "number") {
-    decisions.atbd = undefined;
+    delete decisions.atbd;
   } else {
     // decisions.atbd.mtbd.mean = mean(decisions.atbd.data);
-    decisions.atbd.mtbd.mode = mtbdData;
+    if (decisions.atbd) decisions.atbd.mtbd.mode = mtbdData;
     // decisions.atbd.mtbd.median = median(decisions.atbd.data);
   }
 
@@ -453,16 +447,30 @@ server.get("/audit/staff", async (req, res) => {
       preloadDecisionData(),
     ]);
     membershipStaffCache = officers;
-    const promises = officers.map(async (item) => ({
+    interface OfficerDecisionData {
       officer: {
-        id: item.user.userId,
-        name: item.user.username,
-      },
-      decisions:
-        decisionData.find((item2) => item2.id === item.user.userId)
-          ?.decisions || undefined,
-    }));
-    const data = await Promise.all(promises);
+        id: number;
+        name?: string;
+      };
+      decisions: AuditDecisionData;
+    }
+    const data: OfficerDecisionData[] = [];
+    for (const item of officers) {
+      const decisions = decisionData.find(
+        (item2) => item2.id === item.user?.userId
+      );
+      const user = item.user;
+      if (user?.userId && decisions) {
+        const dataItem: OfficerDecisionData = {
+          officer: {
+            id: user.userId,
+            name: user.username,
+          },
+          decisions: decisions.decisions,
+        };
+        data.push(dataItem);
+      }
+    }
     const filtered = data.filter(
       (item) => typeof item.decisions !== "undefined"
     );
@@ -507,7 +515,6 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
     const userParam: string = req.params.id;
     const blacklistOnly = req.query.blacklistOnly === "true";
     let userId: number = Number(userParam);
-    let userName: string = null;
 
     try {
       if (isEmpty(userParam)) {
@@ -521,7 +528,7 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
         return automated_limit;
       })();
       const user = await limit(() => {
-        return getImmigrationUser(userParam, userId, userName);
+        return getImmigrationUser(userParam, userId);
       });
 
       const [testResults, hccGamepassOwned, history] = await Promise.all([
@@ -537,10 +544,9 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
             username: user.username,
             groupMembership: user.groupMembership,
             hccGamepassOwned: hccGamepassOwned,
-            exempt:
-              user.groupMembership != null
-                ? user.isExempt(user.groupMembership.role.id)
-                : false,
+            exempt: user.groupMembership?.role?.id
+              ? user.isExempt(user.groupMembership?.role?.id)
+              : false,
           },
           tests: testResults,
           group: group,
@@ -569,7 +575,6 @@ server.post<{ Params: userParams; Querystring: userParams2 }>(
   async (req, res) => {
     const userParam: string = req.params.id;
     let userId: number = Number(userParam);
-    let userName: string = null;
     try {
       if (isEmpty(userParam)) {
         throw new Error("User parameter is not valid.");
@@ -582,7 +587,7 @@ server.post<{ Params: userParams; Querystring: userParams2 }>(
         return automated_limit;
       })();
       const user = await limit(() => {
-        return getImmigrationUser(userParam, userId, userName);
+        return getImmigrationUser(userParam, userId);
       });
       const results = await limit(() => {
         return user.automatedReview();

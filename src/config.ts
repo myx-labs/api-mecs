@@ -29,9 +29,15 @@ export default {
       },
     },
   ],
-  port: parseInt(process.env.API_PORT) as number,
+  port:
+    typeof process.env.API_PORT !== "undefined"
+      ? parseInt(process.env.API_PORT)
+      : 3000,
   credentials: {
-    google: JSON.parse(process.env.GOOGLEAUTH),
+    google:
+      typeof process.env.GOOGLEAUTH !== "undefined"
+        ? JSON.parse(process.env.GOOGLEAUTH)
+        : undefined,
     api: process.env.AUTHENTICATION_KEY as string,
     discord: {
       webhook: {
@@ -46,6 +52,9 @@ export default {
     processAudit: process.env.ENABLE_AUDIT_PROCESSING === "true",
   },
   stats: {
-    previousQueries: parseInt(process.env.PREVIOUS_QUERY_COUNT) || 0,
+    previousQueries:
+      typeof process.env.PREVIOUS_QUERY_COUNT !== "undefined"
+        ? parseInt(process.env.PREVIOUS_QUERY_COUNT)
+        : 0,
   },
 };

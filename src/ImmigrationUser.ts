@@ -31,15 +31,15 @@ interface cachedResponse {
 
 export default class ImmigrationUser {
   userId: number;
-  username: string;
-  groupMembership: RobloxAPI_Group_GroupMembershipResponse;
-  private lastRolesetId: number;
+  username: string | null;
+  groupMembership: RobloxAPI_Group_GroupMembershipResponse | undefined;
+  private lastRolesetId: number | null;
   private requestCache: cachedResponse[] = [];
 
   constructor(
     userId: number,
-    username: string = null,
-    lastRolesetId: number = null
+    username: string | null = null,
+    lastRolesetId: number | null = null
   ) {
     this.userId = userId;
     this.username = username;
@@ -73,6 +73,9 @@ export default class ImmigrationUser {
       return response;
     };
     const currentRoleset = this.lastRolesetId;
+    if (currentRoleset === null) {
+      throw new Error("Unable to get current roleset");
+    }
     const rolesetCovered = this.rolesetCovered(currentRoleset);
     const rolesetDifferent = currentRoleset !== rolesetId;
     const rolesetValid = rolesetCovered && rolesetDifferent;
@@ -189,11 +192,16 @@ export default class ImmigrationUser {
         results.values.current = false;
         results.metadata.player = true;
         results.metadata.reason =
-          processReasonString(reason, this.username) || undefined;
-        results.descriptions.current += `User is individually blacklisted`;
+          processReasonString(
+            reason !== null ? reason : undefined,
+            this.username ? this.username : undefined
+          ) || undefined;
+        if (results.descriptions)
+          results.descriptions.current += `User is individually blacklisted`;
       } else {
         results.metadata.player = false;
-        results.descriptions.current += `User is not individually blacklisted`;
+        if (results.descriptions)
+          results.descriptions.current += `User is not individually blacklisted`;
       }
     } catch (error) {
       console.error(error);
@@ -209,9 +217,11 @@ export default class ImmigrationUser {
         results.status = false;
         results.values.current = false;
         results.metadata.group = blacklisted_groups;
-        results.descriptions.current = `Account ${this.userId} is in ${blacklisted_groups.length} blacklisted groups`;
+        if (results.descriptions)
+          results.descriptions.current = `Account ${this.userId} is in ${blacklisted_groups.length} blacklisted groups`;
       } else {
-        results.descriptions.current = `Account ${this.userId} is not in any blacklisted groups`;
+        if (results.descriptions)
+          results.descriptions.current = `Account ${this.userId} is not in any blacklisted groups`;
       }
     } catch (error) {
       throw new Error("Unable to fetch group blacklist");
@@ -264,8 +274,12 @@ export default class ImmigrationUser {
 
   async automatedReview() {
     const membership = await this.getMembership();
-    if (membership !== null) {
+    if (membership) {
       let blacklistOnly = false;
+
+      if (!membership.role?.id) {
+        throw new Error("Membership ID not defined");
+      }
 
       switch (membership.role.id) {
         case rolesets.citizen:
@@ -315,7 +329,9 @@ export default class ImmigrationUser {
 
     results.status = age >= results.values.pass;
     results.values.current = age;
-    results.descriptions.current = `Account age is ${age}`;
+    if (typeof results.descriptions !== "undefined") {
+      results.descriptions.current = `Account age is ${age}`;
+    }
 
     return results;
   }
@@ -334,18 +350,22 @@ export default class ImmigrationUser {
     } as IndividualTest;
 
     try {
-      const acc_count: number = await this.getAccessoryCount();
-      results.values.current = acc_count;
-      results.descriptions.current = `${acc_count} accessory(s) found`;
+      const acc_count = await this.getAccessoryCount();
+      if (acc_count) {
+        results.values.current = acc_count;
+        if (results.descriptions)
+          results.descriptions.current = `${acc_count} accessory(s) found`;
 
-      if (acc_count >= results.values.pass) {
-        results.status = true;
-      } else {
-        results.status = false;
+        if (acc_count >= results.values.pass) {
+          results.status = true;
+        } else {
+          results.status = false;
+        }
       }
     } catch (error) {
       results.values.current = null;
-      results.descriptions.current = `Private inventory`;
+      if (results.descriptions)
+        results.descriptions.current = `Private inventory`;
       results.status = true;
     }
 
@@ -369,7 +389,8 @@ export default class ImmigrationUser {
 
     results.status = badges >= results.values.pass;
     results.values.current = badges;
-    results.descriptions.current = `User has ${badges} badge(s)`;
+    if (results.descriptions)
+      results.descriptions.current = `User has ${badges} badge(s)`;
 
     return results;
   }
@@ -391,7 +412,8 @@ export default class ImmigrationUser {
 
     results.status = friends >= results.values.pass;
     results.values.current = friends;
-    results.descriptions.current = `User has ${friends} friends(s)`;
+    if (results.descriptions)
+      results.descriptions.current = `User has ${friends} friends(s)`;
 
     return results;
   }
@@ -423,7 +445,8 @@ export default class ImmigrationUser {
 
     results.status = group_count >= results.values.pass;
     results.values.current = group_count;
-    results.descriptions.current = `User is in ${group_count} group(s)`;
+    if (results.descriptions)
+      results.descriptions.current = `User is in ${group_count} group(s)`;
 
     return results;
   }
@@ -433,14 +456,14 @@ export default class ImmigrationUser {
     if (cacheHit === undefined) {
       const headers = {
         "content-type": "application/json;charset=UTF-8",
-        cookie: undefined as string,
+        cookie: undefined as string | undefined,
       };
 
       const cookie = await getCookie();
       const ROBLOSECURITY = cookie.cookie;
       headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
 
-      const response = await got.get(url, {
+      const response = await got.get<any>(url, {
         throwHttpErrors: false,
         headers: headers,
         responseType: "json",
@@ -504,7 +527,8 @@ export default class ImmigrationUser {
   async getMembership() {
     await this.getGroups();
     if (this.groupMembership !== null) {
-      this.lastRolesetId = this.groupMembership.role.id;
+      if (this.groupMembership?.role?.id)
+        this.lastRolesetId = this.groupMembership.role?.id;
     }
     return this.groupMembership;
   }
@@ -531,10 +555,13 @@ export default class ImmigrationUser {
   async getGroups() {
     const response = await this.fetchGroups();
     const json: RobloxAPI_Group_ApiArrayResponse = response.body as any;
+    if (!json.data) {
+      throw new Error("Group data not available");
+    }
     const player_groups: RobloxAPI_Group_GroupMembershipResponse[] = json.data;
     player_groups.forEach(
       (player_group_membership: RobloxAPI_Group_GroupMembershipResponse) => {
-        if (player_group_membership.group.id === activeGroup.id) {
+        if (player_group_membership.group?.id === activeGroup.id) {
           this.groupMembership = player_group_membership;
         }
       }
@@ -547,11 +574,14 @@ export default class ImmigrationUser {
       await this.getGroups();
     const blacklisted_IDs = await getBlacklistedGroupIDs();
     const blacklistedGroups: BlacklistedGroup[] = [];
+    if (blacklisted_IDs === null) {
+      throw new Error("Unable to obtain blacklisted IDs");
+    }
     groups.forEach(
       (player_group_membership: RobloxAPI_Group_GroupMembershipResponse) => {
         const group = player_group_membership.group;
         blacklisted_IDs.forEach((blacklistedGroupID) => {
-          if (group.id === blacklistedGroupID.id) {
+          if (group?.id === blacklistedGroupID.id) {
             blacklistedGroups.push({
               id: group.id,
               name: group.name,
@@ -566,12 +596,13 @@ export default class ImmigrationUser {
 
   async getUserBlacklisted() {
     const userIDs = await getBlacklistedUserIDs();
+    if (userIDs === null) throw new Error("Unable to get user IDs");
     for (const blacklisted_id of userIDs) {
       if (blacklisted_id.id === this.userId) {
         return [true, blacklisted_id.reason] as [boolean, string];
       }
     }
-    return [false, null] as [boolean, string];
+    return [false, null] as [boolean, string | null];
   }
 
   async getAge() {
@@ -610,7 +641,8 @@ export default class ImmigrationUser {
     const response = await this.fetchAccessories();
     const json = response.body as any;
     if (response.statusCode === 200) {
-      return json.data.length as number;
+      const data = json.data as any[];
+      return data.length;
     } else {
       if (json.errors[0].code === 4) {
         throw new Error("Not authorised to view " + this.userId + " inventory");

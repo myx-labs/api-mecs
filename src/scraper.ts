@@ -8,8 +8,8 @@ import { getCookie } from "./cookies.js";
 const groups = config.groups;
 
 const cache_blacklist = {
-  users: null as blacklisted_id[],
-  groups: null as blacklisted_id[],
+  users: null as blacklisted_id[] | null,
+  groups: null as blacklisted_id[] | null,
 };
 
 declare global {
@@ -46,7 +46,7 @@ interface blacklisted_id {
 async function getRobloxURL(url: string, cookieRequired: boolean = false) {
   const headers = {
     "content-type": "application/json;charset=UTF-8",
-    cookie: undefined as string,
+    cookie: undefined as string | undefined,
   };
   if (cookieRequired) {
     const cookie = await getCookie();
@@ -68,7 +68,7 @@ async function postRobloxURL(
 ) {
   const headers = {
     "content-type": "application/json;charset=UTF-8",
-    cookie: undefined as string,
+    cookie: undefined as string | undefined,
   };
   if (cookieRequired) {
     const cookie = await getCookie();
@@ -84,7 +84,7 @@ async function postRobloxURL(
     .json<any>();
 }
 
-export function processReasonString(reason: string, name?: string) {
+export function processReasonString(reason: string | undefined, name?: string) {
   interface NameObject {
     name: string;
   }
@@ -100,32 +100,34 @@ export function processReasonString(reason: string, name?: string) {
     return string;
   };
 
-  const names: NameObject[] = [];
+  if (typeof reason !== "undefined") {
+    const names: NameObject[] = [];
 
-  if (name) {
-    names.push({ name: name });
-  }
+    if (name) {
+      names.push({ name: name });
+    }
 
-  const nameFuse = new Fuse(names, {
-    keys: ["name", "displayName"],
-  });
+    const nameFuse = new Fuse(names, {
+      keys: ["name", "displayName"],
+    });
 
-  reason = cleanup(reason);
+    reason = cleanup(reason);
 
-  const reasons = reason
-    .split(" / ")
-    .map(cleanup)
-    .filter((reason) =>
-      !reason.toLowerCase().match("alt")
-        ? nameFuse.search(reason).length === 0
-        : true
-    );
+    const reasons = reason
+      .split(" / ")
+      .map(cleanup)
+      .filter((reason) =>
+        !reason.toLowerCase().match("alt")
+          ? nameFuse.search(reason).length === 0
+          : true
+      );
 
-  if (reasons.length === 0 || reason.length === 0 || reason === null) {
-    reason = undefined;
-  } else {
-    reason = reasons.join(" / ");
-    reason = reason.charAt(0).toUpperCase() + reason.slice(1);
+    if (reasons.length === 0 || reason.length === 0 || reason === null) {
+      reason = undefined;
+    } else {
+      reason = reasons.join(" / ");
+      reason = reason.charAt(0).toUpperCase() + reason.slice(1);
+    }
   }
 
   return reason;
@@ -133,7 +135,7 @@ export function processReasonString(reason: string, name?: string) {
 
 function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
   const idArray: blacklisted_id[] = [];
-  res.body.content.forEach((value) => {
+  res.body?.content?.forEach((value) => {
     const paragraph = value.paragraph;
     if (paragraph) {
       const elements = paragraph.elements;
@@ -156,7 +158,7 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
                         if (id !== groups[0].id) {
                           // no accidental blacklisting the whole group
                           if (textStyle.strikethrough !== true) {
-                            let reason: string = null;
+                            let reason: string | null = null;
                             try {
                               const reasonElement = elements.find(
                                 (element) =>
@@ -164,17 +166,23 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
                               );
                               if (reasonElement) {
                                 const regex2 = /\(([^)]+)\)/;
-                                reason =
-                                  processReasonString(
-                                    reasonElement.textRun?.content?.match(
-                                      regex2
-                                    )[1]
-                                  ) || null;
+                                const content = reasonElement.textRun?.content;
+                                if (
+                                  content !== null &&
+                                  typeof content !== "undefined"
+                                ) {
+                                  const contentMatch = content.match(regex2);
+                                  if (contentMatch !== null) {
+                                    reason =
+                                      processReasonString(contentMatch[1]) ||
+                                      null;
+                                  }
+                                }
                               }
                             } catch (error) {}
 
                             idArray.pushIfNotExist(
-                              { id: id, reason: reason },
+                              { id: id, reason: reason || undefined },
                               (element: blacklisted_id) => {
                                 return element.id === id;
                               }
@@ -197,7 +205,7 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
 
 async function getIDs(type: string, includeNames = false) {
   let documentId = null;
-  let regex: RegExp = null;
+  let regex: RegExp | null = null;
   if (type === "users") {
     documentId = groups[0].blacklists.docs[type];
     regex = /\/users\/(\d+)/;
