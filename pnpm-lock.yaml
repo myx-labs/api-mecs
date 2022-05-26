@@ -9,7 +9,7 @@ specifiers:
   dotenv-safe: ^8.2.0
   fastify: ^3.29.0
   fuse.js: ^6.6.2
-  got: ^12.0.4
+  got: ^12.1.0
   iso8601-duration: ^2.1.1
   nodemon: ^2.0.16
   p-limit: ^4.0.0
@@ -23,7 +23,7 @@ dependencies:
   dotenv-safe: 8.2.0
   fastify: 3.29.0
   fuse.js: 6.6.2
-  got: 12.0.4
+  got: 12.1.0
   iso8601-duration: 2.1.1
   p-limit: 4.0.0
   pg: 8.7.3
@@ -398,7 +398,7 @@ packages:
     dev: true
 
   /clone-response/1.0.2:
-    resolution: {integrity: sha1-0dyXOSAxTfZ/vrlCI7TuNQI56Ws=}
+    resolution: {integrity: sha512-yjLXh88P599UOyPTFX0POsd7WxnbsVsGohcwzHOLspIhhpalPw1BcqED8NblyZLKcGrL8dTgMlcaZxV2jAD41Q==}
     dependencies:
       mimic-response: 1.0.1
 
@@ -831,8 +831,8 @@ packages:
       - supports-color
     dev: false
 
-  /got/12.0.4:
-    resolution: {integrity: sha512-2Eyz4iU/ktq7wtMFXxzK7g5p35uNYLLdiZarZ5/Yn3IJlNEpBd5+dCgcAyxN8/8guZLszffwe3wVyw+DEVrpBg==}
+  /got/12.1.0:
+    resolution: {integrity: sha512-hBv2ty9QN2RdbJJMK3hesmSkFTjVIHyIDDbssCKnSmq62edGgImJWD10Eb1k77TiV1bxloxqcFAVK8+9pkhOig==}
     engines: {node: '>=14.16'}
     dependencies:
       '@sindresorhus/is': 4.6.0
