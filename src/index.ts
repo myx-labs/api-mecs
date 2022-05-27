@@ -23,7 +23,6 @@ const webhookClient = new WebhookClient({
 import {
   DefaultAPIResponse,
   RobloxAPI_ApiArrayResponse,
-  RobloxAPI_GroupRolesetUser,
   RobloxAPI_GroupUserItem,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
@@ -228,12 +227,6 @@ interface MembershipAction {
   data?: DefaultAPIResponse;
 }
 
-interface AuditQueryParams {
-  actorId: string;
-  targetId: string;
-  limit: string;
-}
-
 interface AuditDecisionData {
   dar: {
     percentage: number;
@@ -296,10 +289,40 @@ async function getRankingHistory(targetId: number) {
   return logs;
 }
 
+interface AggregateData {
+  actors: number;
+  dar: {
+    total: number;
+    correct: number;
+  };
+  mtbd: number | null;
+  timeRange: {
+    latest: Date;
+    oldest: Date;
+  };
+}
+
+const cacheUpdateInterval = 5 * 60 * 1000; // 5 minutes
+
+let aggregateDataCache: AggregateData | null = null;
+
+async function updateAggregateDataCache() {
+  try {
+    aggregateDataCache = await getAggregateData();
+  } catch (error) {
+    console.error("Failed to update aggregate data cache:");
+    console.error(error);
+  }
+}
+
+setInterval(updateAggregateDataCache, cacheUpdateInterval);
+
 server.get("/audit/accuracy", async (req, res) => {
   try {
-    const data = await getAggregateData();
-    res.send(data);
+    if (aggregateDataCache === null) {
+      aggregateDataCache = await getAggregateData();
+    }
+    res.send(aggregateDataCache);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500);
@@ -440,44 +463,63 @@ async function preloadDecisionData() {
 
 let membershipStaffCache: RobloxAPI_GroupUserItem[] = [];
 
+let officerDecisionDataCache: OfficerDecisionData[] | null = null;
+
+interface OfficerDecisionData {
+  officer: {
+    id: number;
+    name?: string;
+  };
+  decisions: AuditDecisionData;
+}
+
+async function getOfficerDecisionData() {
+  const [officers, decisionData] = await Promise.all([
+    getMembershipGroupStaff(),
+    preloadDecisionData(),
+  ]);
+  membershipStaffCache = officers;
+  const data: OfficerDecisionData[] = [];
+  for (const item of officers) {
+    const decisions = decisionData.find(
+      (item2) => item2.id === item.user?.userId
+    );
+    const user = item.user;
+    if (user?.userId && decisions) {
+      const dataItem: OfficerDecisionData = {
+        officer: {
+          id: user.userId,
+          name: user.username,
+        },
+        decisions: decisions.decisions,
+      };
+      data.push(dataItem);
+    }
+  }
+  const filtered = data.filter((item) => typeof item.decisions !== "undefined");
+  filtered.sort((a, z) =>
+    z.decisions.dar.data.total > a.decisions.dar.data.total ? 1 : -1
+  );
+  return filtered;
+}
+
+async function updateOfficerDecisionDataCache() {
+  try {
+    officerDecisionDataCache = await getOfficerDecisionData();
+  } catch (error) {
+    console.error("Failed to update officer decision data cache:");
+    console.error(error);
+  }
+}
+
+setInterval(updateOfficerDecisionDataCache, cacheUpdateInterval);
+
 server.get("/audit/staff", async (req, res) => {
   try {
-    const [officers, decisionData] = await Promise.all([
-      getMembershipGroupStaff(),
-      preloadDecisionData(),
-    ]);
-    membershipStaffCache = officers;
-    interface OfficerDecisionData {
-      officer: {
-        id: number;
-        name?: string;
-      };
-      decisions: AuditDecisionData;
+    if (officerDecisionDataCache === null) {
+      officerDecisionDataCache = await getOfficerDecisionData();
     }
-    const data: OfficerDecisionData[] = [];
-    for (const item of officers) {
-      const decisions = decisionData.find(
-        (item2) => item2.id === item.user?.userId
-      );
-      const user = item.user;
-      if (user?.userId && decisions) {
-        const dataItem: OfficerDecisionData = {
-          officer: {
-            id: user.userId,
-            name: user.username,
-          },
-          decisions: decisions.decisions,
-        };
-        data.push(dataItem);
-      }
-    }
-    const filtered = data.filter(
-      (item) => typeof item.decisions !== "undefined"
-    );
-    filtered.sort((a, z) =>
-      z.decisions.dar.data.total > a.decisions.dar.data.total ? 1 : -1
-    );
-    res.send(filtered);
+    res.send(officerDecisionDataCache);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500);
@@ -623,16 +665,24 @@ server.get("/session", async (req, res) => {
 });
 
 async function bootstrap() {
-  await loadCookies();
-  await startDB();
+  await Promise.all([loadCookies(), startDB()]);
+  await Promise.all([
+    updateAggregateDataCache(),
+    updateOfficerDecisionDataCache(),
+  ]);
   const address = await server.listen(port);
   console.log(`Server listening at ${address}`);
   if (config.flags.processAudit) {
-    console.log("Processing audit logs...");
-    await Promise.all([
-      processAuditLogs(undefined, false),
-      processAuditLogs(undefined, true),
-    ]);
+    if (config.flags.onlyNewAudit) {
+      console.log("Processing latest audit logs...");
+      await processAuditLogs(undefined, true);
+    } else {
+      console.log("Processing all audit logs...");
+      await Promise.all([
+        processAuditLogs(undefined, false),
+        processAuditLogs(undefined, true),
+      ]);
+    }
   }
 }
 

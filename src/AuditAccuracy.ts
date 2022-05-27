@@ -74,9 +74,16 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
     }
   }
   const range = await getActionTimestampRange();
-  console.log(
-    `Processing logs with range ${range.latest.toDateString()} - ${range.oldest.toDateString()}, onlyNew = ${onlyNew}`
-  );
+  if (onlyNew) {
+    console.log(
+      `Processing logs with range ${new Date().toDateString()} - ${range.latest.toDateString()}, onlyNew = ${onlyNew}`
+    );
+  } else {
+    console.log(
+      `Processing logs with range ${range.latest.toDateString()} - ${range.oldest.toDateString()}, onlyNew = ${onlyNew}`
+    );
+  }
+
   while (typeof limit !== "undefined" ? counter < limit : true) {
     console.log(
       `Next cursor: ${nextCursor}, onlyNew: ${onlyNew}, ${counter} logs processed`
@@ -154,7 +161,7 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
     }
   }
   if (onlyNew) {
-    await delay(3000);
+    await delay(10 * 1000);
     await processAuditLogs(undefined, true);
   }
 }

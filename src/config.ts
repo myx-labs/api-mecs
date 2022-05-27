@@ -47,9 +47,10 @@ export default {
     },
   },
   flags: {
-    loadCache: process.env.LOAD_FROM_CACHE === "true",
+    loadCache: process.env.LOAD_AUDIT_PROGRESS_FROM_CACHE === "true",
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",
     processAudit: process.env.ENABLE_AUDIT_PROCESSING === "true",
+    onlyNewAudit: process.env.ONLY_PROCESS_LATEST_AUDITS === "true",
   },
   stats: {
     previousQueries:
