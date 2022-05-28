@@ -103,60 +103,66 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
       }
       return timeRange && withinRolesetScope;
     });
-    for (const item of filteredPage) {
-      try {
-        const immigrationUser = new ImmigrationUser(item.description.TargetId);
-        const [[pass, data], hccGamepassOwned] = await Promise.all([
-          immigrationUser.criteriaPassing(
-            item.description.OldRoleSetId === group.rolesets.citizen
-          ),
-          immigrationUser.getHCC().catch(() => false),
-        ]);
-
-        if (typeof immigrationUser.groupMembership?.role?.id !== "undefined") {
-          await addToRankingLogs(
-            item.actor.user.userId,
-            item.description.TargetId,
-            item.description.OldRoleSetId,
-            item.description.NewRoleSetId,
-            new Date(item.created),
-            new Date(),
-            pass,
-            {
-              user: {
-                userId: immigrationUser.userId,
-                username:
-                  (await immigrationUser.getUsername()) ||
-                  immigrationUser.userId.toString(),
-                groupMembership: immigrationUser.groupMembership,
-                hccGamepassOwned: hccGamepassOwned,
-                exempt:
-                  immigrationUser.groupMembership != null
-                    ? immigrationUser.isExempt(
-                        immigrationUser.groupMembership.role.id
-                      )
-                    : false,
-              },
-              tests: data,
-              group: group,
-            }
+    if (filteredPage.length === 0) {
+      console.log(
+        `No more logs within given range, breaking loop to fetch new logs`
+      );
+      break;
+    } else {
+      for (const item of filteredPage) {
+        try {
+          const immigrationUser = new ImmigrationUser(
+            item.description.TargetId
           );
-          counter++;
+          const [[pass, data], hccGamepassOwned] = await Promise.all([
+            immigrationUser.criteriaPassing(
+              item.description.OldRoleSetId === group.rolesets.citizen
+            ),
+            immigrationUser.getHCC().catch(() => false),
+          ]);
+
+          if (
+            typeof immigrationUser.groupMembership?.role?.id !== "undefined"
+          ) {
+            await addToRankingLogs(
+              item.actor.user.userId,
+              item.description.TargetId,
+              item.description.OldRoleSetId,
+              item.description.NewRoleSetId,
+              new Date(item.created),
+              new Date(),
+              pass,
+              {
+                user: {
+                  userId: immigrationUser.userId,
+                  username:
+                    (await immigrationUser.getUsername()) ||
+                    immigrationUser.userId.toString(),
+                  groupMembership: immigrationUser.groupMembership,
+                  hccGamepassOwned: hccGamepassOwned,
+                  exempt:
+                    immigrationUser.groupMembership != null
+                      ? immigrationUser.isExempt(
+                          immigrationUser.groupMembership.role.id
+                        )
+                      : false,
+                },
+                tests: data,
+                group: group,
+              }
+            );
+            counter++;
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
       }
     }
+
     if (page.nextPageCursor) {
-      if (!onlyNew) {
-        nextCursor = page.nextPageCursor;
-      } else {
-        if (filteredPage.length === 0) {
-          console.log(`Breaking loop for new logs`);
-          break;
-        }
-      }
+      nextCursor = page.nextPageCursor;
     } else {
+      console.log(`Reached end of page, breaking loop to fetch new logs`);
       break;
     }
   }
