@@ -98,6 +98,24 @@ export async function getActionTimestampRange() {
 
 const group = config.groups[0];
 
+export async function createTable() {
+  // This function has not been tested, proceed with caution
+  // Use manually when setting up a new database
+  let query = `
+    CREATE TABLE ${table} (
+      "actor_id" int8 NOT NULL,
+      "target_id" int8 NOT NULL,
+      "old_role_id" int8 NOT NULL,
+      "new_role_id" int8 NOT NULL,
+      "action_timestamp" timestamptz NOT NULL,
+      "review_timestamp" timestamptz,
+      "review_pass" bool,
+      "review_data" json
+    );
+  `;
+  await pool.query(query);
+}
+
 export async function getAggregateData() {
   let query = `
       SELECT 
