@@ -15,6 +15,7 @@ specifiers:
   nodemon: ^2.0.16
   p-limit: ^4.0.0
   pg: ^8.7.3
+  postgres-interval: ^4.0.0
   typescript: ^4.7.3
 
 dependencies:
@@ -28,6 +29,7 @@ dependencies:
   iso8601-duration: 2.1.1
   p-limit: 4.0.0
   pg: 8.7.3
+  postgres-interval: 4.0.0
 
 devDependencies:
   '@types/dotenv-safe': 8.1.2
@@ -1356,6 +1358,11 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       xtend: 4.0.2
+
+  /postgres-interval/4.0.0:
+    resolution: {integrity: sha512-OWeL7kyEKJiY7mCmVY+c7/6uhAlt/colA/Nl/Mgls/M3jssrQzFra04iNWnD/qAmG7TsCSgWAASCyiaoBOP/sg==}
+    engines: {node: '>=12'}
+    dev: false
 
   /prepend-http/2.0.0:
     resolution: {integrity: sha512-ravE6m9Atw9Z/jjttRUZ+clIXogdghyZAuWJ3qEzjT+jI/dL1ifAqhZeC5VHzQp1MSt1+jxKkFNemj/iO7tVUA==}

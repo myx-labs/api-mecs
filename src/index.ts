@@ -233,6 +233,10 @@ interface AuditDecisionData {
     data: {
       correct: number;
       total: number;
+      valid?: {
+        correct: number;
+        total: number;
+      };
     };
   };
   atbd?: {
@@ -361,6 +365,7 @@ async function getDecisionDataForAllOfficers() {
       last5: [] as MembershipAction[],
     } as AuditDecisionData;
 
+    decisions.dar.data.valid = darData.valid;
     decisions.dar.data.correct = darData.correct;
     decisions.dar.data.total = darData.total;
     decisions.dar.percentage =

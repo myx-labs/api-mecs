@@ -1,6 +1,7 @@
 import config from "./config.js";
 import pkg from "pg";
 import { DefaultAPIResponse } from "./types";
+import PostgresInterval from "postgres-interval";
 const { Pool } = pkg;
 
 import {
@@ -16,6 +17,7 @@ export async function startDB() {
   try {
     await pool.connect();
   } catch (error) {
+    console.error(error);
     throw new Error("Unable to connect to Postgres database!");
   }
 }
@@ -41,7 +43,7 @@ interface PGAuditCount {
 }
 
 interface PGModeTimeBetweenDecisions {
-  mtbd: any;
+  mtbd: PostgresInterval.IPostgresInterval;
 }
 
 interface PGActorIds {
@@ -52,14 +54,18 @@ interface PGAggregateActorData {
   actor_id: string;
   total: string;
   correct: string;
-  mtbd: any;
+  valid_total: string;
+  valid_correct: string;
+  mtbd: PostgresInterval.IPostgresInterval;
 }
 
 interface PGAggregateData {
   actors: string;
   total: string;
   correct: string;
-  mtbd: any;
+  valid_total: string;
+  valid_correct: string;
+  mtbd: PostgresInterval.IPostgresInterval;
 }
 
 interface PGTimestampRange {
@@ -116,6 +122,12 @@ export async function createTable() {
   await pool.query(query);
 }
 
+function getPostgresIntervalInSeconds(
+  interval: PostgresInterval.IPostgresInterval
+) {
+  return durationToSeconds(parseIsoDuration(interval.toISOString()));
+}
+
 export async function getAggregateData() {
   let query = `
       SELECT 
@@ -130,7 +142,30 @@ export async function getAggregateData() {
             review_pass = false 
             AND new_role_id = ${group.rolesets.idc}
           ) THEN 1 ELSE null END
-        ) AS correct, 
+        ) AS correct,
+        COUNT(
+            CASE
+                WHEN (
+                    DATE_PART('day', review_timestamp - action_timestamp) = 0
+                ) THEN 1
+                ELSE null
+            END
+        ) AS valid_total,
+        COUNT(
+            CASE
+                WHEN (
+                    review_pass = true
+                    AND new_role_id = ${group.rolesets.citizen}
+                    AND DATE_PART('day', review_timestamp - action_timestamp) = 0
+                )
+                OR (
+                    review_pass = false
+                    AND new_role_id = ${group.rolesets.idc}
+                    AND DATE_PART('day', review_timestamp - action_timestamp) = 0
+                ) THEN 1
+                ELSE null
+            END
+        ) AS valid_correct, 
         (
           SELECT 
             mode() WITHIN GROUP (
@@ -161,8 +196,12 @@ export async function getAggregateData() {
     dar: {
       total: parseInt(item.total),
       correct: parseInt(item.correct),
+      valid: {
+        total: parseInt(item.valid_total),
+        correct: parseInt(item.valid_correct),
+      },
     },
-    mtbd: durationToSeconds(parseIsoDuration(item.mtbd.toISOString())) || null,
+    mtbd: getPostgresIntervalInSeconds(item.mtbd) || null,
     timeRange: timestampRange,
   };
 }
@@ -175,13 +214,30 @@ export async function getAggregateActorData() {
         COUNT(
           CASE WHEN (
             review_pass = true 
-            AND new_role_id = 7476582
+            AND new_role_id = ${group.rolesets.citizen}
           ) 
           OR (
             review_pass = false 
-            AND new_role_id = 7476578
+            AND new_role_id = ${group.rolesets.idc}
           ) THEN 1 ELSE null END
-        ) AS correct, 
+        ) AS correct,
+        COUNT(
+          CASE WHEN (
+            DATE_PART('day', review_timestamp - action_timestamp) = 0
+          ) THEN 1 ELSE null END
+        ) AS valid_total,
+        COUNT(
+          CASE WHEN (
+            review_pass = true 
+            AND new_role_id = ${group.rolesets.citizen}
+            AND DATE_PART('day', review_timestamp - action_timestamp) = 0
+          ) 
+          OR (
+            review_pass = false 
+            AND new_role_id = ${group.rolesets.idc}
+            AND DATE_PART('day', review_timestamp - action_timestamp) = 0
+          ) THEN 1 ELSE null END
+        ) AS valid_correct, 
         mtbd_table.mtbd 
       FROM 
         ${table} 
@@ -219,8 +275,15 @@ export async function getAggregateActorData() {
     dar: {
       total: parseInt(item.total),
       correct: parseInt(item.correct),
+      valid:
+        parseInt(item.valid_total) > 0
+          ? {
+              total: parseInt(item.valid_total),
+              correct: parseInt(item.valid_correct),
+            }
+          : undefined,
     },
-    mtbd: durationToSeconds(parseIsoDuration(item.mtbd.toISOString())) || null,
+    mtbd: getPostgresIntervalInSeconds(item.mtbd) || null,
   }));
 }
 
@@ -252,7 +315,7 @@ export async function getMTBD(actorId: number) {
   const item = response.rows[0];
   // console.dir(item.mtbd, { depth: null });
   if (item.mtbd) {
-    return durationToSeconds(parseIsoDuration(item.mtbd.toISOString()));
+    return getPostgresIntervalInSeconds(item.mtbd);
   }
   return null;
 }
