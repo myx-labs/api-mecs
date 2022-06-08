@@ -2,9 +2,9 @@ lockfileVersion: 5.4
 
 specifiers:
   '@fastify/cors': ^7.0.0
-  '@googleapis/docs': ^0.4.1
+  '@googleapis/docs': ^0.4.2
   '@types/dotenv-safe': ^8.1.2
-  '@types/node': ^16.11.38
+  '@types/node': ^16.11.39
   '@types/pg': ^8.6.5
   discord.js: ^13.8.0
   dotenv-safe: ^8.2.0
@@ -19,7 +19,7 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 7.0.0
-  '@googleapis/docs': 0.4.1
+  '@googleapis/docs': 0.4.2
   discord.js: 13.8.0
   dotenv-safe: 8.2.0
   fastify: 3.29.0
@@ -31,7 +31,7 @@ dependencies:
 
 devDependencies:
   '@types/dotenv-safe': 8.1.2
-  '@types/node': 16.11.38
+  '@types/node': 16.11.39
   '@types/pg': 8.6.5
   nodemon: 2.0.16
   typescript: 4.7.3
@@ -44,7 +44,7 @@ packages:
     dependencies:
       '@sapphire/shapeshift': 3.1.0
       '@sindresorhus/is': 4.6.0
-      discord-api-types: 0.33.3
+      discord-api-types: 0.33.5
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.1
       tslib: 2.4.0
@@ -72,8 +72,8 @@ packages:
     resolution: {integrity: sha512-wI3fpfDT0t7p8E6dA2eTECzzOd+bZsZCJ2Hcv+Onn2b7ZwK3RwD27uW2QDaMtQhAfWQQP+WNK7nKf0twLsBf9w==}
     dev: false
 
-  /@googleapis/docs/0.4.1:
-    resolution: {integrity: sha512-Ypa+rB5TGgGkbvx1R19rF7SahvrwduNZpT+hOmevbAyX8sbNfabHVPUk0eIrZBpCclmUYfAQWdJtwJnlZ04pZw==}
+  /@googleapis/docs/0.4.2:
+    resolution: {integrity: sha512-EEk/9lVxUcNMK9kziBdeWA+QVTxHCQdYEX8I3hHeTbeviTAy/aTWZnHin8Bt6/01cXOiqOZoCr/rFoOmMqFskg==}
     engines: {node: '>=10.0.0'}
     dependencies:
       googleapis-common: 5.1.0
@@ -121,7 +121,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 16.11.38
+      '@types/node': 16.11.39
       '@types/responselike': 1.0.0
     dev: false
 
@@ -142,22 +142,22 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 16.11.38
+      '@types/node': 16.11.39
 
   /@types/node-fetch/2.6.1:
     resolution: {integrity: sha512-oMqjURCaxoSIsHSr1E47QHzbmzNR5rK8McHuNb11BOM9cHcIK3Avy0s/b2JlXHoQGTYS3NsvWzV1M0iK7l0wbA==}
     dependencies:
-      '@types/node': 16.11.38
+      '@types/node': 16.11.39
       form-data: 3.0.1
     dev: false
 
-  /@types/node/16.11.38:
-    resolution: {integrity: sha512-hjO/0K140An3GWDw2HJfq7gko3wWeznbjXgg+rzPdVzhe198hp4x2i1dgveAOEiFKd8sOilAxzoSJiVv5P/CUg==}
+  /@types/node/16.11.39:
+    resolution: {integrity: sha512-K0MsdV42vPwm9L6UwhIxMAOmcvH/1OoVkZyCgEtVu4Wx7sElGloy/W7kMBNe/oJ7V/jW9BVt1F6RahH6e7tPXw==}
 
   /@types/pg/8.6.5:
     resolution: {integrity: sha512-tOkGtAqRVkHa/PVZicq67zuujI4Oorfglsr2IbKofDwBSysnaqSx7W1mDqFqdkGE6Fbgh+PZAl0r/BWON/mozw==}
     dependencies:
-      '@types/node': 16.11.38
+      '@types/node': 16.11.39
       pg-protocol: 1.5.0
       pg-types: 2.2.0
     dev: true
@@ -165,12 +165,12 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 16.11.38
+      '@types/node': 16.11.39
 
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 16.11.38
+      '@types/node': 16.11.39
     dev: false
 
   /abbrev/1.1.1:
@@ -518,8 +518,8 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: false
 
-  /discord-api-types/0.33.3:
-    resolution: {integrity: sha512-P3A1RJXKEDmGPHrFTN5+gYLsBPGUVGj+D3+fa3m0K/umc+LMfqGuEad+p7cNq7ry/icReVhS3bz9jvBvne/BRA==}
+  /discord-api-types/0.33.5:
+    resolution: {integrity: sha512-dvO5M52v7m7Dy96+XUnzXNsQ/0npsYpU6dL205kAtEDueswoz3aU3bh1UMoK4cQmcGtB1YRyLKqp+DXi05lzFg==}
     dev: false
 
   /discord.js/13.8.0:
@@ -531,7 +531,7 @@ packages:
       '@sapphire/async-queue': 1.3.1
       '@types/node-fetch': 2.6.1
       '@types/ws': 8.5.3
-      discord-api-types: 0.33.3
+      discord-api-types: 0.33.5
       form-data: 4.0.0
       node-fetch: 2.6.7
       ws: 8.7.0
@@ -821,7 +821,7 @@ packages:
       extend: 3.0.2
       gaxios: 4.3.3
       google-auth-library: 7.14.1
-      qs: 6.10.3
+      qs: 6.10.5
       url-template: 2.0.8
       uuid: 8.3.2
     transitivePeerDependencies:
@@ -1396,8 +1396,8 @@ packages:
       escape-goat: 2.1.1
     dev: true
 
-  /qs/6.10.3:
-    resolution: {integrity: sha512-wr7M2E0OFRfIfJZjKGieI8lBKb7fRCH4Fv5KNPEs7gJ8jadvotdsS08PzOKR7opXhZ/Xkjtt3WF9g38drmyRqQ==}
+  /qs/6.10.5:
+    resolution: {integrity: sha512-O5RlPh0VFtR78y79rgcgKK4wbAI0C5zGVLztOIdpWX6ep368q5Hv6XRxDvXuZ9q3C6v+e3n8UfZZJw7IIG27eQ==}
     engines: {node: '>=0.6'}
     dependencies:
       side-channel: 1.0.4
@@ -1457,7 +1457,7 @@ packages:
     dev: false
 
   /responselike/1.0.2:
-    resolution: {integrity: sha1-kYcg7ztjHFZCvgaPFa3lpG9Loec=}
+    resolution: {integrity: sha512-/Fpe5guzJk1gPqdJLJR5u7eG/gNY4nImjbRDaVWVMRhne55TCmj2i9Q+54PBRfatRC8v/rIiv9BN0pMd9OV5EQ==}
     dependencies:
       lowercase-keys: 1.0.1
     dev: true

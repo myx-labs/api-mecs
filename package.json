@@ -22,14 +22,14 @@
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
-    "@types/node": "^16.11.38",
+    "@types/node": "^16.11.39",
     "@types/pg": "^8.6.5",
     "nodemon": "^2.0.16",
     "typescript": "^4.7.3"
   },
   "dependencies": {
     "@fastify/cors": "^7.0.0",
-    "@googleapis/docs": "^0.4.1",
+    "@googleapis/docs": "^0.4.2",
     "discord.js": "^13.8.0",
     "dotenv-safe": "^8.2.0",
     "fastify": "^3.29.0",
