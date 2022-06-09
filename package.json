@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.0.0",
-    "@fastify/type-provider-typebox": "0.1.0-beta.1",
+    "@fastify/type-provider-typebox": "0.1.0",
     "@googleapis/docs": "^0.4.2",
     "@sinclair/typebox": "^0.23.5",
     "discord.js": "^13.8.0",
