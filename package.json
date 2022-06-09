@@ -1,6 +1,6 @@
 {
   "name": "myx-mecs-api",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "",
   "type": "module",
   "exports": "./dist/index.js",
@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^8.0.0",
-    "@fastify/type-provider-typebox": "0.1.0",
+    "@fastify/type-provider-typebox": "^0.1.0",
     "@googleapis/docs": "^0.4.2",
     "@sinclair/typebox": "^0.23.5",
     "discord.js": "^13.8.0",
