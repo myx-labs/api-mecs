@@ -1,10 +1,14 @@
 // Modules
 import { config as config_env } from "dotenv-safe";
 config_env();
-import got from "got";
+
 import fastify, { FastifyRequest } from "fastify";
-import pLimit from "p-limit";
 import fastifyCors from "@fastify/cors";
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import { Type } from "@sinclair/typebox";
+
+import got from "got";
+import pLimit from "p-limit";
 
 const origin = "https://myx.yan.gg";
 
@@ -51,7 +55,9 @@ const group = config.groups[0];
 
 // Variables
 
-const server = fastify({ trustProxy: "127.0.0.1" });
+const server = fastify({
+  trustProxy: "127.0.0.1",
+}).withTypeProvider<TypeBoxTypeProvider>();
 const port: number = config.port;
 
 const automated_limit = pLimit(1);
@@ -175,39 +181,25 @@ async function logPayload(req: FastifyRequest, payload: any) {
   } catch {}
 }
 
-interface userParams {
-  id: string;
-}
-
-interface userParams2 {
-  blacklistOnly: string;
-}
-
 server.get("/blacklist/groups", async (req, res) => {
   try {
-    res.send(await getBlacklistedGroupIDs(undefined, true));
+    return await getBlacklistedGroupIDs(undefined, true);
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500);
-      res.send({ error: error.message });
-    } else {
-      res.status(500);
-      res.send({ error: "Unknown error occured" });
-    }
+    res.status(500);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 });
 
 server.get("/blacklist/users", async (req, res) => {
   try {
-    res.send(await getBlacklistedUserIDs(undefined, true));
+    return await getBlacklistedUserIDs(undefined, true);
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500);
-      res.send({ error: error.message });
-    } else {
-      res.status(500);
-      res.send({ error: "Unknown error occured" });
-    }
+    res.status(500);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 });
 
@@ -326,15 +318,12 @@ server.get("/audit/accuracy", async (req, res) => {
     if (aggregateDataCache === null) {
       aggregateDataCache = await getAggregateData();
     }
-    res.send(aggregateDataCache);
+    return aggregateDataCache;
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500);
-      res.send({ error: error.message });
-    } else {
-      res.status(500);
-      res.send({ error: "Unknown error occured" });
-    }
+    res.status(500);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 });
 
@@ -524,43 +513,74 @@ server.get("/audit/staff", async (req, res) => {
     if (officerDecisionDataCache === null) {
       officerDecisionDataCache = await getOfficerDecisionData();
     }
-    res.send(officerDecisionDataCache);
+    return officerDecisionDataCache;
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500);
-      res.send({ error: error.message });
-    } else {
-      res.status(500);
-      res.send({ error: "Unknown error occured" });
-    }
+    res.status(500);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 });
 
-server.get<{ Params: userParams }>("/audit/staff/:id", async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    if (id) {
-      const decisions = await getDecisionDataForOfficer(id);
-      res.send(decisions);
-    } else {
-      throw new Error("Invalid ID");
-    }
-  } catch (error) {
-    if (error instanceof Error) {
+server.get(
+  "/audit/staff/:id",
+  {
+    schema: {
+      params: Type.Strict(
+        Type.Object({
+          id: Type.String(),
+        })
+      ),
+    },
+  },
+  async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (id) {
+        const decisions = await getDecisionDataForOfficer(id);
+        return decisions;
+      } else {
+        throw new Error("Invalid ID");
+      }
+    } catch (error) {
       res.status(500);
-      res.send({ error: error.message });
-    } else {
-      res.status(500);
-      res.send({ error: "Unknown error occured" });
+      return {
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      };
     }
   }
-});
+);
 
-server.get<{ Params: userParams; Querystring: userParams2 }>(
+server.get(
   "/user/:id",
+  {
+    schema: {
+      params: Type.Strict(
+        Type.Object({
+          id: Type.String(),
+        })
+      ),
+      querystring: Type.Strict(
+        Type.Object({
+          blacklistOnly: Type.Optional(Type.Boolean()),
+          includeHistory: Type.Optional(Type.Boolean()),
+        })
+      ),
+      // no idea why but header types can't be inferred without this line
+      headers: Type.Strict(Type.Object({})),
+    },
+  },
   async (req, res) => {
     const userParam: string = req.params.id;
-    const blacklistOnly = req.query.blacklistOnly === "true";
+    const blacklistOnly =
+      typeof req.query.blacklistOnly !== "undefined"
+        ? req.query.blacklistOnly
+        : false;
+    const includeHistory =
+      typeof req.query.includeHistory !== "undefined"
+        ? req.query.includeHistory
+        : true;
     let userId: number = Number(userParam);
 
     try {
@@ -581,7 +601,9 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
       const [testResults, hccGamepassOwned, history] = await Promise.all([
         limit(async () => user.getTestStatus(blacklistOnly)),
         user.getHCC().catch(() => false),
-        getRankingHistory(user.userId).catch(() => undefined),
+        includeHistory
+          ? getRankingHistory(user.userId).catch(() => undefined)
+          : undefined,
       ]);
 
       if (testResults !== null && typeof testResults !== "undefined") {
@@ -600,25 +622,38 @@ server.get<{ Params: userParams; Querystring: userParams2 }>(
           history: history,
         };
         logPayload(req, payload);
-        res.send(payload);
+        return payload;
       } else {
-        res.status(500);
+        throw new Error("Test results are null");
       }
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500);
-        console.error(error);
-        res.send({ error: error.message });
-      } else {
-        res.status(500);
-        res.send({ error: "Unknown error occured" });
-      }
+      res.status(500);
+      return {
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      };
     }
   }
 );
 
-server.post<{ Params: userParams; Querystring: userParams2 }>(
+server.post(
   "/user/:id/automated-review",
+  {
+    schema: {
+      params: Type.Strict(
+        Type.Object({
+          id: Type.String(),
+        })
+      ),
+      querystring: Type.Strict(
+        Type.Object({
+          blacklistOnly: Type.Optional(Type.Boolean()),
+        })
+      ),
+      // no idea why but header types can't be inferred without this line
+      headers: Type.Strict(Type.Object({})),
+    },
+  },
   async (req, res) => {
     const userParam: string = req.params.id;
     let userId: number = Number(userParam);
@@ -640,32 +675,28 @@ server.post<{ Params: userParams; Querystring: userParams2 }>(
         return user.automatedReview();
       });
       res.status(200);
-      res.send(results);
+      return results;
     } catch (error) {
-      let errorString = "Unknown error occured";
-      if (error instanceof Error) {
-        errorString = error.message;
-      }
       res.status(500);
-      res.send({ error: errorString });
+      return {
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      };
     }
   }
 );
 
 server.get("/session", async (req, res) => {
   try {
-    res.send({
+    return {
       requestCounter: requestCounter,
       sessionStart: sessionStart,
-    });
+    };
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500);
-      res.send({ error: error.message });
-    } else {
-      res.status(500);
-      res.send({ error: "Unknown error occured" });
-    }
+    res.status(500);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
 });
 
@@ -675,7 +706,7 @@ async function bootstrap() {
     updateAggregateDataCache(),
     updateOfficerDecisionDataCache(),
   ]);
-  const address = await server.listen(port);
+  const address = await server.listen({ port: port });
   console.log(`Server listening at ${address}`);
   if (config.flags.processAudit) {
     if (config.flags.onlyNewAudit) {
