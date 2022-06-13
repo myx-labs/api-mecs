@@ -10,7 +10,7 @@ specifiers:
   '@types/pg': ^8.6.5
   discord.js: ^13.8.0
   dotenv-safe: ^8.2.0
-  fastify: ^4.0.1
+  fastify: ^4.0.2
   fuse.js: ^6.6.2
   got: ^12.1.0
   iso8601-duration: ^2.1.1
@@ -22,12 +22,12 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.0.0
-  '@fastify/type-provider-typebox': 1.0.0_vuo3o35odoyvpohhcxep3qcecy
+  '@fastify/type-provider-typebox': 1.0.0_tlolvcppnbnw4indudbhzxm3te
   '@googleapis/docs': 0.4.2
   '@sinclair/typebox': 0.23.5
   discord.js: 13.8.0
   dotenv-safe: 8.2.0
-  fastify: 4.0.1
+  fastify: 4.0.2
   fuse.js: 6.6.2
   got: 12.1.0
   iso8601-duration: 2.1.1
@@ -80,20 +80,20 @@ packages:
     resolution: {integrity: sha512-dPRyT40GiHRzSCll3/Jn2nPe25+E1VXc9tDwRAIKwFCxd5Np5wzgz1tmooWG3sV0qKgrBibihVoCna2ru4SEFg==}
     dev: false
 
-  /@fastify/fast-json-stringify-compiler/3.0.0:
-    resolution: {integrity: sha512-Wh0wAtL2O83lrUlSawkF5uXC4pL6UGva3P8j9ztVipjIYFBMnzSaxTaSTi9GATXupl8E/BykI+HVBEIyh9FDIw==}
+  /@fastify/fast-json-stringify-compiler/3.0.1:
+    resolution: {integrity: sha512-X9BL9/N7827M9UTBVsa5G3xOoD3MQ6EqX+D6EyJyF8LdvWTHQJ//BDN4FAEaGZUA2sL+GEMC6+KNjHESnPwQuw==}
     dependencies:
-      fast-json-stringify: 4.1.0
+      fast-json-stringify: 4.2.0
     dev: false
 
-  /@fastify/type-provider-typebox/1.0.0_vuo3o35odoyvpohhcxep3qcecy:
+  /@fastify/type-provider-typebox/1.0.0_tlolvcppnbnw4indudbhzxm3te:
     resolution: {integrity: sha512-PPg4mKXyXfKRM/KTa2HY04Xta2+fcVmHd6XjmzCdws32dutG0raExeQWhhzVftQMuYP62f6VGXRBOQBnpCBJ7w==}
     peerDependencies:
       '@sinclair/typebox': ^0.23.0
       fastify: ^4.0.0
     dependencies:
       '@sinclair/typebox': 0.23.5
-      fastify: 4.0.1
+      fastify: 4.0.2
     dev: false
 
   /@googleapis/docs/0.4.2:
@@ -632,8 +632,8 @@ packages:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: false
 
-  /fast-json-stringify/4.1.0:
-    resolution: {integrity: sha512-yy/5SUALH1LxcVFg/tqaA2a3cfXhpZl5MqdyhSJeAmOZg1nQgU0meg0KuRrFaG3iSrrDMWxTittWb12oIBXOcQ==}
+  /fast-json-stringify/4.2.0:
+    resolution: {integrity: sha512-9RWBl82H7jwnPlkZ/ghi0VD5OFZVdwgwVui0nYzjnXbPQxJ3ES1+SQcWIoeCJOgrY7JkBkY/69UNZSroFPDRdQ==}
     engines: {node: '>= 10.0.0'}
     dependencies:
       ajv: 8.11.0
@@ -665,14 +665,15 @@ packages:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
     dev: false
 
-  /fastify/4.0.1:
-    resolution: {integrity: sha512-bSny+B9y2jwB1bdhdiXKAg5Nk1mZlSiI4I/rROGq8QXGtth5qPEhxfvkq9+Vb92V2Kl2BwN2BFG5EWRHWmFTnQ==}
+  /fastify/4.0.2:
+    resolution: {integrity: sha512-1DYyRyIqdPbvu/c5Xtt5MF7wQRLO+GbCibRWq+5JhntQVdod9oCy7rGsSNDMjvRgvJY5EUm2UYnBtAsDr5NdFA==}
     dependencies:
       '@fastify/ajv-compiler': 3.1.0
       '@fastify/error': 3.0.0
-      '@fastify/fast-json-stringify-compiler': 3.0.0
+      '@fastify/fast-json-stringify-compiler': 3.0.1
       abstract-logging: 2.0.1
       avvio: 8.1.3
+      fast-json-stringify: 4.2.0
       find-my-way: 6.3.0
       light-my-request: 5.0.0
       pino: 8.0.0
@@ -1793,7 +1794,7 @@ packages:
     dev: false
 
   /whatwg-url/5.0.0:
-    resolution: {integrity: sha1-lmRU6HZUYuN2RNNib2dCzotwll0=}
+    resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
     dependencies:
       tr46: 0.0.3
       webidl-conversions: 3.0.1
@@ -1816,7 +1817,7 @@ packages:
     dev: true
 
   /wrappy/1.0.2:
-    resolution: {integrity: sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=}
+    resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
 
   /write-file-atomic/3.0.3:
     resolution: {integrity: sha512-AvHcyZ5JnSfq3ioSyjrBkH9yW4m7Ayk8/9My/DD9onKeu/94fwrMocemO2QAJFAlnnDN+ZDS+ZjAR5ua1/PV/Q==}
