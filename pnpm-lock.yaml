@@ -3,14 +3,14 @@ lockfileVersion: 5.4
 specifiers:
   '@fastify/cors': ^8.0.0
   '@fastify/type-provider-typebox': ^1.0.0
-  '@googleapis/docs': ^1.0.0
+  '@googleapis/docs': ^1.0.1
   '@sinclair/typebox': ^0.23.5
   '@types/dotenv-safe': ^8.1.2
   '@types/node': ^16.11.41
   '@types/pg': ^8.6.5
   discord.js: ^13.8.0
   dotenv-safe: ^8.2.0
-  fastify: ^4.0.3
+  fastify: ^4.1.0
   fuse.js: ^6.6.2
   got: ^12.1.0
   iso8601-duration: ^2.1.1
@@ -22,12 +22,12 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.0.0
-  '@fastify/type-provider-typebox': 1.0.0_2avrrdccdwmozrtqnagzgtrsem
-  '@googleapis/docs': 1.0.0
+  '@fastify/type-provider-typebox': 1.0.0_erdvaifpfws7i4rlkj3t6qekp4
+  '@googleapis/docs': 1.0.1
   '@sinclair/typebox': 0.23.5
   discord.js: 13.8.0
   dotenv-safe: 8.2.0
-  fastify: 4.0.3
+  fastify: 4.1.0
   fuse.js: 6.6.2
   got: 12.1.0
   iso8601-duration: 2.1.1
@@ -48,7 +48,7 @@ packages:
     resolution: {integrity: sha512-+fqLIqa9wN3R+kvlld8sgG0nt04BAZxdCDP4t2qZ9TJsquLWA+xMtT8Waibb3d4li4AQS+IOfjiHAznv/dhHgQ==}
     engines: {node: '>=16.9.0'}
     dependencies:
-      '@sapphire/shapeshift': 3.2.0
+      '@sapphire/shapeshift': 3.3.0
       '@sindresorhus/is': 4.6.0
       discord-api-types: 0.33.5
       fast-deep-equal: 3.1.3
@@ -86,18 +86,18 @@ packages:
       fast-json-stringify: 4.2.0
     dev: false
 
-  /@fastify/type-provider-typebox/1.0.0_2avrrdccdwmozrtqnagzgtrsem:
+  /@fastify/type-provider-typebox/1.0.0_erdvaifpfws7i4rlkj3t6qekp4:
     resolution: {integrity: sha512-PPg4mKXyXfKRM/KTa2HY04Xta2+fcVmHd6XjmzCdws32dutG0raExeQWhhzVftQMuYP62f6VGXRBOQBnpCBJ7w==}
     peerDependencies:
       '@sinclair/typebox': ^0.23.0
       fastify: ^4.0.0
     dependencies:
       '@sinclair/typebox': 0.23.5
-      fastify: 4.0.3
+      fastify: 4.1.0
     dev: false
 
-  /@googleapis/docs/1.0.0:
-    resolution: {integrity: sha512-KWA/i6GxS/oLeC37CElBvucDZxuZRvH3KvFhZPmUy++SebIOUgToU2VpQU1QbunQov+n5EOnbSYtfnRIYsix3A==}
+  /@googleapis/docs/1.0.1:
+    resolution: {integrity: sha512-oJvNEcUkYZ+u97sOM2nRX55+MlPhILwETtvg1ZdvnhtY0tLpCVUnV3Y2+F/SSM3ZKU8dHLnb2D9qrtT7OBfPpA==}
     engines: {node: '>=10.0.0'}
     dependencies:
       googleapis-common: 5.1.0
@@ -111,9 +111,9 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sapphire/shapeshift/3.2.0:
-    resolution: {integrity: sha512-asNgE5Ooil2/oGIAj6vZMoUc2ZFED0TGYD7jwvZsjHPQZBEh9ITj94ca4bCgiCR1s2ER/UjzykH+5wE3ebVZnQ==}
-    engines: {node: '>=v15.0.0', npm: '>=7.0.0'}
+  /@sapphire/shapeshift/3.3.0:
+    resolution: {integrity: sha512-6MNupTaIXtyVCHuejbTIE/Wmw35FKbpfRhiPCkxaQHm76iHICaWNO0oej0lipLb7vhK8mQHQn3zE6umOVvwGLw==}
+    engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
   /@sinclair/typebox/0.23.5:
@@ -377,7 +377,7 @@ packages:
       clone-response: 1.0.2
       get-stream: 5.2.0
       http-cache-semantics: 4.1.0
-      keyv: 4.3.0
+      keyv: 4.3.1
       lowercase-keys: 2.0.0
       normalize-url: 6.1.0
       responselike: 2.0.0
@@ -649,8 +649,8 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
-  /fast-text-encoding/1.0.3:
-    resolution: {integrity: sha512-dtm4QZH9nZtcDt8qJiOH9fcQd1NAgi+K1O2DbE6GG1PPCK/BWfOH3idCTRQ4ImXRUOyopDEgDEnVEE7Y/2Wrig==}
+  /fast-text-encoding/1.0.4:
+    resolution: {integrity: sha512-x6lDDm/tBAzX9kmsPcZsNbvDs3Zey3+scsxaZElS8xWLgUMAg/oFLeewfUz0mu1CblHhhsu15jGkraldkFh8KQ==}
     dev: false
 
   /fast-uri/1.0.1:
@@ -665,15 +665,15 @@ packages:
     resolution: {integrity: sha512-qKcDXmuZadJqdTm6vlCqioEbyewF60b/0LOFCcYN1B6BIZGlYJumWWOYs70SFYLDAH4YqdE1cxH/RKMG7rFxgA==}
     dev: false
 
-  /fastify/4.0.3:
-    resolution: {integrity: sha512-ACb3SXYQaN3zbRRND/51Dk/lmMkEJmGZ1YjSayzefCGX4UeHPw1it9PfJrfiuiG07FO2UxRC7Vxl+GwKfDi1Vw==}
+  /fastify/4.1.0:
+    resolution: {integrity: sha512-nze95u3wpVIsOXMmSi5kgUaEIZq2HJmerk/+ivFBPtYozAydoDg92BcsxDtO4cb8vW4RBkahx8zL5PgH9YulCw==}
     dependencies:
       '@fastify/ajv-compiler': 3.1.0
       '@fastify/error': 3.0.0
       '@fastify/fast-json-stringify-compiler': 3.0.1
       abstract-logging: 2.0.1
       avvio: 8.1.3
-      find-my-way: 6.3.0
+      find-my-way: 6.4.0
       light-my-request: 5.0.0
       pino: 8.0.0
       process-warning: 2.0.0
@@ -699,8 +699,8 @@ packages:
       to-regex-range: 5.0.1
     dev: true
 
-  /find-my-way/6.3.0:
-    resolution: {integrity: sha512-WRtxcItuTCR6X+jaZFMI1aWT4Ih5GzL5faZAOxoHrmZAMneTzHl6AeGs2RN5b6dEMYIykVsRJtGrTk3RYGfJBg==}
+  /find-my-way/6.4.0:
+    resolution: {integrity: sha512-OAxMF75jKPpy8jUb29WupNfypFAzBuAiPM6xS17twiP07hJb0tKkD6Fy8dy8pN14AD8hMlc0jA6q0d+Dg5reUQ==}
     engines: {node: '>=12'}
     dependencies:
       fast-deep-equal: 3.1.3
@@ -823,7 +823,7 @@ packages:
       arrify: 2.0.1
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      fast-text-encoding: 1.0.3
+      fast-text-encoding: 1.0.4
       gaxios: 4.3.3
       gcp-metadata: 4.3.1
       gtoken: 5.3.2
@@ -1106,8 +1106,8 @@ packages:
       json-buffer: 3.0.0
     dev: true
 
-  /keyv/4.3.0:
-    resolution: {integrity: sha512-C30Un9+63J0CsR7Wka5quXKqYZsT6dcRQ2aOwGcSc3RiQ4HGWpTAHlCA+puNfw2jA/s11EsxA1nCXgZRuRKMQQ==}
+  /keyv/4.3.1:
+    resolution: {integrity: sha512-nwP7AQOxFzELXsNq3zCx/oh81zu4DHWwCE6W9RaeHb7OHO0JpmKS8n801ovVQC7PTsZDWtPA5j1QY+/WWtARYg==}
     dependencies:
       compress-brotli: 1.3.8
       json-buffer: 3.0.1
