@@ -4,9 +4,9 @@ specifiers:
   '@fastify/cors': ^8.0.0
   '@fastify/type-provider-typebox': ^2.0.1
   '@googleapis/docs': ^1.0.1
-  '@sinclair/typebox': ^0.24.6
+  '@sinclair/typebox': ^0.24.9
   '@types/dotenv-safe': ^8.1.2
-  '@types/node': ^16.11.42
+  '@types/node': ^16.11.43
   '@types/pg': ^8.6.5
   discord.js: ^13.8.1
   dotenv-safe: ^8.2.0
@@ -17,15 +17,15 @@ specifiers:
   nodemon: ^2.0.18
   p-limit: ^4.0.0
   pg: ^8.7.3
-  pnpm: ^7.4.1
+  pnpm: ^7.5.0
   postgres-interval: ^4.0.0
   typescript: ^4.7.4
 
 dependencies:
   '@fastify/cors': 8.0.0
-  '@fastify/type-provider-typebox': 2.0.1_b4ccdtxfvyxn3ljyntv756bba4
+  '@fastify/type-provider-typebox': 2.0.1_7luxvcmyon22uink7fqqyhax4q
   '@googleapis/docs': 1.0.1
-  '@sinclair/typebox': 0.24.6
+  '@sinclair/typebox': 0.24.9
   discord.js: 13.8.1
   dotenv-safe: 8.2.0
   fastify: 4.2.0
@@ -34,12 +34,12 @@ dependencies:
   iso8601-duration: 2.1.1
   p-limit: 4.0.0
   pg: 8.7.3
-  pnpm: 7.4.1
+  pnpm: 7.5.0
   postgres-interval: 4.0.0
 
 devDependencies:
   '@types/dotenv-safe': 8.1.2
-  '@types/node': 16.11.42
+  '@types/node': 16.11.43
   '@types/pg': 8.6.5
   nodemon: 2.0.18
   typescript: 4.7.4
@@ -63,12 +63,12 @@ packages:
     engines: {node: '>=16.9.0'}
     dev: false
 
-  /@fastify/ajv-compiler/3.1.0:
-    resolution: {integrity: sha512-+hRMMxcUmdqtnCGPwrI2yczFdlgp3IBR88WlPLimXlgRb8vHBTXz38I17R/9ui+hIt9jx0uOdZKOis77VooHfA==}
+  /@fastify/ajv-compiler/3.1.1:
+    resolution: {integrity: sha512-sn01z9hluLu4ZKUEWK/gdCOU+QJTa6r7YpwD2l7lATgfwrJD/sMSe+zX03UWWebI9kdMmK18gj4Fhi0I3LtLnQ==}
     dependencies:
       ajv: 8.11.0
       ajv-formats: 2.1.1
-      fast-uri: 1.0.1
+      fast-uri: 2.1.0
     dev: false
 
   /@fastify/cors/8.0.0:
@@ -88,13 +88,13 @@ packages:
       fast-json-stringify: 5.0.5
     dev: false
 
-  /@fastify/type-provider-typebox/2.0.1_b4ccdtxfvyxn3ljyntv756bba4:
+  /@fastify/type-provider-typebox/2.0.1_7luxvcmyon22uink7fqqyhax4q:
     resolution: {integrity: sha512-Z9Dd+nAiNodeOkyOfJUoGYoZDrfs4wYM0Xq77dc04zkoOLTv25LxysfIND1Tz+UXnHJSfT3mb/9kMrG9YA0bEw==}
     peerDependencies:
       '@sinclair/typebox': ^0.24.1
       fastify: ^4.0.0
     dependencies:
-      '@sinclair/typebox': 0.24.6
+      '@sinclair/typebox': 0.24.9
       fastify: 4.2.0
     dev: false
 
@@ -118,8 +118,8 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sinclair/typebox/0.24.6:
-    resolution: {integrity: sha512-ziqHFbpqzAuXtDFx4hwwPR1fm6SyfzhQoYXkmLZq4rFzRob1TDtjhI68rV84V7voqhb0yrwVJSwbOc3nm+0avQ==}
+  /@sinclair/typebox/0.24.9:
+    resolution: {integrity: sha512-ID/my8r4g0fp9aefo+bmEApgEgG6Sid42i5bmBXXXGqOK00aTMjHTNwSV2zTt7ddJn0IcevUxS7JzFn0WjwrGg==}
     dev: false
 
   /@sindresorhus/is/0.14.0:
@@ -151,7 +151,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 16.11.42
+      '@types/node': 16.11.43
       '@types/responselike': 1.0.0
     dev: false
 
@@ -172,22 +172,22 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 16.11.42
+      '@types/node': 16.11.43
 
   /@types/node-fetch/2.6.2:
     resolution: {integrity: sha512-DHqhlq5jeESLy19TYhLakJ07kNumXWjcDdxXsLUMJZ6ue8VZJj4kLPQVE/2mdHh3xZziNF1xppu5lwmS53HR+A==}
     dependencies:
-      '@types/node': 16.11.42
+      '@types/node': 16.11.43
       form-data: 3.0.1
     dev: false
 
-  /@types/node/16.11.42:
-    resolution: {integrity: sha512-iwLrPOopPy6V3E+1yHTpJea3bdsNso0b0utLOJJwaa/PLzqBt3GZl3stMcakc/gr89SfcNk2ki3z7Gvue9hYGQ==}
+  /@types/node/16.11.43:
+    resolution: {integrity: sha512-GqWykok+3uocgfAJM8imbozrqLnPyTrpFlrryURQlw1EesPUCx5XxTiucWDSFF9/NUEXDuD4bnvHm8xfVGWTpQ==}
 
   /@types/pg/8.6.5:
     resolution: {integrity: sha512-tOkGtAqRVkHa/PVZicq67zuujI4Oorfglsr2IbKofDwBSysnaqSx7W1mDqFqdkGE6Fbgh+PZAl0r/BWON/mozw==}
     dependencies:
-      '@types/node': 16.11.42
+      '@types/node': 16.11.43
       pg-protocol: 1.5.0
       pg-types: 2.2.0
     dev: true
@@ -195,12 +195,12 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 16.11.42
+      '@types/node': 16.11.43
 
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 16.11.42
+      '@types/node': 16.11.43
     dev: false
 
   /abbrev/1.1.1:
@@ -644,10 +644,6 @@ packages:
     resolution: {integrity: sha512-x6lDDm/tBAzX9kmsPcZsNbvDs3Zey3+scsxaZElS8xWLgUMAg/oFLeewfUz0mu1CblHhhsu15jGkraldkFh8KQ==}
     dev: false
 
-  /fast-uri/1.0.1:
-    resolution: {integrity: sha512-dbO/+ny6lX4tt7pvfPMTiHfQVR5igYKFa5BJ2a21TWuOgd2ySp5DYswsEGuMcJZLL3/eJ/MQJ5KNcXyNUvDt8w==}
-    dev: false
-
   /fast-uri/2.1.0:
     resolution: {integrity: sha512-qKRta6N7BWEFVlyonVY/V+BMLgFqktCUV0QjT259ekAIlbVrMaFnFLxJ4s/JPl4tou56S1BzPufI60bLe29fHA==}
     dev: false
@@ -659,7 +655,7 @@ packages:
   /fastify/4.2.0:
     resolution: {integrity: sha512-0QXEp+8ceKc0fwVakeBLM/1Ss/+fc7a3auuygT+1GjbSAgHfwqxSucUuu0rYjziu32UgEZXfjItYN/a89HWKhw==}
     dependencies:
-      '@fastify/ajv-compiler': 3.1.0
+      '@fastify/ajv-compiler': 3.1.1
       '@fastify/error': 3.0.0
       '@fastify/fast-json-stringify-compiler': 4.0.0
       abstract-logging: 2.0.1
@@ -1369,8 +1365,8 @@ packages:
       thread-stream: 1.0.1
     dev: false
 
-  /pnpm/7.4.1:
-    resolution: {integrity: sha512-zbgCWWw/qN5cvG1cBTNxwtT625BjxiZO974CAetIial/om4tyVgCmPxq9FRKDrYffTTLfahIXfXOjMUYqQ8wZw==}
+  /pnpm/7.5.0:
+    resolution: {integrity: sha512-sb9wJNyx/d8l3Gze2jI1y8BGNbb/ga+JT3SrGNiH+C5KbtZ4wmgePBWGjaiGugcpT9+vQ5MO//+QlVWhMCpedQ==}
     engines: {node: '>=14.6'}
     hasBin: true
     dev: false
