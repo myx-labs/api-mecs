@@ -16,7 +16,7 @@ const origin = "https://myx.yan.gg";
 import ImmigrationUser from "./ImmigrationUser.js";
 import config from "./config.js";
 
-import { MessageEmbed, WebhookClient } from "discord.js";
+import { EmbedBuilder, WebhookClient } from "discord.js";
 
 const webhookClient = new WebhookClient({
   id: config.credentials.discord.webhook.id,
@@ -134,7 +134,7 @@ async function getImmigrationUser(
 async function logPayload(req: FastifyRequest, payload: any) {
   try {
     requestCounter.valid++;
-    const requestEmbed = new MessageEmbed()
+    const requestEmbed = new EmbedBuilder()
       .setFields([
         {
           name: "Request URL",
@@ -149,7 +149,7 @@ async function logPayload(req: FastifyRequest, payload: any) {
       ])
       .setTitle("Request data")
       .setTimestamp();
-    const userEmbed = new MessageEmbed()
+    const userEmbed = new EmbedBuilder()
       .setFields([
         {
           name: "User ID",
@@ -163,7 +163,7 @@ async function logPayload(req: FastifyRequest, payload: any) {
         },
       ])
       .setTitle("User data");
-    const testEmbed = new MessageEmbed()
+    const testEmbed = new EmbedBuilder()
       .setFields(
         Object.keys(payload.tests).map((key) => {
           const test = payload.tests[key as keyof typeof payload.tests];

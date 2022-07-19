@@ -5,7 +5,6 @@
     "lib": ["ES2020"],
     "jsx": "react",
     "strict": true,
-    "skipLibCheck": true,
     "preserveConstEnums": true,
     "outDir": "./dist",
     "moduleResolution": "node",
