@@ -22,17 +22,17 @@
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
-    "@types/node": "^16.11.46",
+    "@types/node": "^16.11.47",
     "@types/pg": "^8.6.5",
     "nodemon": "^2.0.19",
     "typescript": "^4.7.4"
   },
   "dependencies": {
     "@fastify/cors": "^8.0.0",
-    "@fastify/type-provider-typebox": "^2.1.0",
+    "@fastify/type-provider-typebox": "^2.2.0",
     "@googleapis/docs": "^1.0.1",
-    "@sinclair/typebox": "^0.24.21",
-    "discord.js": "^14.0.3",
+    "@sinclair/typebox": "^0.24.22",
+    "discord.js": "^14.1.2",
     "dotenv-safe": "^8.2.0",
     "fastify": "^4.3.0",
     "fuse.js": "^6.6.2",
