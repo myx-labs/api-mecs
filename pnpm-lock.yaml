@@ -10,7 +10,7 @@ specifiers:
   '@types/pg': ^8.6.5
   discord.js: ^14.2.0
   dotenv-safe: ^8.2.0
-  fastify: ^4.4.0
+  fastify: ^4.5.2
   fuse.js: ^6.6.2
   got: ^12.3.1
   iso8601-duration: ^2.1.1
@@ -22,12 +22,12 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.1.0
-  '@fastify/type-provider-typebox': 2.3.0_dizheh3e2eouydkaepwojq5fte
+  '@fastify/type-provider-typebox': 2.3.0_lkbxsw4fjojrtjr3hkql7b433a
   '@googleapis/docs': 1.0.1
   '@sinclair/typebox': 0.24.28
   discord.js: 14.2.0
   dotenv-safe: 8.2.0
-  fastify: 4.4.0
+  fastify: 4.5.2
   fuse.js: 6.6.2
   got: 12.3.1
   iso8601-duration: 2.1.1
@@ -65,12 +65,12 @@ packages:
     engines: {node: '>=16.9.0'}
     dependencies:
       '@discordjs/collection': 1.0.1
-      '@sapphire/async-queue': 1.4.0
+      '@sapphire/async-queue': 1.5.0
       '@sapphire/snowflake': 3.2.2
       discord-api-types: 0.36.3
       file-type: 17.1.6
       tslib: 2.4.0
-      undici: 5.8.2
+      undici: 5.9.1
     dev: false
 
   /@fastify/ajv-compiler/3.1.2:
@@ -102,14 +102,14 @@ packages:
       fast-json-stringify: 5.1.0
     dev: false
 
-  /@fastify/type-provider-typebox/2.3.0_dizheh3e2eouydkaepwojq5fte:
+  /@fastify/type-provider-typebox/2.3.0_lkbxsw4fjojrtjr3hkql7b433a:
     resolution: {integrity: sha512-arEH1FL6CNTgctoVw++jNPJN9DdzUe7rJlb3XJyw7rAGiT2m402P4GMFVhtDqndQzEJN37UJXVYbCR9D0AahgQ==}
     peerDependencies:
       '@sinclair/typebox': ^0.24.1
       fastify: ^4.0.0
     dependencies:
       '@sinclair/typebox': 0.24.28
-      fastify: 4.4.0
+      fastify: 4.5.2
     dev: false
 
   /@googleapis/docs/1.0.1:
@@ -122,8 +122,8 @@ packages:
       - supports-color
     dev: false
 
-  /@sapphire/async-queue/1.4.0:
-    resolution: {integrity: sha512-1npoLO1YPPXCsWCfuonsSdtHbPUo6dvjWUJtmUHiK8yDTmy00LbkpRkdV/UycA1fh+QsxwOPhgx2zu64Z+19ww==}
+  /@sapphire/async-queue/1.5.0:
+    resolution: {integrity: sha512-JkLdIsP8fPAdh9ZZjrbHWR/+mZj0wvKS5ICibcLrRI1j84UmLMshx5n9QmL8b95d4onJ2xxiyugTgSAX7AalmA==}
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
@@ -442,7 +442,7 @@ packages:
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       tslib: 2.4.0
-      undici: 5.8.2
+      undici: 5.9.1
       ws: 8.8.1
     transitivePeerDependencies:
       - bufferutil
@@ -511,8 +511,8 @@ packages:
     resolution: {integrity: sha512-hovKzEXZc2YgeuXn41/2EA/IaIOdRu1pB9WKgnzDBj3lhKSdDCEsckHa7I6LiT/LhflvAQX7ZY8IQ6eBX0htTg==}
     dev: false
 
-  /fastify/4.4.0:
-    resolution: {integrity: sha512-ePI4g9vPJXIBF4YlVcDSLxjvtdTrlM8QzdgYAPFGdCH+rot+4MXoFFAUb10fGrIcRRjaq6CvcbIzxiWQzMMHkw==}
+  /fastify/4.5.2:
+    resolution: {integrity: sha512-cDLhc0bh1ftzMoS7ccGGPUW/xTUnk6I51TktQqKFeJnhoAfk56tfn+xDs8JcJYfouPK23Ljx4OpMaEi+kIDwEg==}
     dependencies:
       '@fastify/ajv-compiler': 3.1.2
       '@fastify/error': 3.0.0
@@ -520,7 +520,7 @@ packages:
       abstract-logging: 2.0.1
       avvio: 8.2.0
       find-my-way: 7.0.1
-      light-my-request: 5.4.0
+      light-my-request: 5.5.0
       pino: 8.4.1
       process-warning: 2.0.0
       proxy-addr: 2.0.7
@@ -838,8 +838,8 @@ packages:
       json-buffer: 3.0.1
     dev: false
 
-  /light-my-request/5.4.0:
-    resolution: {integrity: sha512-lWwUibGSDifLsCGKVy5mCktifWGYiZUCzuKqXgrb3Na7wHPl8aPShxjDhUGQE3MI8k2wJSuvSJh5lyHkMnOTMg==}
+  /light-my-request/5.5.0:
+    resolution: {integrity: sha512-G2O8o7f3sR8JP5NG+vtzUm0vpvDNh+/DpZH2GcFEFOkUHggmHSEwj9Vj4VTgPEDe/zANyhZJGFO6R57eeSMBAQ==}
     dependencies:
       cookie: 0.5.0
       process-warning: 2.0.0
@@ -1352,8 +1352,8 @@ packages:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
     dev: true
 
-  /undici/5.8.2:
-    resolution: {integrity: sha512-3KLq3pXMS0Y4IELV045fTxqz04Nk9Ms7yfBBHum3yxsTR4XNn+ZCaUbf/mWitgYDAhsplQ0B1G4S5D345lMO3A==}
+  /undici/5.9.1:
+    resolution: {integrity: sha512-6fB3a+SNnWEm4CJbgo0/CWR8RGcOCQP68SF4X0mxtYTq2VNN8T88NYrWVBAeSX+zb7bny2dx2iYhP3XHi00omg==}
     engines: {node: '>=12.18'}
     dev: false
 
