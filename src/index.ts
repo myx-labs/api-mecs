@@ -56,7 +56,7 @@ const group = config.groups[0];
 // Variables
 
 const server = fastify({
-  trustProxy: "127.0.0.1",
+  trustProxy: true,
 }).withTypeProvider<TypeBoxTypeProvider>();
 const port: number = config.port;
 
