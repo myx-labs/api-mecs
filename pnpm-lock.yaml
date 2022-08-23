@@ -6,7 +6,7 @@ specifiers:
   '@googleapis/docs': ^1.0.1
   '@sinclair/typebox': ^0.24.28
   '@types/dotenv-safe': ^8.1.2
-  '@types/node': ^16.11.52
+  '@types/node': ^16.11.54
   '@types/pg': ^8.6.5
   discord.js: ^14.3.0
   dotenv-safe: ^8.2.0
@@ -16,7 +16,7 @@ specifiers:
   iso8601-duration: ^2.1.1
   nodemon: ^2.0.19
   p-limit: ^4.0.0
-  pg: ^8.7.3
+  pg: ^8.8.0
   postgres-interval: ^4.0.0
   typescript: ^4.7.4
 
@@ -32,12 +32,12 @@ dependencies:
   got: 12.3.1
   iso8601-duration: 2.1.1
   p-limit: 4.0.0
-  pg: 8.7.3
+  pg: 8.8.0
   postgres-interval: 4.0.0
 
 devDependencies:
   '@types/dotenv-safe': 8.1.2
-  '@types/node': 16.11.52
+  '@types/node': 16.11.54
   '@types/pg': 8.6.5
   nodemon: 2.0.19
   typescript: 4.7.4
@@ -165,7 +165,7 @@ packages:
     dependencies:
       '@types/http-cache-semantics': 4.0.1
       '@types/keyv': 3.1.4
-      '@types/node': 16.11.52
+      '@types/node': 16.11.54
       '@types/responselike': 1.0.0
     dev: false
 
@@ -186,16 +186,16 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 16.11.52
+      '@types/node': 16.11.54
     dev: false
 
-  /@types/node/16.11.52:
-    resolution: {integrity: sha512-GnstYouCa9kbYokBCWEVrszJ1P2rGAQpKrqACHKuixkaT8XGu8nsqHvEUIGqDs5vwtsJ7LrYqnPDKRD1V+M39A==}
+  /@types/node/16.11.54:
+    resolution: {integrity: sha512-ryOpwe15+BtTUxKFfzABjaI/EtXLPBSBEW4B6D5ygWNcORLVKG/1/FC3WwAr5d7t6lCnlVPRsCY0NH680QT+Pg==}
 
   /@types/pg/8.6.5:
     resolution: {integrity: sha512-tOkGtAqRVkHa/PVZicq67zuujI4Oorfglsr2IbKofDwBSysnaqSx7W1mDqFqdkGE6Fbgh+PZAl0r/BWON/mozw==}
     dependencies:
-      '@types/node': 16.11.52
+      '@types/node': 16.11.54
       pg-protocol: 1.5.0
       pg-types: 2.2.0
     dev: true
@@ -203,13 +203,13 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 16.11.52
+      '@types/node': 16.11.54
     dev: false
 
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 16.11.52
+      '@types/node': 16.11.54
     dev: false
 
   /abbrev/1.1.1:
@@ -1000,12 +1000,12 @@ packages:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
 
-  /pg-pool/3.5.1_pg@8.7.3:
-    resolution: {integrity: sha512-6iCR0wVrro6OOHFsyavV+i6KYL4lVNyYAB9RD18w66xSzN+d8b66HiwuP30Gp1SH5O9T82fckkzsRjlrhD0ioQ==}
+  /pg-pool/3.5.2_pg@8.8.0:
+    resolution: {integrity: sha512-His3Fh17Z4eg7oANLob6ZvH8xIVen3phEZh2QuyrIl4dQSDVEabNducv6ysROKpDNPSD+12tONZVWfSgMvDD9w==}
     peerDependencies:
       pg: '>=8.0'
     dependencies:
-      pg: 8.7.3
+      pg: 8.8.0
     dev: false
 
   /pg-protocol/1.5.0:
@@ -1021,11 +1021,11 @@ packages:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  /pg/8.7.3:
-    resolution: {integrity: sha512-HPmH4GH4H3AOprDJOazoIcpI49XFsHCe8xlrjHkWiapdbHK+HLtbm/GQzXYAZwmPju/kzKhjaSfMACG+8cgJcw==}
+  /pg/8.8.0:
+    resolution: {integrity: sha512-UXYN0ziKj+AeNNP7VDMwrehpACThH7LUl/p8TDFpEUuSejCUIwGSfxpHsPvtM6/WXFy6SU4E5RG4IJV/TZAGjw==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
-      pg-native: '>=2.0.0'
+      pg-native: '>=3.0.1'
     peerDependenciesMeta:
       pg-native:
         optional: true
@@ -1033,7 +1033,7 @@ packages:
       buffer-writer: 2.0.0
       packet-reader: 1.0.0
       pg-connection-string: 2.5.0
-      pg-pool: 3.5.1_pg@8.7.3
+      pg-pool: 3.5.2_pg@8.8.0
       pg-protocol: 1.5.0
       pg-types: 2.2.0
       pgpass: 1.0.5

@@ -22,7 +22,7 @@
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
-    "@types/node": "^16.11.52",
+    "@types/node": "^16.11.54",
     "@types/pg": "^8.6.5",
     "nodemon": "^2.0.19",
     "typescript": "^4.7.4"
@@ -39,7 +39,7 @@
     "got": "^12.3.1",
     "iso8601-duration": "^2.1.1",
     "p-limit": "^4.0.0",
-    "pg": "^8.7.3",
+    "pg": "^8.8.0",
     "postgres-interval": "^4.0.0"
   }
 }
