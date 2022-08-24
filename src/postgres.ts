@@ -407,8 +407,8 @@ export async function addToRankingLogs(
       ]
     );
   } else {
-    throw new Error(
-      `${actorId}-${targetId}-${oldRolesetId}-${newRolesetId}-${actionTimestamp.getTime()} already exists, skipping.`
-    );
+    // throw new Error(
+    //   `${actorId}-${targetId}-${oldRolesetId}-${newRolesetId}-${actionTimestamp.getTime()} already exists, skipping.`
+    // );
   }
 }
