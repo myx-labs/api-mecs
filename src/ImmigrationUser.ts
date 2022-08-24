@@ -117,7 +117,7 @@ export default class ImmigrationUser {
         );
         return respond(true, `Player ranked to ${rolesetId}`);
       } else {
-        console.error(response);
+        // console.error(response);
         throw new Error(
           `Error occurred attempting to rank user: ${response.statusMessage}`
         );
