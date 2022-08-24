@@ -18,7 +18,7 @@ import {
   processReasonString,
 } from "./scraper.js";
 import config from "./config.js";
-import { getCookie } from "./cookies.js";
+import { getCookie, updateCookieCSRF } from "./cookies.js";
 
 const activeGroup = config.groups[0];
 const rolesets = activeGroup.rolesets;
@@ -118,6 +118,10 @@ export default class ImmigrationUser {
         return respond(true, `Player ranked to ${rolesetId}`);
       } else {
         // console.error(response);
+        console.error(
+          "Error occurred during ranking, will attempt to reset CSRF for cookie"
+        );
+        await updateCookieCSRF(ROBLOSECURITY);
         throw new Error(
           `Error occurred attempting to rank user: ${response.statusMessage}`
         );

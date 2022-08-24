@@ -67,3 +67,15 @@ export async function getCookie(audit = false, rank = false) {
     throw new Error("No valid cookies found for given requirements!");
   }
 }
+
+export async function updateCookieCSRF(cookie: string) {
+  const index = cache.findIndex((c) => c.cookie === cookie);
+  if (index !== -1) {
+    const c = cache[index];
+    const newCSRF = await getCSRFToken(cookie, true);
+    console.log(`Changing CSRF from ${c.csrf} to ${newCSRF}`);
+    cache[index].csrf = newCSRF;
+  } else {
+    throw new Error("Unable to find cookie");
+  }
+}
