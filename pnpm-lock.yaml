@@ -12,7 +12,7 @@ specifiers:
   dotenv-safe: ^8.2.0
   fastify: ^4.5.3
   fuse.js: ^6.6.2
-  got: ^12.3.1
+  got: ^12.4.1
   iso8601-duration: ^2.1.1
   nodemon: ^2.0.19
   p-limit: ^4.0.0
@@ -29,7 +29,7 @@ dependencies:
   dotenv-safe: 8.2.0
   fastify: 4.5.3
   fuse.js: 6.6.2
-  got: 12.3.1
+  got: 12.4.1
   iso8601-duration: 2.1.1
   p-limit: 4.0.0
   pg: 8.8.0
@@ -177,10 +177,6 @@ packages:
 
   /@types/http-cache-semantics/4.0.1:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
-    dev: false
-
-  /@types/json-buffer/3.0.0:
-    resolution: {integrity: sha512-3YP80IxxFJB4b5tYC2SUPwkg0XQLiu0nWvhRgEatgjf+29IcWO9X1k8xRv5DGssJ/lCrjYTjQPcobJr2yWIVuQ==}
     dev: false
 
   /@types/keyv/3.1.4:
@@ -338,7 +334,7 @@ packages:
       clone-response: 1.0.3
       get-stream: 5.2.0
       http-cache-semantics: 4.1.0
-      keyv: 4.4.1
+      keyv: 4.5.0
       lowercase-keys: 2.0.0
       normalize-url: 6.1.0
       responselike: 2.0.1
@@ -370,14 +366,6 @@ packages:
     resolution: {integrity: sha512-ROoL94jJH2dUVML2Y/5PEDNaSHgeOdSDicUyS7izcF63G6sTc/FTjLub4b8Il9S8S0beOfYt0TaA5qvFK+w0wA==}
     dependencies:
       mimic-response: 1.0.1
-    dev: false
-
-  /compress-brotli/1.3.8:
-    resolution: {integrity: sha512-lVcQsjhxhIXsuupfy9fmZUFtAIdBmXA7EGY6GBdgZ++qkM9zG4YFT8iU7FoBxzryNDMOpD1HIFHUSX4D87oqhQ==}
-    engines: {node: '>= 12'}
-    dependencies:
-      '@types/json-buffer': 3.0.0
-      json-buffer: 3.0.1
     dev: false
 
   /concat-map/0.0.1:
@@ -683,14 +671,13 @@ packages:
       - supports-color
     dev: false
 
-  /got/12.3.1:
-    resolution: {integrity: sha512-tS6+JMhBh4iXMSXF6KkIsRxmloPln31QHDlcb6Ec3bzxjjFJFr/8aXdpyuLmVc9I4i2HyBHYw1QU5K1ruUdpkw==}
+  /got/12.4.1:
+    resolution: {integrity: sha512-Sz1ojLt4zGNkcftIyJKnulZT/yEDvifhUjccHA8QzOuTgPs/+njXYNMFE3jR4/2OODQSSbH8SdnoLCkbh41ieA==}
     engines: {node: '>=14.16'}
     dependencies:
       '@sindresorhus/is': 5.3.0
       '@szmarczak/http-timer': 5.0.1
       '@types/cacheable-request': 6.0.2
-      '@types/responselike': 1.0.0
       cacheable-lookup: 6.1.0
       cacheable-request: 7.0.2
       decompress-response: 6.0.0
@@ -699,7 +686,7 @@ packages:
       http2-wrapper: 2.1.11
       lowercase-keys: 3.0.0
       p-cancelable: 3.0.0
-      responselike: 2.0.1
+      responselike: 3.0.0
     dev: false
 
   /gtoken/5.3.2:
@@ -832,10 +819,9 @@ packages:
       safe-buffer: 5.2.1
     dev: false
 
-  /keyv/4.4.1:
-    resolution: {integrity: sha512-PzByhNxfBLnSBW2MZi1DF+W5+qB/7BMpOokewqIvqS8GFtP7xHm2oeGU72Y1fhtfOv/FiEnI4+nyViYDmUChnw==}
+  /keyv/4.5.0:
+    resolution: {integrity: sha512-2YvuMsA+jnFGtBareKqgANOEKe1mk3HKiXu2fRmAfyxG0MJAywNhi5ttWA3PMjl4NmpyjZNbFifR2vNjW1znfA==}
     dependencies:
-      compress-brotli: 1.3.8
       json-buffer: 3.0.1
     dev: false
 
@@ -1194,6 +1180,13 @@ packages:
     resolution: {integrity: sha512-4gl03wn3hj1HP3yzgdI7d3lCkF95F21Pz4BPGvKHinyQzALR5CapwC8yIi0Rh58DEMQ/SguC03wFj2k0M/mHhw==}
     dependencies:
       lowercase-keys: 2.0.0
+    dev: false
+
+  /responselike/3.0.0:
+    resolution: {integrity: sha512-40yHxbNcl2+rzXvZuVkrYohathsSJlMTXKryG5y8uciHv1+xDLHQpgjG64JUO9nrEq2jGLH6IZ8BcZyw3wrweg==}
+    engines: {node: '>=14.16'}
+    dependencies:
+      lowercase-keys: 3.0.0
     dev: false
 
   /ret/0.2.2:
