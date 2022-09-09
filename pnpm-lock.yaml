@@ -4,7 +4,7 @@ specifiers:
   '@fastify/cors': ^8.1.0
   '@fastify/type-provider-typebox': ^2.3.0
   '@googleapis/docs': ^1.0.1
-  '@sinclair/typebox': ^0.24.38
+  '@sinclair/typebox': ^0.24.39
   '@types/dotenv-safe': ^8.1.2
   '@types/node': ^16.11.58
   '@types/pg': ^8.6.5
@@ -18,13 +18,13 @@ specifiers:
   p-limit: ^4.0.0
   pg: ^8.8.0
   postgres-interval: ^4.0.0
-  typescript: ^4.8.2
+  typescript: ^4.8.3
 
 dependencies:
   '@fastify/cors': 8.1.0
-  '@fastify/type-provider-typebox': 2.3.0_5epekrm7mvwovmfymcncsduqam
+  '@fastify/type-provider-typebox': 2.3.0_rcfsv3yb2r36tuibyzwuzc4z2e
   '@googleapis/docs': 1.0.1
-  '@sinclair/typebox': 0.24.38
+  '@sinclair/typebox': 0.24.39
   discord.js: 14.3.0
   dotenv-safe: 8.2.0
   fastify: 4.5.3
@@ -40,7 +40,7 @@ devDependencies:
   '@types/node': 16.11.58
   '@types/pg': 8.6.5
   nodemon: 2.0.19
-  typescript: 4.8.2
+  typescript: 4.8.3
 
 packages:
 
@@ -102,13 +102,13 @@ packages:
       fast-json-stringify: 5.2.0
     dev: false
 
-  /@fastify/type-provider-typebox/2.3.0_5epekrm7mvwovmfymcncsduqam:
+  /@fastify/type-provider-typebox/2.3.0_rcfsv3yb2r36tuibyzwuzc4z2e:
     resolution: {integrity: sha512-arEH1FL6CNTgctoVw++jNPJN9DdzUe7rJlb3XJyw7rAGiT2m402P4GMFVhtDqndQzEJN37UJXVYbCR9D0AahgQ==}
     peerDependencies:
       '@sinclair/typebox': ^0.24.1
       fastify: ^4.0.0
     dependencies:
-      '@sinclair/typebox': 0.24.38
+      '@sinclair/typebox': 0.24.39
       fastify: 4.5.3
     dev: false
 
@@ -140,8 +140,8 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sinclair/typebox/0.24.38:
-    resolution: {integrity: sha512-IbYB6vdhLFmzGEyXXEdFAJKyq7S4/RsivkgxNzs/LzwYuUJHmeNQ0cHkjG/Yqm6VgUzzZDLMZAf0XgeeaZAocA==}
+  /@sinclair/typebox/0.24.39:
+    resolution: {integrity: sha512-GqtkxoAjhTzoMwFg/JYRl+1+miOoyvp6mkLpbMSd2fIQak2KvY00ndlXxxkDBpuCPYkorZeEZf0LEQn9V9NRVQ==}
     dev: false
 
   /@sindresorhus/is/5.3.0:
@@ -1336,8 +1336,8 @@ packages:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
     dev: false
 
-  /typescript/4.8.2:
-    resolution: {integrity: sha512-C0I1UsrrDHo2fYI5oaCGbSejwX4ch+9Y5jTQELvovfmFkK3HHSZJB8MSJcWLmCUBzQBchCrZ9rMRV6GuNrvGtw==}
+  /typescript/4.8.3:
+    resolution: {integrity: sha512-goMHfm00nWPa8UvR/CPSvykqf6dVV8x/dp0c5mFTMTIu0u0FlGWRioyy7Nn0PGAdHxpJZnuO/ut+PpQ8UiHAig==}
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true

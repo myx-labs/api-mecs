@@ -25,13 +25,13 @@
     "@types/node": "^16.11.58",
     "@types/pg": "^8.6.5",
     "nodemon": "^2.0.19",
-    "typescript": "^4.8.2"
+    "typescript": "^4.8.3"
   },
   "dependencies": {
     "@fastify/cors": "^8.1.0",
     "@fastify/type-provider-typebox": "^2.3.0",
     "@googleapis/docs": "^1.0.1",
-    "@sinclair/typebox": "^0.24.38",
+    "@sinclair/typebox": "^0.24.39",
     "discord.js": "^14.3.0",
     "dotenv-safe": "^8.2.0",
     "fastify": "^4.5.3",
@@ -41,8 +41,5 @@
     "p-limit": "^4.0.0",
     "pg": "^8.8.0",
     "postgres-interval": "^4.0.0"
-  },
-  "overrides": {
-    "@types/responselike": "1.0.0"
   }
 }
