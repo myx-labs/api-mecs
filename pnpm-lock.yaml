@@ -99,7 +99,7 @@ packages:
   /@fastify/fast-json-stringify-compiler/4.1.0:
     resolution: {integrity: sha512-cTKBV2J9+u6VaKDhX7HepSfPSzw+F+TSd+k0wzifj4rG+4E5PjSFJCk19P8R6tr/72cuzgGd+mbB3jFT6lvAgw==}
     dependencies:
-      fast-json-stringify: 5.2.0
+      fast-json-stringify: 5.3.0
     dev: false
 
   /@fastify/type-provider-typebox/2.3.0_rcfsv3yb2r36tuibyzwuzc4z2e:
@@ -472,8 +472,8 @@ packages:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: false
 
-  /fast-json-stringify/5.2.0:
-    resolution: {integrity: sha512-u5jtrcAK9RINW15iuDKnsuuhqmqre4AmDMp3crRTjUMdAuHMpQUt3IfoMm5wlJm59b74PcajqOl3SjgnC5FPmw==}
+  /fast-json-stringify/5.3.0:
+    resolution: {integrity: sha512-jTlJV/VAaYMtYl5G41uEL8UQT7/fT5W6LuxKxIS/Lpm6bXxmR+reF3m3WgP/WwxXybH61O+xhWK7n9uAsY6zGA==}
     dependencies:
       '@fastify/deepmerge': 1.1.0
       ajv: 8.11.0
@@ -508,8 +508,8 @@ packages:
       '@fastify/fast-json-stringify-compiler': 4.1.0
       abstract-logging: 2.0.1
       avvio: 8.2.0
-      find-my-way: 7.0.1
-      light-my-request: 5.5.1
+      find-my-way: 7.1.0
+      light-my-request: 5.6.0
       pino: 8.5.0
       process-warning: 2.0.0
       proxy-addr: 2.0.7
@@ -543,8 +543,8 @@ packages:
       to-regex-range: 5.0.1
     dev: true
 
-  /find-my-way/7.0.1:
-    resolution: {integrity: sha512-w05SaOPg54KqBof/RDA+75n1R48V7ZZNPL3nR17jJJs5dgZpR3ivfrMWOyx7BVFQgCLhYRG05hfgFCohYvSUXA==}
+  /find-my-way/7.1.0:
+    resolution: {integrity: sha512-yQYjxgcZmo6SQ1bRPr9ToMcCyzBOZ3L1cbDYTNCHRq7XfQPLSDhbywUAsQCLWlL3uuOUAKvTxeJ2V2i+Z9YqGA==}
     engines: {node: '>=14'}
     dependencies:
       fast-deep-equal: 3.1.3
@@ -825,8 +825,8 @@ packages:
       json-buffer: 3.0.1
     dev: false
 
-  /light-my-request/5.5.1:
-    resolution: {integrity: sha512-Zd4oZjF7axSyc5rYQsbB0qsgY4LFFviZSbEywxf7Vi5UE3y3c7tYF/GeheQjBNYY+pQ55BF8UGGJTjneoxOS1w==}
+  /light-my-request/5.6.0:
+    resolution: {integrity: sha512-xd9HY7p8t+j5bzP5Waqe4+0hluDnupzhLNu7Lk3l6wUbq3MFmTO0xykd0xwd7yhq7nMXfRPnDEurqYEkcJ3Q5g==}
     dependencies:
       cookie: 0.5.0
       process-warning: 2.0.0
