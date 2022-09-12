@@ -4,7 +4,7 @@ specifiers:
   '@fastify/cors': ^8.1.0
   '@fastify/type-provider-typebox': ^2.3.0
   '@googleapis/docs': ^1.0.1
-  '@sinclair/typebox': ^0.24.39
+  '@sinclair/typebox': ^0.24.40
   '@types/dotenv-safe': ^8.1.2
   '@types/node': ^16.11.58
   '@types/pg': ^8.6.5
@@ -22,9 +22,9 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.1.0
-  '@fastify/type-provider-typebox': 2.3.0_rcfsv3yb2r36tuibyzwuzc4z2e
+  '@fastify/type-provider-typebox': 2.3.0_q5zphoio3rrpwmdywhdzcaf4eu
   '@googleapis/docs': 1.0.1
-  '@sinclair/typebox': 0.24.39
+  '@sinclair/typebox': 0.24.40
   discord.js: 14.3.0
   dotenv-safe: 8.2.0
   fastify: 4.5.3
@@ -102,13 +102,13 @@ packages:
       fast-json-stringify: 5.3.0
     dev: false
 
-  /@fastify/type-provider-typebox/2.3.0_rcfsv3yb2r36tuibyzwuzc4z2e:
+  /@fastify/type-provider-typebox/2.3.0_q5zphoio3rrpwmdywhdzcaf4eu:
     resolution: {integrity: sha512-arEH1FL6CNTgctoVw++jNPJN9DdzUe7rJlb3XJyw7rAGiT2m402P4GMFVhtDqndQzEJN37UJXVYbCR9D0AahgQ==}
     peerDependencies:
       '@sinclair/typebox': ^0.24.1
       fastify: ^4.0.0
     dependencies:
-      '@sinclair/typebox': 0.24.39
+      '@sinclair/typebox': 0.24.40
       fastify: 4.5.3
     dev: false
 
@@ -140,8 +140,8 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sinclair/typebox/0.24.39:
-    resolution: {integrity: sha512-GqtkxoAjhTzoMwFg/JYRl+1+miOoyvp6mkLpbMSd2fIQak2KvY00ndlXxxkDBpuCPYkorZeEZf0LEQn9V9NRVQ==}
+  /@sinclair/typebox/0.24.40:
+    resolution: {integrity: sha512-Xint60L8rF0+nRy+6fCjW9jQMmu7fTpbwTBrXZiK6eq/RHDJS7LvWX/0oXC8O7fCePmrY/XdfaTv2HiUDeCq4g==}
     dev: false
 
   /@sindresorhus/is/5.3.0:
