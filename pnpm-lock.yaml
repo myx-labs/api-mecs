@@ -4,7 +4,7 @@ specifiers:
   '@fastify/cors': ^8.1.0
   '@fastify/type-provider-typebox': ^2.3.0
   '@googleapis/docs': ^1.0.1
-  '@sinclair/typebox': ^0.24.40
+  '@sinclair/typebox': ^0.24.41
   '@types/dotenv-safe': ^8.1.2
   '@types/node': ^16.11.58
   '@types/pg': ^8.6.5
@@ -22,9 +22,9 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.1.0
-  '@fastify/type-provider-typebox': 2.3.0_q5zphoio3rrpwmdywhdzcaf4eu
+  '@fastify/type-provider-typebox': 2.3.0_xilajphe2g2nnufjnjjmtyp464
   '@googleapis/docs': 1.0.1
-  '@sinclair/typebox': 0.24.40
+  '@sinclair/typebox': 0.24.41
   discord.js: 14.3.0
   dotenv-safe: 8.2.0
   fastify: 4.5.3
@@ -49,7 +49,7 @@ packages:
     engines: {node: '>=16.9.0'}
     dependencies:
       '@sapphire/shapeshift': 3.6.0
-      discord-api-types: 0.37.8
+      discord-api-types: 0.37.9
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.1
       tslib: 2.4.0
@@ -67,7 +67,7 @@ packages:
       '@discordjs/collection': 1.1.0
       '@sapphire/async-queue': 1.5.0
       '@sapphire/snowflake': 3.2.2
-      discord-api-types: 0.37.8
+      discord-api-types: 0.37.9
       file-type: 17.1.6
       tslib: 2.4.0
       undici: 5.10.0
@@ -102,13 +102,13 @@ packages:
       fast-json-stringify: 5.3.0
     dev: false
 
-  /@fastify/type-provider-typebox/2.3.0_q5zphoio3rrpwmdywhdzcaf4eu:
+  /@fastify/type-provider-typebox/2.3.0_xilajphe2g2nnufjnjjmtyp464:
     resolution: {integrity: sha512-arEH1FL6CNTgctoVw++jNPJN9DdzUe7rJlb3XJyw7rAGiT2m402P4GMFVhtDqndQzEJN37UJXVYbCR9D0AahgQ==}
     peerDependencies:
       '@sinclair/typebox': ^0.24.1
       fastify: ^4.0.0
     dependencies:
-      '@sinclair/typebox': 0.24.40
+      '@sinclair/typebox': 0.24.41
       fastify: 4.5.3
     dev: false
 
@@ -140,8 +140,8 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sinclair/typebox/0.24.40:
-    resolution: {integrity: sha512-Xint60L8rF0+nRy+6fCjW9jQMmu7fTpbwTBrXZiK6eq/RHDJS7LvWX/0oXC8O7fCePmrY/XdfaTv2HiUDeCq4g==}
+  /@sinclair/typebox/0.24.41:
+    resolution: {integrity: sha512-TJCgQurls4FipFvHeC+gfAzb+GGstL0TDwYJKQVtTeSvJIznWzP7g3bAd5gEBlr8+bIxqnWS9VGVWREDhmE8jA==}
     dev: false
 
   /@sindresorhus/is/5.3.0:
@@ -344,7 +344,7 @@ packages:
     resolution: {integrity: sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==}
     dependencies:
       function-bind: 1.1.1
-      get-intrinsic: 1.1.2
+      get-intrinsic: 1.1.3
     dev: false
 
   /chokidar/3.5.3:
@@ -413,8 +413,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /discord-api-types/0.37.8:
-    resolution: {integrity: sha512-uhol9KQ2moExZItMpuDMkf0R7sqqNHqcJBFN7S5iSdXBVCMRO7sC0GoyuRrv6ZDBYxoFU6nDy4dv0nld/aysqA==}
+  /discord-api-types/0.37.9:
+    resolution: {integrity: sha512-mAJv7EcDDo6YztR3XSIED2IAHJcAlzWFD31Q2cHLURMKPb0CW0TM/r32HhAHO9uHw74N3cviOzJIZfZVB/e/5A==}
     dev: false
 
   /discord.js/14.3.0:
@@ -426,7 +426,7 @@ packages:
       '@discordjs/rest': 1.1.0
       '@sapphire/snowflake': 3.2.2
       '@types/ws': 8.5.3
-      discord-api-types: 0.37.8
+      discord-api-types: 0.37.9
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       tslib: 2.4.0
@@ -603,8 +603,8 @@ packages:
       - supports-color
     dev: false
 
-  /get-intrinsic/1.1.2:
-    resolution: {integrity: sha512-Jfm3OyCxHh9DJyc28qGk+JmfkpO41A4XkneDSujN9MDXrm4oDKdHvndhZ2dN94+ERNfkYJWDclW6k2L/ZGHjXA==}
+  /get-intrinsic/1.1.3:
+    resolution: {integrity: sha512-QJVz1Tj7MS099PevUG5jvnt9tSkXN8K14dxQlikJuPt4uD9hHAHjLyLBiLR5zELelBdD9QNRAXZzsJx0WaDL9A==}
     dependencies:
       function-bind: 1.1.1
       has: 1.0.3
@@ -1248,7 +1248,7 @@ packages:
     resolution: {integrity: sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==}
     dependencies:
       call-bind: 1.0.2
-      get-intrinsic: 1.1.2
+      get-intrinsic: 1.1.3
       object-inspect: 1.12.2
     dev: false
 
