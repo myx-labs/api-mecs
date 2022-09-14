@@ -22,7 +22,7 @@
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
-    "@types/node": "^16.11.58",
+    "@types/node": "^16.11.59",
     "@types/pg": "^8.6.5",
     "nodemon": "^2.0.19",
     "typescript": "^4.8.3"
@@ -34,7 +34,7 @@
     "@sinclair/typebox": "^0.24.41",
     "discord.js": "^14.3.0",
     "dotenv-safe": "^8.2.0",
-    "fastify": "^4.5.3",
+    "fastify": "^4.6.0",
     "fuse.js": "^6.6.2",
     "got": "^12.4.1",
     "iso8601-duration": "^2.1.1",
