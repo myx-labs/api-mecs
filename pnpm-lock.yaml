@@ -5,7 +5,7 @@ specifiers:
   '@fastify/type-provider-typebox': ^2.3.0
   '@googleapis/docs': ^1.0.1
   '@sinclair/typebox': ^0.24.47
-  '@types/node': ^16.11.66
+  '@types/node': ^18.11.0
   '@types/pg': ^8.6.5
   discord.js: ^14.6.0
   dotenv: ^16.0.3
@@ -35,7 +35,7 @@ dependencies:
   postgres-interval: 4.0.0
 
 devDependencies:
-  '@types/node': 16.11.66
+  '@types/node': 18.11.0
   '@types/pg': 8.6.5
   nodemon: 2.0.20
   typescript: 4.8.4
@@ -169,13 +169,13 @@ packages:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
     dev: false
 
-  /@types/node/16.11.66:
-    resolution: {integrity: sha512-+xvMrGl3eAygKcf5jm+4zA4tbfEgmKM9o6/glTmN0RFVdu2VuFXMYYtRmuv3zTGCgAYMnEZLde3B7BTp+Yxcig==}
+  /@types/node/18.11.0:
+    resolution: {integrity: sha512-IOXCvVRToe7e0ny7HpT/X9Rb2RYtElG1a+VshjwT00HxrM2dWBApHQoqsI6WiY7Q03vdf2bCrIGzVrkF/5t10w==}
 
   /@types/pg/8.6.5:
     resolution: {integrity: sha512-tOkGtAqRVkHa/PVZicq67zuujI4Oorfglsr2IbKofDwBSysnaqSx7W1mDqFqdkGE6Fbgh+PZAl0r/BWON/mozw==}
     dependencies:
-      '@types/node': 16.11.66
+      '@types/node': 18.11.0
       pg-protocol: 1.5.0
       pg-types: 2.2.0
     dev: true
@@ -183,7 +183,7 @@ packages:
   /@types/ws/8.5.3:
     resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
     dependencies:
-      '@types/node': 16.11.66
+      '@types/node': 18.11.0
     dev: false
 
   /abbrev/1.1.1:
