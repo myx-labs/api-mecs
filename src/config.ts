@@ -1,5 +1,5 @@
-import { config as config_env } from "dotenv-safe";
-config_env();
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export default {
   testMode: false,

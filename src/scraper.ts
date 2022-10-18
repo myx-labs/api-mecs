@@ -107,7 +107,7 @@ export function processReasonString(reason: string | undefined, name?: string) {
       names.push({ name: name });
     }
 
-    const nameFuse = new Fuse(names, {
+    const nameFuse = new Fuse.default(names, {
       keys: ["name", "displayName"],
     });
 

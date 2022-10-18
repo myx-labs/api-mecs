@@ -1,8 +1,5 @@
 // Modules
-import { config as config_env } from "dotenv-safe";
-config_env();
-
-import fastify, { FastifyRequest } from "fastify";
+import { fastify, FastifyRequest } from "fastify";
 import fastifyCors from "@fastify/cors";
 import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import { Type } from "@sinclair/typebox";
@@ -63,7 +60,7 @@ const port: number = config.port;
 const automated_limit = pLimit(1);
 const manual_limit = pLimit(1);
 
-server.register(fastifyCors, {
+server.register(fastifyCors.default, {
   origin: [/localhost/, /yan3321\.com$/, /yan\.gg$/, /127.0.0.1/],
 });
 
