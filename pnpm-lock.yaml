@@ -4,7 +4,7 @@ specifiers:
   '@fastify/cors': ^8.2.0
   '@fastify/type-provider-typebox': ^2.4.0
   '@googleapis/docs': ^2.0.0
-  '@sinclair/typebox': ^0.25.16
+  '@sinclair/typebox': ^0.25.17
   '@types/dotenv-safe': ^8.1.2
   '@types/node': ^16.18.11
   '@types/pg': ^8.6.6
@@ -22,9 +22,9 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.2.0
-  '@fastify/type-provider-typebox': 2.4.0_srxu27r7jelwulqij6gi3ymtwi
+  '@fastify/type-provider-typebox': 2.4.0_y6voea7wlufjruel6hbil4r7cq
   '@googleapis/docs': 2.0.0
-  '@sinclair/typebox': 0.25.16
+  '@sinclair/typebox': 0.25.17
   discord.js: 14.7.1
   dotenv-safe: 8.2.0
   fastify: 4.11.0
@@ -50,7 +50,7 @@ packages:
     dependencies:
       '@discordjs/util': 0.1.0
       '@sapphire/shapeshift': 3.8.1
-      discord-api-types: 0.37.25
+      discord-api-types: 0.37.26
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.2
       tslib: 2.4.1
@@ -69,7 +69,7 @@ packages:
       '@discordjs/util': 0.1.0
       '@sapphire/async-queue': 1.5.0
       '@sapphire/snowflake': 3.4.0
-      discord-api-types: 0.37.25
+      discord-api-types: 0.37.26
       file-type: 18.0.0
       tslib: 2.4.1
       undici: 5.14.0
@@ -109,13 +109,13 @@ packages:
       fast-json-stringify: 5.5.0
     dev: false
 
-  /@fastify/type-provider-typebox/2.4.0_srxu27r7jelwulqij6gi3ymtwi:
+  /@fastify/type-provider-typebox/2.4.0_y6voea7wlufjruel6hbil4r7cq:
     resolution: {integrity: sha512-dP8KnpfyBD1FT1UxNWCRqSpKG69xYAK53q6MqUjuwYL7xvogXBbH/tpAMc1kZkKmgAHPT0migy9DaYtnkTbIIQ==}
     peerDependencies:
       '@sinclair/typebox': ^0.25.9
       fastify: ^4.0.0
     dependencies:
-      '@sinclair/typebox': 0.25.16
+      '@sinclair/typebox': 0.25.17
       fastify: 4.11.0
     dev: false
 
@@ -147,8 +147,8 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sinclair/typebox/0.25.16:
-    resolution: {integrity: sha512-5sclbtYBKQ0W5hY8ovF/cBbQV+FWBZArd738hQpLgWUdlWyuOA0HOuYN178jUJRz0pXuL1+UYR+LCMvoR47osg==}
+  /@sinclair/typebox/0.25.17:
+    resolution: {integrity: sha512-OLQlcfNZn2Qy59LE7Fzt2dLAxvVx3F7GsAGpQPKWq1nsdzPpudaSNjwhrjc1HgtbidSxxJmSe7RNTbedFlSqkg==}
     dev: false
 
   /@sindresorhus/is/5.3.0:
@@ -172,6 +172,10 @@ packages:
     dependencies:
       dotenv: 8.6.0
     dev: true
+
+  /@types/http-cache-semantics/4.0.1:
+    resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
+    dev: false
 
   /@types/node/16.18.11:
     resolution: {integrity: sha512-3oJbGBUWuS6ahSnEq1eN2XrCyf4YsWI8OyCvo7c64zQJNplk3mO84t53o8lfTk+2ji59g5ycfc6qQ3fdHliHuA==}
@@ -323,10 +327,11 @@ packages:
     engines: {node: '>=14.16'}
     dev: false
 
-  /cacheable-request/10.2.4:
-    resolution: {integrity: sha512-IWIea8ei1Ht4dBqvlvh7Gs7EYlMyBhlJybLDUB9sadEqHqftmdNieMLIR5ia3vs8gbjj9t8hXLBpUVg3vcQNbg==}
+  /cacheable-request/10.2.5:
+    resolution: {integrity: sha512-5RwYYCfzjNPsyJxb/QpaM0bfzx+kw5/YpDhZPm9oMIDntHFQ9YXeyV47ZvzlTE0XrrrbyO2UITJH4GF9eRLdXQ==}
     engines: {node: '>=14.16'}
     dependencies:
+      '@types/http-cache-semantics': 4.0.1
       get-stream: 6.0.1
       http-cache-semantics: 4.1.0
       keyv: 4.5.2
@@ -407,8 +412,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /discord-api-types/0.37.25:
-    resolution: {integrity: sha512-aCwA2sWnL1zPQgTELkkMzQneuWyCXXUjZCUKswesiE6RDCfOfxAPXOHg6ZTlBA5layPSikGCBBRjyh8S3Wzd+A==}
+  /discord-api-types/0.37.26:
+    resolution: {integrity: sha512-xZT6qosExE1ziBgD8vYU2R2aQQKOrSYWI6AFq5CiYhQtwR+Nkt9gPA3v9kHj2RFnsWDI2AbtESiQ4Rrhsa06+Q==}
     dev: false
 
   /discord.js/14.7.1:
@@ -421,12 +426,12 @@ packages:
       '@discordjs/util': 0.1.0
       '@sapphire/snowflake': 3.4.0
       '@types/ws': 8.5.4
-      discord-api-types: 0.37.25
+      discord-api-types: 0.37.26
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       tslib: 2.4.1
       undici: 5.14.0
-      ws: 8.11.0
+      ws: 8.12.0
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -481,8 +486,8 @@ packages:
       rfdc: 1.3.0
     dev: false
 
-  /fast-querystring/1.0.0:
-    resolution: {integrity: sha512-3LQi62IhQoDlmt4ULCYmh17vRO2EtS7hTSsG4WwoKWgV7GLMKBOecEh+aiavASnLx8I2y89OD33AGLo0ccRhzA==}
+  /fast-querystring/1.1.0:
+    resolution: {integrity: sha512-LWkjBCZlxjnSanuPpZ6mHswjy8hQv3VcPJsQB3ltUF2zjvrycr0leP3TSTEEfvQ1WEMSRl5YNsGqaft9bjLqEw==}
     dependencies:
       fast-decode-uri-component: 1.0.1
     dev: false
@@ -553,7 +558,7 @@ packages:
     engines: {node: '>=14'}
     dependencies:
       fast-deep-equal: 3.1.3
-      fast-querystring: 1.0.0
+      fast-querystring: 1.1.0
       safe-regex2: 2.0.0
     dev: false
 
@@ -676,7 +681,7 @@ packages:
       '@sindresorhus/is': 5.3.0
       '@szmarczak/http-timer': 5.0.1
       cacheable-lookup: 7.0.0
-      cacheable-request: 10.2.4
+      cacheable-request: 10.2.5
       decompress-response: 6.0.0
       form-data-encoder: 2.1.4
       get-stream: 6.0.1
@@ -1369,12 +1374,12 @@ packages:
       webidl-conversions: 3.0.1
     dev: false
 
-  /ws/8.11.0:
-    resolution: {integrity: sha512-HPG3wQd9sNQoT9xHyNCXoDUa+Xw/VevmY9FoHyQ+g+rrMn4j6FB4np7Z0OhdTgjx6MgQLK7jwSy1YecU1+4Asg==}
+  /ws/8.12.0:
+    resolution: {integrity: sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
+      utf-8-validate: '>=5.0.2'
     peerDependenciesMeta:
       bufferutil:
         optional: true
