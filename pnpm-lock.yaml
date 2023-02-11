@@ -10,7 +10,7 @@ specifiers:
   '@types/pg': ^8.6.6
   discord.js: ^14.7.1
   dotenv-safe: ^8.2.0
-  fastify: ^4.12.0
+  fastify: ^4.13.0
   fuse.js: ^6.6.2
   got: ^12.5.3
   iso8601-duration: ^2.1.1
@@ -22,12 +22,12 @@ specifiers:
 
 dependencies:
   '@fastify/cors': 8.2.0
-  '@fastify/type-provider-typebox': 2.4.0_7tm3ucp7md5tt35ifascqc3rhq
+  '@fastify/type-provider-typebox': 2.4.0_cf67w7aiu5hzknnnxnvxg2b6cm
   '@googleapis/docs': 2.0.0
   '@sinclair/typebox': 0.25.21
   discord.js: 14.7.1
   dotenv-safe: 8.2.0
-  fastify: 4.12.0
+  fastify: 4.13.0
   fuse.js: 6.6.2
   got: 12.5.3
   iso8601-duration: 2.1.1
@@ -50,9 +50,9 @@ packages:
     dependencies:
       '@discordjs/util': 0.1.0
       '@sapphire/shapeshift': 3.8.1
-      discord-api-types: 0.37.31
+      discord-api-types: 0.37.32
       fast-deep-equal: 3.1.3
-      ts-mixer: 6.0.2
+      ts-mixer: 6.0.3
       tslib: 2.5.0
     dev: false
 
@@ -69,7 +69,7 @@ packages:
       '@discordjs/util': 0.1.0
       '@sapphire/async-queue': 1.5.0
       '@sapphire/snowflake': 3.4.0
-      discord-api-types: 0.37.31
+      discord-api-types: 0.37.32
       file-type: 18.2.0
       tslib: 2.5.0
       undici: 5.18.0
@@ -109,14 +109,14 @@ packages:
       fast-json-stringify: 5.5.0
     dev: false
 
-  /@fastify/type-provider-typebox/2.4.0_7tm3ucp7md5tt35ifascqc3rhq:
+  /@fastify/type-provider-typebox/2.4.0_cf67w7aiu5hzknnnxnvxg2b6cm:
     resolution: {integrity: sha512-dP8KnpfyBD1FT1UxNWCRqSpKG69xYAK53q6MqUjuwYL7xvogXBbH/tpAMc1kZkKmgAHPT0migy9DaYtnkTbIIQ==}
     peerDependencies:
       '@sinclair/typebox': ^0.25.9
       fastify: ^4.0.0
     dependencies:
       '@sinclair/typebox': 0.25.21
-      fastify: 4.12.0
+      fastify: 4.13.0
     dev: false
 
   /@googleapis/docs/2.0.0:
@@ -258,8 +258,8 @@ packages:
     engines: {node: '>=8.0.0'}
     dev: false
 
-  /avvio/8.2.0:
-    resolution: {integrity: sha512-bbCQdg7bpEv6kGH41RO/3B2/GMMmJSo2iBK+X8AWN9mujtfUipMDfIjsgHCfpnKqoGEQrrmCDKSa5OQ19+fDmg==}
+  /avvio/8.2.1:
+    resolution: {integrity: sha512-TAlMYvOuwGyLK3PfBb5WKBXZmXz2fVCgv23d6zZFdle/q3gPjmxBaeuC0pY0Dzs5PWMSgfqqEZkrye19GlDTgw==}
     dependencies:
       archy: 1.0.0
       debug: 4.3.4
@@ -407,8 +407,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /discord-api-types/0.37.31:
-    resolution: {integrity: sha512-k9DQQ7Wv+ehiF7901qk/FnP47k6O2MHm3meQFee4gUzi5dfGAVLf7SfLNtb4w7G2dmukJyWQtVJEDF9oMb9yuQ==}
+  /discord-api-types/0.37.32:
+    resolution: {integrity: sha512-oUA4dhrzFOkvIWOc9WvKhPwsezUUVd5v5M7am1uupnRZjOmpE9RJMS0fTCUqNiMRlNAaZwPEy09UZOdIR9CyGQ==}
     dev: false
 
   /discord.js/14.7.1:
@@ -421,7 +421,7 @@ packages:
       '@discordjs/util': 0.1.0
       '@sapphire/snowflake': 3.4.0
       '@types/ws': 8.5.4
-      discord-api-types: 0.37.31
+      discord-api-types: 0.37.32
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       tslib: 2.5.0
@@ -508,18 +508,18 @@ packages:
     resolution: {integrity: sha512-79ak0JxddO0utAXAQ5ccKhvs6vX2MGyHHMMsmZkBANrq3hXc1CHzvNPHOcvTsVMEPl5I+NT+RO4YKMGehOfSIg==}
     dev: false
 
-  /fastify/4.12.0:
-    resolution: {integrity: sha512-Hh2GCsOCqnOuewWSvqXlpq5V/9VA+/JkVoooQWUhrU6gryO9+/UGOoF/dprGcKSDxkM/9TkMXSffYp8eA/YhYQ==}
+  /fastify/4.13.0:
+    resolution: {integrity: sha512-p9ibdFWH3pZ7KPgmfHPKGUy2W4EWU2TEpwlcu58w4CwGyU3ARFfh2kwq6zpZ5W2ZGVbufi4tZbqHIHAlX/9Z/A==}
     dependencies:
       '@fastify/ajv-compiler': 3.5.0
       '@fastify/error': 3.2.0
       '@fastify/fast-json-stringify-compiler': 4.2.0
       abstract-logging: 2.0.1
-      avvio: 8.2.0
+      avvio: 8.2.1
       fast-content-type-parse: 1.0.0
       find-my-way: 7.4.0
       light-my-request: 5.8.0
-      pino: 8.9.0
+      pino: 8.10.0
       process-warning: 2.1.0
       proxy-addr: 2.0.7
       rfdc: 1.3.0
@@ -1038,8 +1038,8 @@ packages:
     resolution: {integrity: sha512-KO0m2f1HkrPe9S0ldjx7za9BJjeHqBku5Ch8JyxETxT8dEFGz1PwgrHaOQupVYitpzbFSYm7nnljxD8dik2c+g==}
     dev: false
 
-  /pino/8.9.0:
-    resolution: {integrity: sha512-/x9qSrFW4wh+7OL5bLIbfl06aK/8yCSIldhD3VmVGiVYWSdFFpXvJh/4xWKENs+DhG1VkJnnpWxMF6fZ2zGXeg==}
+  /pino/8.10.0:
+    resolution: {integrity: sha512-ODfIe+giJtQGsvNAEj5/sHHpL3TFBg161JBH4W62Hc0l0PJjsDFD1R7meLI4PZ2aoHDJznxFNShkJcaG/qJToQ==}
     hasBin: true
     dependencies:
       atomic-sleep: 1.0.0
@@ -1318,8 +1318,8 @@ packages:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
     dev: false
 
-  /ts-mixer/6.0.2:
-    resolution: {integrity: sha512-zvHx3VM83m2WYCE8XL99uaM7mFwYSkjR2OZti98fabHrwkjsCvgwChda5xctein3xGOyaQhtTeDq/1H/GNvF3A==}
+  /ts-mixer/6.0.3:
+    resolution: {integrity: sha512-k43M7uCG1AkTyxgnmI5MPwKoUvS/bRvLvUb7+Pgpdlmok8AoqmUaZxUUw8zKM5B1lqZrt41GjYgnvAi0fppqgQ==}
     dev: false
 
   /tslib/2.5.0:
