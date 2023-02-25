@@ -31,7 +31,7 @@
     "@fastify/cors": "^8.2.0",
     "@fastify/type-provider-typebox": "^2.4.0",
     "@googleapis/docs": "^2.0.0",
-    "@sinclair/typebox": "^0.25.23",
+    "@sinclair/typebox": "^0.25.24",
     "discord.js": "^14.7.1",
     "dotenv-safe": "^8.2.0",
     "fastify": "^4.13.0",
