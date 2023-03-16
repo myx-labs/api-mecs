@@ -1,12 +1,12 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@fastify/cors': ^8.2.0
+  '@fastify/cors': ^8.2.1
   '@fastify/type-provider-typebox': ^2.4.0
-  '@googleapis/docs': ^2.0.0
+  '@googleapis/docs': ^2.0.1
   '@sinclair/typebox': ^0.25.24
   '@types/dotenv-safe': ^8.1.2
-  '@types/node': ^16.18.15
+  '@types/node': ^16.18.16
   '@types/pg': ^8.6.6
   discord.js: ^14.8.0
   dotenv-safe: ^8.2.0
@@ -18,12 +18,12 @@ specifiers:
   p-limit: ^4.0.0
   pg: ^8.10.0
   postgres-interval: ^4.0.0
-  typescript: ^4.9.5
+  typescript: ^5.0.2
 
 dependencies:
-  '@fastify/cors': 8.2.0
+  '@fastify/cors': 8.2.1
   '@fastify/type-provider-typebox': 2.4.0_naatsb2dmwxq3j32xoqzjtyzqm
-  '@googleapis/docs': 2.0.0
+  '@googleapis/docs': 2.0.1
   '@sinclair/typebox': 0.25.24
   discord.js: 14.8.0
   dotenv-safe: 8.2.0
@@ -37,10 +37,10 @@ dependencies:
 
 devDependencies:
   '@types/dotenv-safe': 8.1.2
-  '@types/node': 16.18.15
+  '@types/node': 16.18.16
   '@types/pg': 8.6.6
   nodemon: 2.0.21
-  typescript: 4.9.5
+  typescript: 5.0.2
 
 packages:
 
@@ -96,8 +96,8 @@ packages:
       fast-uri: 2.2.0
     dev: false
 
-  /@fastify/cors/8.2.0:
-    resolution: {integrity: sha512-qDgwpmg6C4D0D3nh8MTMuRXWyEwPnDZDBODaJv90FP2o9ukbahJByW4FtrM5Bpod5KbTf1oIExBmpItbUTQmHg==}
+  /@fastify/cors/8.2.1:
+    resolution: {integrity: sha512-2H2MrDD3ea7g707g1CNNLWb9/tYbmw7HS+MK2SDcgjxwzbOFR93JortelTIO8DBFsZqFtEpKNxiZfSyrGgYcbw==}
     dependencies:
       fastify-plugin: 4.5.0
       mnemonist: 0.39.5
@@ -127,8 +127,8 @@ packages:
       fastify: 4.14.1
     dev: false
 
-  /@googleapis/docs/2.0.0:
-    resolution: {integrity: sha512-TtQcwIUhBGc4ftr3XChNcXaXUSwZtZJo6HlOQ95Qjq1gsImXuPOAEKfjPhIsN0xlea9WOutC6ZT7kNWuOK+3CA==}
+  /@googleapis/docs/2.0.1:
+    resolution: {integrity: sha512-ujJT/9uTwtGsKQ6QVJmDNhc4TYqsekM0ME7uX5tJbqgeeNxCq73SPpDzYsZsMpsWonF5nF0v+DYPrNXHFJ7W8A==}
     engines: {node: '>=12.0.0'}
     dependencies:
       googleapis-common: 6.0.4
@@ -185,13 +185,13 @@ packages:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
     dev: false
 
-  /@types/node/16.18.15:
-    resolution: {integrity: sha512-a5RBe4vw4bFITL6351US4glblsc0m7JKfm9RpSl9f/rSAXmZmulIEzk7fvpWFr14iJCvKxV7sQUqI0bwee0iVw==}
+  /@types/node/16.18.16:
+    resolution: {integrity: sha512-ZOzvDRWp8dCVBmgnkIqYCArgdFOO9YzocZp8Ra25N/RStKiWvMOXHMz+GjSeVNe5TstaTmTWPucGJkDw0XXJWA==}
 
   /@types/pg/8.6.6:
     resolution: {integrity: sha512-O2xNmXebtwVekJDD+02udOncjVcMZQuTEQEMpKJ0ZRf5E7/9JJX3izhKUcUifBkyKpljyUM6BTgy2trmviKlpw==}
     dependencies:
-      '@types/node': 16.18.15
+      '@types/node': 16.18.16
       pg-protocol: 1.6.0
       pg-types: 2.2.0
     dev: true
@@ -199,7 +199,7 @@ packages:
   /@types/ws/8.5.4:
     resolution: {integrity: sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==}
     dependencies:
-      '@types/node': 16.18.15
+      '@types/node': 16.18.16
     dev: false
 
   /abbrev/1.1.1:
@@ -534,7 +534,7 @@ packages:
       rfdc: 1.3.0
       secure-json-parse: 2.7.0
       semver: 7.3.8
-      tiny-lru: 10.2.0
+      tiny-lru: 10.2.1
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -1296,8 +1296,8 @@ packages:
       real-require: 0.2.0
     dev: false
 
-  /tiny-lru/10.2.0:
-    resolution: {integrity: sha512-7mHRLMaUGZbrKaPh6WZRcr52Ba50cUZbA8o0VJO43DBNGOljIFt+muGaRSgqcWpmsNuInW38apKcJc213l4GDA==}
+  /tiny-lru/10.2.1:
+    resolution: {integrity: sha512-cxcNyX4O50FDnB5x9jdEJupYC+9PPutt6wT16TaOtXeHfV9t41aFqg0VniB9YK5KmBeqmZaYriNMajm/5TtA7Q==}
     engines: {node: '>=12'}
     dev: false
 
@@ -1335,9 +1335,9 @@ packages:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
     dev: false
 
-  /typescript/4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
+  /typescript/5.0.2:
+    resolution: {integrity: sha512-wVORMBGO/FAs/++blGNeAVdbNKtIh1rbBL2EyQ1+J9lClJ93KiiKe8PmFIVdXhHcyv44SL9oglmfeSsndo0jRw==}
+    engines: {node: '>=12.20'}
     hasBin: true
     dev: true
 
