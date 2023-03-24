@@ -6,7 +6,7 @@ specifiers:
   '@googleapis/docs': ^2.0.1
   '@sinclair/typebox': ^0.25.24
   '@types/dotenv-safe': ^8.1.2
-  '@types/node': ^16.18.18
+  '@types/node': ^16.18.19
   '@types/pg': ^8.6.6
   discord.js: ^14.8.0
   dotenv-safe: ^8.2.0
@@ -14,7 +14,7 @@ specifiers:
   fuse.js: ^6.6.2
   got: ^12.6.0
   iso8601-duration: ^2.1.1
-  nodemon: ^2.0.21
+  nodemon: ^2.0.22
   p-limit: ^4.0.0
   pg: ^8.10.0
   postgres-interval: ^4.0.0
@@ -37,9 +37,9 @@ dependencies:
 
 devDependencies:
   '@types/dotenv-safe': 8.1.2
-  '@types/node': 16.18.18
+  '@types/node': 16.18.19
   '@types/pg': 8.6.6
-  nodemon: 2.0.21
+  nodemon: 2.0.22
   typescript: 5.0.2
 
 packages:
@@ -51,7 +51,7 @@ packages:
       '@discordjs/formatters': 0.2.0
       '@discordjs/util': 0.2.0
       '@sapphire/shapeshift': 3.8.1
-      discord-api-types: 0.37.36
+      discord-api-types: 0.37.37
       fast-deep-equal: 3.1.3
       ts-mixer: 6.0.3
       tslib: 2.5.0
@@ -66,7 +66,7 @@ packages:
     resolution: {integrity: sha512-vn4oMSXuMZUm8ITqVOtvE7/fMMISj4cI5oLsR09PEQXHKeKDAMLltG/DWeeIs7Idfy6V8Fk3rn1e69h7NfzuNA==}
     engines: {node: '>=16.9.0'}
     dependencies:
-      discord-api-types: 0.37.36
+      discord-api-types: 0.37.37
     dev: false
 
   /@discordjs/rest/1.6.0:
@@ -77,7 +77,7 @@ packages:
       '@discordjs/util': 0.2.0
       '@sapphire/async-queue': 1.5.0
       '@sapphire/snowflake': 3.4.0
-      discord-api-types: 0.37.36
+      discord-api-types: 0.37.37
       file-type: 18.2.1
       tslib: 2.5.0
       undici: 5.21.0
@@ -185,13 +185,13 @@ packages:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
     dev: false
 
-  /@types/node/16.18.18:
-    resolution: {integrity: sha512-fwGw1uvQAzabxL1pyoknPlJIF2t7+K90uTqynleKRx24n3lYcxWa3+KByLhgkF8GEAK2c7hC8Ki0RkNM5H15jQ==}
+  /@types/node/16.18.19:
+    resolution: {integrity: sha512-Qd2EhjbjOKZuHMn+IJc2EUYwdkJw9kgsZ3k2zdyi2uIBH0hU00Yd9T5rpMq6KRiFvpscpXUQRjJSaJHH29ei8A==}
 
   /@types/pg/8.6.6:
     resolution: {integrity: sha512-O2xNmXebtwVekJDD+02udOncjVcMZQuTEQEMpKJ0ZRf5E7/9JJX3izhKUcUifBkyKpljyUM6BTgy2trmviKlpw==}
     dependencies:
-      '@types/node': 16.18.18
+      '@types/node': 16.18.19
       pg-protocol: 1.6.0
       pg-types: 2.2.0
     dev: true
@@ -199,7 +199,7 @@ packages:
   /@types/ws/8.5.4:
     resolution: {integrity: sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==}
     dependencies:
-      '@types/node': 16.18.18
+      '@types/node': 16.18.19
     dev: false
 
   /abbrev/1.1.1:
@@ -415,8 +415,8 @@ packages:
     engines: {node: '>=10'}
     dev: false
 
-  /discord-api-types/0.37.36:
-    resolution: {integrity: sha512-Nlxmp10UpVr/utgZ9uODQvG2Or+5w7LFrvFMswyeKC9l/+UaqGT6H0OVgEFhu9GEO4U6K7NNO5W8Carv7irnCA==}
+  /discord-api-types/0.37.37:
+    resolution: {integrity: sha512-LDMBKzl/zbvHO/yCzno5hevuA6lFIXJwdKSJZQrB+1ToDpFfN9thK+xxgZNR4aVkI7GHRDja0p4Sl2oYVPnHYg==}
     dev: false
 
   /discord.js/14.8.0:
@@ -430,7 +430,7 @@ packages:
       '@discordjs/util': 0.2.0
       '@sapphire/snowflake': 3.4.0
       '@types/ws': 8.5.4
-      discord-api-types: 0.37.36
+      discord-api-types: 0.37.37
       fast-deep-equal: 3.1.3
       lodash.snakecase: 4.1.1
       tslib: 2.5.0
@@ -534,7 +534,7 @@ packages:
       rfdc: 1.3.0
       secure-json-parse: 2.7.0
       semver: 7.3.8
-      tiny-lru: 10.2.2
+      tiny-lru: 10.3.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -910,8 +910,8 @@ packages:
     engines: {node: '>= 6.13.0'}
     dev: false
 
-  /nodemon/2.0.21:
-    resolution: {integrity: sha512-djN/n2549DUtY33S7o1djRCd7dEm0kBnj9c7S9XVXqRUbuggN1MZH/Nqa+5RFQr63Fbefq37nFXAE9VU86yL1A==}
+  /nodemon/2.0.22:
+    resolution: {integrity: sha512-B8YqaKMmyuCO7BowF1Z1/mkPqLk6cs/l63Ojtd6otKjMx47Dq1utxfRxcavH1I7VSaL8n5BUaoutadnsX3AAVQ==}
     engines: {node: '>=8.10.0'}
     hasBin: true
     requiresBuild: true
@@ -1296,8 +1296,8 @@ packages:
       real-require: 0.2.0
     dev: false
 
-  /tiny-lru/10.2.2:
-    resolution: {integrity: sha512-yx+e2W/6E0SBEuXG+3M1fibQyyMDbz3jd/8EPyodw+LQVcUXA6tfNGUzktEy1PgZlresc6PiC4HQiyeZM2lGzA==}
+  /tiny-lru/10.3.0:
+    resolution: {integrity: sha512-vTKRT2AEO1sViFDWAIzZVpV8KURCaMtnHa4RZB3XqtYLbrTO/fLDXKPEX9kVWq9u+nZREkwakbcmzGgvJm8QKA==}
     engines: {node: '>=12'}
     dev: false
 
