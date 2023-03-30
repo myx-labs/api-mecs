@@ -42,6 +42,12 @@ interface PGAuditCount {
   total: string;
 }
 
+export interface PGTimeCaseStats {
+  time: Date;
+  granted: string;
+  total: string;
+}
+
 interface PGModeTimeBetweenDecisions {
   mtbd: PostgresInterval.IPostgresInterval;
 }
@@ -126,6 +132,20 @@ function getPostgresIntervalInSeconds(
   interval: PostgresInterval.IPostgresInterval
 ) {
   return durationToSeconds(parseIsoDuration(interval.toISOString()));
+}
+
+export async function getTimeCaseStats() {
+  let query = `--sql
+  SELECT date_trunc('month', action_timestamp) AS time,
+  COUNT(CASE WHEN new_role_id = $1 THEN 1 END) AS granted,
+  COUNT(*) AS total
+  FROM ${table}
+  GROUP BY time;
+  `;
+  const response = await pool.query<PGTimeCaseStats>(query, [
+    group.rolesets.citizen,
+  ]);
+  return response.rows;
 }
 
 export async function getAggregateData() {

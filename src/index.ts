@@ -38,6 +38,8 @@ import {
   getDecisionValues,
   getMTBD,
   getRankingLogs,
+  getTimeCaseStats,
+  PGTimeCaseStats,
   startDB,
 } from "./postgres.js";
 import {
@@ -333,6 +335,39 @@ server.get("/audit/accuracy", async (req, res) => {
       aggregateDataCache = await getAggregateData();
     }
     return aggregateDataCache;
+  } catch (error) {
+    res.status(500);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+});
+
+let timeCaseStatsCache: PGTimeCaseStats[] | null = null;
+
+async function updateTimeCaseStats() {
+  try {
+    timeCaseStatsCache = await getTimeCaseStats();
+  } catch (error) {
+    console.error("Failed to update time case stats data cache:");
+    console.error(error);
+  }
+}
+
+setInterval(updateTimeCaseStats, cacheUpdateInterval);
+
+server.get("/stats/case", async (req, res) => {
+  try {
+    if (timeCaseStatsCache === null) {
+      timeCaseStatsCache = await getTimeCaseStats();
+    }
+    return timeCaseStatsCache
+      .map((item) => ({
+        time: new Date(item.time),
+        granted: parseInt(item.granted),
+        total: parseInt(item.total),
+      }))
+      .sort((a, b) => a.time.getTime() - b.time.getTime());
   } catch (error) {
     res.status(500);
     return {
