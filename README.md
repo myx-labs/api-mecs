@@ -6,7 +6,7 @@ This repository hosts the source code for the Membership Eligibility Criteria Sy
 
 ## Requirements
 
-- Node.js v16+
+- Node.js v18 LTS+
 - Postgres database
 - PNPM package manager `npm i -g pnpm`
 - Google Cloud API service account credentials (in JSON string format)
