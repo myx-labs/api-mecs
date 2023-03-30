@@ -5,14 +5,14 @@ dependencies:
     specifier: ^8.2.1
     version: 8.2.1
   '@fastify/type-provider-typebox':
-    specifier: ^2.4.0
-    version: 2.4.0(@sinclair/typebox@0.25.24)(fastify@4.15.0)
+    specifier: ^3.0.0
+    version: 3.0.0(fastify@4.15.0)
   '@googleapis/docs':
     specifier: ^2.0.1
     version: 2.0.1
   '@sinclair/typebox':
-    specifier: ^0.25.24
-    version: 0.25.24
+    specifier: ^0.26.8
+    version: 0.26.8
   discord.js:
     specifier: ^14.8.0
     version: 14.8.0
@@ -46,8 +46,8 @@ devDependencies:
     specifier: ^8.1.2
     version: 8.1.2
   '@types/node':
-    specifier: ^16.18.23
-    version: 16.18.23
+    specifier: ^18.15.11
+    version: 18.15.11
   '@types/pg':
     specifier: ^8.6.6
     version: 8.6.6
@@ -133,13 +133,12 @@ packages:
       fast-json-stringify: 5.6.2
     dev: false
 
-  /@fastify/type-provider-typebox@2.4.0(@sinclair/typebox@0.25.24)(fastify@4.15.0):
-    resolution: {integrity: sha512-dP8KnpfyBD1FT1UxNWCRqSpKG69xYAK53q6MqUjuwYL7xvogXBbH/tpAMc1kZkKmgAHPT0migy9DaYtnkTbIIQ==}
+  /@fastify/type-provider-typebox@3.0.0(fastify@4.15.0):
+    resolution: {integrity: sha512-VVYY/ZcPSFElLtRYboA2bmFxoINGDqmmqJ8Ch8+2lvmc+XFCsOJ714SEOpgshC4n52KBclgQxf2O80NeEAN7gQ==}
     peerDependencies:
-      '@sinclair/typebox': ^0.25.9
       fastify: ^4.0.0
     dependencies:
-      '@sinclair/typebox': 0.25.24
+      '@sinclair/typebox': 0.26.8
       fastify: 4.15.0
     dev: false
 
@@ -171,8 +170,8 @@ packages:
     engines: {node: '>=v14.0.0', npm: '>=7.0.0'}
     dev: false
 
-  /@sinclair/typebox@0.25.24:
-    resolution: {integrity: sha512-XJfwUVUKDHF5ugKwIcxEgc9k8b7HbznCp6eUfWgu710hMPNIO4aw4/zB5RogDQz8nd6gyCDpU9O/m6qYEWY6yQ==}
+  /@sinclair/typebox@0.26.8:
+    resolution: {integrity: sha512-fvAkOrUWndf5vjptkW+4TeTH84/bILWQHgk7rbbzT8trZxW+b84lr8dZQPM/r7cGNRFxDaJYsMjHCikEYyAHaw==}
     dev: false
 
   /@sindresorhus/is@5.3.0:
@@ -201,13 +200,13 @@ packages:
     resolution: {integrity: sha512-SZs7ekbP8CN0txVG2xVRH6EgKmEm31BOxA07vkFaETzZz1xh+cbt8BcI0slpymvwhx5dlFnQG2rTlPVQn+iRPQ==}
     dev: false
 
-  /@types/node@16.18.23:
-    resolution: {integrity: sha512-XAMpaw1s1+6zM+jn2tmw8MyaRDIJfXxqmIQIS0HfoGYPuf7dUWeiUKopwq13KFX9lEp1+THGtlaaYx39Nxr58g==}
+  /@types/node@18.15.11:
+    resolution: {integrity: sha512-E5Kwq2n4SbMzQOn6wnmBjuK9ouqlURrcZDVfbo9ftDDTFt3nk7ZKK4GMOzoYgnpQJKcxwQw+lGaBvvlMo0qN/Q==}
 
   /@types/pg@8.6.6:
     resolution: {integrity: sha512-O2xNmXebtwVekJDD+02udOncjVcMZQuTEQEMpKJ0ZRf5E7/9JJX3izhKUcUifBkyKpljyUM6BTgy2trmviKlpw==}
     dependencies:
-      '@types/node': 16.18.23
+      '@types/node': 18.15.11
       pg-protocol: 1.6.0
       pg-types: 2.2.0
     dev: true
@@ -215,7 +214,7 @@ packages:
   /@types/ws@8.5.4:
     resolution: {integrity: sha512-zdQDHKUgcX/zBc4GrwsE/7dVdAD8JR4EuiAXiiUhhfyIJXXb2+PrGshFyeXWQPMmmZ2XxgaqclgpIC7eTXc1mg==}
     dependencies:
-      '@types/node': 16.18.23
+      '@types/node': 18.15.11
     dev: false
 
   /abbrev@1.1.1:
