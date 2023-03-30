@@ -82,10 +82,17 @@ function isEmpty(text: string) {
 
 async function getImmigrationUser(
   userParam: string,
-  userId: number,
-  userName?: string
+  inferType = true,
+  treatAsUserId = false
 ) {
-  if (Number.isNaN(userId)) {
+  let userName: string | undefined;
+  let userId: number | undefined;
+
+  if (inferType) {
+    treatAsUserId = !Number.isNaN(Number(userParam));
+  }
+
+  if (!treatAsUserId) {
     const response = await got<any>(
       `https://users.roblox.com/v1/usernames/users`,
       {
@@ -127,7 +134,14 @@ async function getImmigrationUser(
         console.error(response);
       }
     }
+  } else {
+    userId = Number(userParam);
   }
+
+  if (!userId) {
+    throw new Error("Unable to get user ID!");
+  }
+
   return new ImmigrationUser(userId, userName);
 }
 
@@ -552,6 +566,11 @@ server.get(
   }
 );
 
+enum ParamType {
+  ID = "id",
+  Name = "name",
+}
+
 server.get(
   "/user/:id",
   {
@@ -565,6 +584,9 @@ server.get(
         Type.Object({
           blacklistOnly: Type.Optional(Type.Boolean()),
           includeHistory: Type.Optional(Type.Boolean()),
+          paramType: Type.Optional(
+            Type.Union([Type.Literal("id"), Type.Literal("name")])
+          ),
         })
       ),
       // no idea why but header types can't be inferred without this line
@@ -581,7 +603,8 @@ server.get(
       typeof req.query.includeHistory !== "undefined"
         ? req.query.includeHistory
         : true;
-    let userId: number = Number(userParam);
+
+    const paramType = req.query.paramType;
 
     try {
       if (isEmpty(userParam)) {
@@ -595,7 +618,11 @@ server.get(
         return automated_limit;
       })();
       const user = await limit(() => {
-        return getImmigrationUser(userParam, userId);
+        return getImmigrationUser(
+          userParam,
+          typeof paramType === "undefined",
+          paramType === "id"
+        );
       });
 
       const [testResults, hccGamepassOwned, history] = await Promise.all([
@@ -656,7 +683,6 @@ server.post(
   },
   async (req, res) => {
     const userParam: string = req.params.id;
-    let userId: number = Number(userParam);
     try {
       if (isEmpty(userParam)) {
         throw new Error("User parameter is not valid.");
@@ -669,7 +695,7 @@ server.post(
         return automated_limit;
       })();
       const user = await limit(() => {
-        return getImmigrationUser(userParam, userId);
+        return getImmigrationUser(userParam, true);
       });
       const results = await limit(() => {
         return user.automatedReview();
