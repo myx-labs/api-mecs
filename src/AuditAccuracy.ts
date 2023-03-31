@@ -51,7 +51,7 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
   const response = await fetchRobloxURL(
     `https://groups.roblox.com/v1/groups/${
       group.id
-    }/audit-log?actionType=ChangeRank&sortOrder=Asc&limit=10${
+    }/audit-log?actionType=ChangeRank&sortOrder=Asc&limit=100${
       userId ? `&userId=${userId}` : ""
     }${cursor ? `&cursor=${cursor}` : ""}`,
     true
@@ -63,7 +63,16 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export async function processAuditLogs(limit?: number, onlyNew = false) {
+interface AuditRange {
+  latest: Date;
+  oldest: Date;
+}
+
+export async function processAuditLogs(
+  limit?: number,
+  onlyNew = false,
+  specificRange?: AuditRange
+) {
   let counter = 0;
   let nextCursor: string | undefined = undefined;
   if (!onlyNew) {
@@ -73,7 +82,13 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
       nextCursor = cache.lastPagingCursor;
     }
   }
-  const range = await getActionTimestampRange();
+
+  let range = await getActionTimestampRange();
+
+  if (specificRange) {
+    range = specificRange;
+  }
+
   // if (onlyNew) {
   //   console.log(
   //     `Processing logs with range ${new Date().toDateString()} - ${range.latest.toDateString()}, onlyNew = ${onlyNew}`
@@ -101,9 +116,14 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
       if (onlyNew) {
         timeRange = timestamp > range.latest.getTime();
       }
+      if (specificRange) {
+        timeRange =
+          timestamp > range.oldest.getTime() &&
+          timestamp < range.latest.getTime();
+      }
       return timeRange && withinRolesetScope;
     });
-    if (filteredPage.length === 0) {
+    if (filteredPage.length === 0 && !specificRange) {
       // console.log(
       //   `No more logs within given range, breaking loop to fetch new logs`
       // );

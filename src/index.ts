@@ -769,6 +769,18 @@ async function bootstrap() {
   ]);
   const address = await server.listen({ port: port });
   console.log(`Server listening at ${address}`);
+  if (config.flags.fillAuditGaps.enabled) {
+    if (
+      config.flags.fillAuditGaps.range.from &&
+      config.flags.fillAuditGaps.range.to
+    ) {
+      const range = {
+        latest: config.flags.fillAuditGaps.range.from,
+        oldest: config.flags.fillAuditGaps.range.to,
+      };
+      processAuditLogs(undefined, false, range);
+    }
+  }
   if (config.flags.processAudit) {
     if (config.flags.onlyNewAudit) {
       console.log("Processing latest audit logs...");

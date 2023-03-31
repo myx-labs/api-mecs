@@ -51,6 +51,17 @@ export default {
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",
     processAudit: process.env.ENABLE_AUDIT_PROCESSING === "true",
     onlyNewAudit: process.env.ONLY_PROCESS_LATEST_AUDITS === "true",
+    fillAuditGaps: {
+      enabled: process.env.FILL_DATA_GAP === "true",
+      range: {
+        from: process.env.FILL_FROM_TIMESTAMP
+          ? new Date(process.env.FILL_FROM_TIMESTAMP)
+          : null,
+        to: process.env.FILL_TO_TIMESTAMP
+          ? new Date(process.env.FILL_TO_TIMESTAMP)
+          : null,
+      },
+    },
   },
   stats: {
     previousQueries:
