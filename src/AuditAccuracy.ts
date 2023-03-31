@@ -186,7 +186,7 @@ export async function processAuditLogs(
       break;
     }
   }
-  if (onlyNew) {
+  if (onlyNew || specificRange) {
     await delay(10 * 1000);
     await processAuditLogs(undefined, true);
   }
