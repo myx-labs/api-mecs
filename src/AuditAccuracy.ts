@@ -97,7 +97,7 @@ export async function processAuditLogs(limit?: number, onlyNew = false) {
       const withinRolesetScope =
         item.description.NewRoleSetId === group.rolesets.citizen ||
         item.description.NewRoleSetId === group.rolesets.idc;
-      let timeRange = timestamp < range.oldest.getTime();
+      let timeRange = timestamp > range.oldest.getTime();
       if (onlyNew) {
         timeRange = timestamp > range.latest.getTime();
       }

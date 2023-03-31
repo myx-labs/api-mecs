@@ -777,7 +777,7 @@ async function bootstrap() {
       console.log("Processing all audit logs...");
       await Promise.all([
         processAuditLogs(undefined, false),
-        processAuditLogs(undefined, true),
+        // processAuditLogs(undefined, true),
       ]);
     }
   }
