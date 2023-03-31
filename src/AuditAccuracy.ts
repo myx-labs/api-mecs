@@ -75,7 +75,10 @@ export async function processAuditLogs(
 ) {
   let counter = 0;
   let nextCursor: string | undefined = undefined;
-  if (!onlyNew) {
+
+  const shouldCache = !onlyNew && !specificRange;
+
+  if (shouldCache) {
     const cache = await getCache();
     if (typeof cache.lastPagingCursor === "string") {
       console.log(`Loading cached paging cursor: ${cache.lastPagingCursor}`);
@@ -89,24 +92,13 @@ export async function processAuditLogs(
     range = specificRange;
   }
 
-  // if (onlyNew) {
-  //   console.log(
-  //     `Processing logs with range ${new Date().toDateString()} - ${range.latest.toDateString()}, onlyNew = ${onlyNew}`
-  //   );
-  // } else {
-  //   console.log(
-  //     `Processing logs with range ${range.latest.toDateString()} - ${range.oldest.toDateString()}, onlyNew = ${onlyNew}`
-  //   );
-  // }
-
   while (typeof limit !== "undefined" ? counter < limit : true) {
-    // console.log(
-    //   `Next cursor: ${nextCursor}, onlyNew: ${onlyNew}, ${counter} logs processed`
-    // );
     const page = await getAuditLogPage(nextCursor);
-    if (!onlyNew) {
+
+    if (shouldCache) {
       await setPagingCursor(nextCursor);
     }
+
     const filteredPage = page.data.filter((item) => {
       const timestamp = new Date(item.created).getTime();
       const withinRolesetScope =
@@ -123,11 +115,19 @@ export async function processAuditLogs(
       }
       return timeRange && withinRolesetScope;
     });
-    if (filteredPage.length === 0 && !specificRange) {
-      // console.log(
-      //   `No more logs within given range, breaking loop to fetch new logs`
-      // );
-      break;
+
+    if (filteredPage.length === 0) {
+      if (specificRange) {
+        const outOfRange = page.data.some(
+          (item) =>
+            specificRange.oldest.getTime() > new Date(item.created).getTime()
+        );
+        if (outOfRange) {
+          break;
+        }
+      } else {
+        break;
+      }
     } else {
       for (const item of filteredPage) {
         try {

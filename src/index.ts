@@ -364,6 +364,7 @@ server.get("/stats/case", async (req, res) => {
     return timeCaseStatsCache
       .map((item) => ({
         time: new Date(item.time),
+        users: parseInt(item.users),
         granted: parseInt(item.granted),
         total: parseInt(item.total),
       }))
@@ -767,30 +768,31 @@ async function bootstrap() {
     updateAggregateDataCache(),
     updateOfficerDecisionDataCache(),
   ]);
+
   const address = await server.listen({ port: port });
   console.log(`Server listening at ${address}`);
-  if (config.flags.fillAuditGaps.enabled) {
-    if (
-      config.flags.fillAuditGaps.range.from &&
-      config.flags.fillAuditGaps.range.to
-    ) {
-      const range = {
-        latest: config.flags.fillAuditGaps.range.from,
-        oldest: config.flags.fillAuditGaps.range.to,
-      };
-      processAuditLogs(undefined, false, range);
-    }
-  }
+
   if (config.flags.processAudit) {
     if (config.flags.onlyNewAudit) {
       console.log("Processing latest audit logs...");
-      await processAuditLogs(undefined, true);
+      processAuditLogs(undefined, true);
     } else {
       console.log("Processing all audit logs...");
-      await Promise.all([
-        processAuditLogs(undefined, false),
-        // processAuditLogs(undefined, true),
-      ]);
+      processAuditLogs(undefined, false);
+    }
+  }
+
+  const fillAuditGaps = config.flags.fillAuditGaps;
+
+  if (fillAuditGaps.enabled) {
+    const latest = fillAuditGaps.range.from;
+    const oldest = fillAuditGaps.range.to;
+    if (latest && oldest) {
+      const range = {
+        latest,
+        oldest,
+      };
+      processAuditLogs(undefined, false, range);
     }
   }
 }
