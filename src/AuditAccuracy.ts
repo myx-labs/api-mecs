@@ -4,7 +4,11 @@ import config from "./config.js";
 import { AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
 import { getCookie } from "./cookies.js";
-import { addToRankingLogs, getActionTimestampRange } from "./postgres.js";
+import {
+  addToRankingLogs,
+  checkIfExists,
+  getActionTimestampRange,
+} from "./postgres.js";
 import {
   RobloxAPI_GroupRolesetUserResponse,
   RobloxAPI_GroupUsersResponse,
@@ -137,22 +141,38 @@ export async function processAuditLogs(
 
     for (const item of filteredPage) {
       try {
-        const immigrationUser = new ImmigrationUser(item.description.TargetId);
+        const actorId = item.actor.user.userId;
+        const targetId = item.description.TargetId;
+        const oldRolesetId = item.description.OldRoleSetId;
+        const newRolesetId = item.description.NewRoleSetId;
+        const actionTimestamp = new Date(item.created);
+
+        const exists = await checkIfExists(
+          actorId,
+          targetId,
+          oldRolesetId,
+          newRolesetId,
+          actionTimestamp
+        );
+
+        if (exists) continue;
+
+        const immigrationUser = new ImmigrationUser(targetId);
 
         const [[pass, data], hccGamepassOwned] = await Promise.all([
           immigrationUser.criteriaPassing(
-            item.description.OldRoleSetId === group.rolesets.citizen
+            oldRolesetId === group.rolesets.citizen
           ),
           immigrationUser.getHCC().catch(() => false),
         ]);
 
         if (typeof immigrationUser.groupMembership?.role?.id !== "undefined") {
           await addToRankingLogs(
-            item.actor.user.userId,
-            item.description.TargetId,
-            item.description.OldRoleSetId,
-            item.description.NewRoleSetId,
-            new Date(item.created),
+            actorId,
+            targetId,
+            oldRolesetId,
+            newRolesetId,
+            actionTimestamp,
             new Date(),
             pass,
             {

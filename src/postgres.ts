@@ -399,6 +399,21 @@ export async function getRankingLogs(
   return response.rows;
 }
 
+export async function checkIfExists(
+  actorId: number,
+  targetId: number,
+  oldRolesetId: number,
+  newRolesetId: number,
+  actionTimestamp: Date
+) {
+  const countResponse = await pool.query<PGCount>(
+    `SELECT COUNT(*) FROM ${table} WHERE actor_id = $1 AND target_id = $2 AND old_role_id = $3 AND new_role_id = $4 AND action_timestamp = $5`,
+    [actorId, targetId, oldRolesetId, newRolesetId, actionTimestamp]
+  );
+  const count = parseInt(countResponse.rows[0].count);
+  return count > 0;
+}
+
 export async function addToRankingLogs(
   actorId: number,
   targetId: number,
@@ -409,12 +424,14 @@ export async function addToRankingLogs(
   reviewPassing?: boolean,
   reviewData?: DefaultAPIResponse
 ) {
-  const countResponse = await pool.query<PGCount>(
-    `SELECT COUNT(*) FROM ${table} WHERE actor_id = $1 AND target_id = $2 AND old_role_id = $3 AND new_role_id = $4 AND action_timestamp = $5`,
-    [actorId, targetId, oldRolesetId, newRolesetId, actionTimestamp]
+  const exists = await checkIfExists(
+    actorId,
+    targetId,
+    oldRolesetId,
+    newRolesetId,
+    actionTimestamp
   );
-  const count = parseInt(countResponse.rows[0].count);
-  if (count === 0) {
+  if (exists) {
     await pool.query(
       `INSERT INTO ${table}(actor_id, target_id, old_role_id, new_role_id, action_timestamp, review_timestamp, review_pass, review_data) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
