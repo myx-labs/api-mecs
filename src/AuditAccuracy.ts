@@ -101,9 +101,10 @@ export async function processAuditLogs(
 
     const filteredPage = page.data.filter((item) => {
       const timestamp = new Date(item.created).getTime();
+      const rolesetId = item.description.NewRoleSetId;
       const withinRolesetScope =
-        item.description.NewRoleSetId === group.rolesets.citizen ||
-        item.description.NewRoleSetId === group.rolesets.idc;
+        rolesetId === group.rolesets.citizen ||
+        rolesetId === group.rolesets.idc;
       let timeRange = timestamp > range.oldest.getTime();
       if (onlyNew) {
         timeRange = timestamp > range.latest.getTime();
@@ -116,66 +117,67 @@ export async function processAuditLogs(
       return timeRange && withinRolesetScope;
     });
 
-    if (filteredPage.length === 0) {
-      if (specificRange) {
-        const outOfRange = page.data.some(
-          (item) =>
-            specificRange.oldest.getTime() > new Date(item.created).getTime()
-        );
-        if (outOfRange) {
-          break;
-        }
-      } else {
-        break;
-      }
-    } else {
-      for (const item of filteredPage) {
-        try {
-          const immigrationUser = new ImmigrationUser(
-            item.description.TargetId
+    const shouldStop = (() => {
+      if (filteredPage.length === 0) {
+        if (specificRange) {
+          const outOfRange = page.data.some(
+            (item) =>
+              specificRange.oldest.getTime() > new Date(item.created).getTime()
           );
-          const [[pass, data], hccGamepassOwned] = await Promise.all([
-            immigrationUser.criteriaPassing(
-              item.description.OldRoleSetId === group.rolesets.citizen
-            ),
-            immigrationUser.getHCC().catch(() => false),
-          ]);
-
-          if (
-            typeof immigrationUser.groupMembership?.role?.id !== "undefined"
-          ) {
-            await addToRankingLogs(
-              item.actor.user.userId,
-              item.description.TargetId,
-              item.description.OldRoleSetId,
-              item.description.NewRoleSetId,
-              new Date(item.created),
-              new Date(),
-              pass,
-              {
-                user: {
-                  userId: immigrationUser.userId,
-                  username:
-                    (await immigrationUser.getUsername()) ||
-                    immigrationUser.userId.toString(),
-                  groupMembership: immigrationUser.groupMembership,
-                  hccGamepassOwned: hccGamepassOwned,
-                  exempt:
-                    immigrationUser.groupMembership != null
-                      ? immigrationUser.isExempt(
-                          immigrationUser.groupMembership.role.id
-                        )
-                      : false,
-                },
-                tests: data,
-                group: group,
-              }
-            );
-            counter++;
-          }
-        } catch (error) {
-          console.error(error);
+          return outOfRange;
         }
+        return true;
+      }
+      return false;
+    })();
+
+    if (shouldStop) {
+      break;
+    }
+
+    for (const item of filteredPage) {
+      try {
+        const immigrationUser = new ImmigrationUser(item.description.TargetId);
+
+        const [[pass, data], hccGamepassOwned] = await Promise.all([
+          immigrationUser.criteriaPassing(
+            item.description.OldRoleSetId === group.rolesets.citizen
+          ),
+          immigrationUser.getHCC().catch(() => false),
+        ]);
+
+        if (typeof immigrationUser.groupMembership?.role?.id !== "undefined") {
+          await addToRankingLogs(
+            item.actor.user.userId,
+            item.description.TargetId,
+            item.description.OldRoleSetId,
+            item.description.NewRoleSetId,
+            new Date(item.created),
+            new Date(),
+            pass,
+            {
+              user: {
+                userId: immigrationUser.userId,
+                username:
+                  (await immigrationUser.getUsername()) ||
+                  immigrationUser.userId.toString(),
+                groupMembership: immigrationUser.groupMembership,
+                hccGamepassOwned: hccGamepassOwned,
+                exempt:
+                  immigrationUser.groupMembership != null
+                    ? immigrationUser.isExempt(
+                        immigrationUser.groupMembership.role.id
+                      )
+                    : false,
+              },
+              tests: data,
+              group: group,
+            }
+          );
+          counter++;
+        }
+      } catch (error) {
+        console.error(error);
       }
     }
 
