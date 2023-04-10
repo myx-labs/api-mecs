@@ -4,8 +4,7 @@ config_env();
 
 import fastify, { FastifyRequest } from "fastify";
 import fastifyCors from "@fastify/cors";
-import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
-import { Type } from "@sinclair/typebox";
+import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 import got from "got";
 import pLimit from "p-limit";
