@@ -41,11 +41,8 @@ import {
   PGTimeCaseStats,
   startDB,
 } from "./postgres.js";
-import {
-  getMembershipGroupStaff,
-  getMembershipStaff,
-  processAuditLogs,
-} from "./AuditAccuracy.js";
+
+import { getMembershipGroupStaff, processAuditLogs } from "./AuditAccuracy.js";
 
 const requestCounter = {
   valid: 0 + config.stats.previousQueries,

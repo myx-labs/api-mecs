@@ -463,15 +463,20 @@ export default class ImmigrationUser {
         cookie: undefined as string | undefined,
       };
 
-      const cookie = await getCookie();
-      const ROBLOSECURITY = cookie.cookie;
-      headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+      if (!config.proxy) {
+        const cookie = await getCookie();
+        const ROBLOSECURITY = cookie.cookie;
+        headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+      } else {
+        url = `${config.proxy.url}?apiurl=${encodeURIComponent(url)}`;
+      }
 
       const response = await got.get<any>(url, {
         throwHttpErrors: false,
         headers: headers,
         responseType: "json",
       });
+
       const clone = Object.assign({}, response);
       this.requestCache.push({ url: url, response: clone });
       return clone;

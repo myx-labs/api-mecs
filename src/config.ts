@@ -46,6 +46,10 @@ export default {
       },
     },
   },
+  proxy: {
+    enabled: process.env.USE_WORKER_PROXY === "true",
+    url: process.env.WORKER_PROXY_URL as string,
+  },
   flags: {
     loadCache: process.env.LOAD_AUDIT_PROGRESS_FROM_CACHE === "true",
     processPending: process.env.DISABLE_PENDING_PROCESSING !== "true",
