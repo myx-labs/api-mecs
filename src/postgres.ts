@@ -1,6 +1,6 @@
 import config from "./config.js";
 import pkg from "pg";
-import { DefaultAPIResponse } from "./types";
+import { DefaultAPIResponse } from "./types.js";
 import PostgresInterval from "postgres-interval";
 const { Pool } = pkg;
 

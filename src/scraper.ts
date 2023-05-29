@@ -1,7 +1,7 @@
 import { docs, auth, docs_v1 } from "@googleapis/docs";
 import got from "got";
 
-import Fuse from "fuse.js";
+import { search } from "fast-fuzzy";
 
 import config from "./config.js";
 import { getCookie } from "./cookies.js";
@@ -85,10 +85,6 @@ async function postRobloxURL(
 }
 
 export function processReasonString(reason: string | undefined, name?: string) {
-  interface NameObject {
-    name: string;
-  }
-
   const cleanup = (string: string) => {
     string = string.trim();
     string = string.replace("/", " / ");
@@ -101,15 +97,11 @@ export function processReasonString(reason: string | undefined, name?: string) {
   };
 
   if (typeof reason !== "undefined") {
-    const names: NameObject[] = [];
+    const names: string[] = [];
 
     if (name) {
-      names.push({ name: name });
+      names.push(name);
     }
-
-    const nameFuse = new Fuse(names, {
-      keys: ["name", "displayName"],
-    });
 
     reason = cleanup(reason);
 
@@ -118,7 +110,7 @@ export function processReasonString(reason: string | undefined, name?: string) {
       .map(cleanup)
       .filter((reason) =>
         !reason.toLowerCase().match("alt")
-          ? nameFuse.search(reason).length === 0
+          ? search(reason, names).length === 0
           : true
       );
 
