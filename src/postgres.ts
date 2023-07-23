@@ -431,7 +431,7 @@ export async function addToRankingLogs(
     newRolesetId,
     actionTimestamp
   );
-  if (exists) {
+  if (!exists) {
     await pool.query(
       `INSERT INTO ${table}(actor_id, target_id, old_role_id, new_role_id, action_timestamp, review_timestamp, review_pass, review_data) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
@@ -445,9 +445,5 @@ export async function addToRankingLogs(
         reviewData,
       ]
     );
-  } else {
-    // throw new Error(
-    //   `${actorId}-${targetId}-${oldRolesetId}-${newRolesetId}-${actionTimestamp.getTime()} already exists, skipping.`
-    // );
   }
 }
