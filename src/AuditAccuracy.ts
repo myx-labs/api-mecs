@@ -55,7 +55,7 @@ async function getAuditLogPage(cursor?: string, userId?: number) {
   const response = await fetchRobloxURL(
     `https://groups.roblox.com/v1/groups/${
       group.id
-    }/audit-log?actionType=ChangeRank&sortOrder=Asc&limit=100${
+    }/audit-log?actionType=ChangeRank&sortOrder=Desc&limit=100${
       userId ? `&userId=${userId}` : ""
     }${cursor ? `&cursor=${cursor}` : ""}`,
     true
