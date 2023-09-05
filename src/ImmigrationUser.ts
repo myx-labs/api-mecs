@@ -478,13 +478,9 @@ export default class ImmigrationUser {
         cookie: undefined as string | undefined,
       };
 
-      if (!config.proxy.enabled) {
-        const cookie = await getCookie();
-        const ROBLOSECURITY = cookie.cookie;
-        headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
-      } else {
-        url = `${config.proxy.url}?apiurl=${encodeURIComponent(url)}`;
-      }
+      const cookie = await getCookie();
+      const ROBLOSECURITY = cookie.cookie;
+      headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
 
       const response = await got.get<any>(url, {
         throwHttpErrors: false,
