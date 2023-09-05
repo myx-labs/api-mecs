@@ -59,6 +59,10 @@ interface PGAggregateActorData {
   mtbd: PostgresInterval.IPostgresInterval;
 }
 
+interface PGUserIDData {
+  user_id: string;
+}
+
 interface PGAggregateData {
   actors: string;
   total: string;
@@ -76,6 +80,15 @@ export async function getDistinctActorIds() {
   let query = `SELECT DISTINCT actor_id FROM ${table}`;
   const response = await pool.query<PGActorIds>(query);
   return response.rows.map((item) => parseInt(item.actor_id));
+}
+
+export async function getUserIdFromUsername(name: string) {
+  let query = `SELECT target_id AS user_id
+  FROM ${table}
+  WHERE LOWER(review_data -> 'user' ->> 'username')
+  LIKE LOWER($1) FETCH FIRST ROW ONLY`;
+  const response = await pool.query<PGUserIDData>(query, [name]);
+  return parseInt(response.rows[0]?.user_id);
 }
 
 export async function getActionTimestampRange() {
@@ -151,8 +164,7 @@ export async function getTimeCaseStats() {
 }
 
 export async function getAggregateData() {
-  let query = `
-      SELECT 
+  let query = `SELECT 
         COUNT(DISTINCT actor_id) as actors, 
         COUNT(*) as total, 
         COUNT(

@@ -38,6 +38,7 @@ import {
   getMTBD,
   getRankingLogs,
   getTimeCaseStats,
+  getUserIdFromUsername,
   PGTimeCaseStats,
   startDB,
 } from "./postgres.js";
@@ -91,45 +92,50 @@ async function getImmigrationUser(
   }
 
   if (!treatAsUserId) {
-    const response = await got<any>(
-      `https://users.roblox.com/v1/usernames/users`,
-      {
-        throwHttpErrors: false,
-        method: "POST",
-        json: {
-          usernames: [userParam],
-          excludeBannedUsers: true,
-        },
-        headers: {
-          "content-type": "application/json",
-          accept: "application/json",
-        },
-        responseType: "json",
-      }
-    );
-    if (response) {
-      if (response.statusCode === 200) {
-        const json: RobloxAPI_ApiArrayResponse = response.body;
-        if (json.data) {
-          if (json.data.length !== 0) {
-            json.data.forEach(
-              (element: RobloxAPI_MultiGetUserByNameResponse) => {
-                if (element.requestedUsername === userParam) {
-                  if (element.name && element.id) {
-                    userName = element.name;
-                    userId = element.id;
-                  } else {
-                    throw new Error("Unable to get name and ID of user!");
+    const dbUserId = (await getUserIdFromUsername(userParam)) || undefined;
+    if (dbUserId) {
+      userId = Number(dbUserId);
+    } else {
+      const response = await got<any>(
+        `https://users.roblox.com/v1/usernames/users`,
+        {
+          throwHttpErrors: false,
+          method: "POST",
+          json: {
+            usernames: [userParam],
+            excludeBannedUsers: true,
+          },
+          headers: {
+            "content-type": "application/json",
+            accept: "application/json",
+          },
+          responseType: "json",
+        }
+      );
+      if (response) {
+        if (response.statusCode === 200) {
+          const json: RobloxAPI_ApiArrayResponse = response.body;
+          if (json.data) {
+            if (json.data.length !== 0) {
+              json.data.forEach(
+                (element: RobloxAPI_MultiGetUserByNameResponse) => {
+                  if (element.requestedUsername === userParam) {
+                    if (element.name && element.id) {
+                      userName = element.name;
+                      userId = element.id;
+                    } else {
+                      throw new Error("Unable to get name and ID of user!");
+                    }
                   }
                 }
-              }
-            );
-          } else {
-            throw new Error("No user found with that username!");
+              );
+            } else {
+              throw new Error("No user found with that username!");
+            }
           }
+        } else {
+          console.error(response);
         }
-      } else {
-        console.error(response);
       }
     }
   } else {
