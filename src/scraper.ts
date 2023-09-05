@@ -80,6 +80,7 @@ async function postRobloxURL(
       throwHttpErrors: false,
       headers: headers,
       json: body,
+      cache: config.cache,
     })
     .json<any>();
 }
