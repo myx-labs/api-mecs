@@ -586,9 +586,18 @@ export default class ImmigrationUser {
   }
 
   async getFriends() {
-    const response = await this.fetchFriends();
-    if (response.statusCode === 200) {
-      const json = response.body as any;
+    let json = null;
+
+    if (config.proxy.enabled) {
+      json = await this.fetchDataProxy("friends");
+    } else {
+      const response = await this.fetchFriends();
+      if (response.statusCode === 200) {
+        json = response.body as any;
+      }
+    }
+
+    if (json) {
       return json.count as number;
     } else {
       throw new Error("Error occured while fetching friends data");
