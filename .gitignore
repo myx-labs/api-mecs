@@ -1,6 +1,9 @@
 # api-mecs
 cache.json
+cache.json.*
+
 cookies.json
+cookies.json.*
 
 # Logs
 logs

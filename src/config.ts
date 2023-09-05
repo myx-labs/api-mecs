@@ -73,4 +73,5 @@ export default {
         ? parseInt(process.env.PREVIOUS_QUERY_COUNT)
         : 0,
   },
+  cache: new Map(),
 };

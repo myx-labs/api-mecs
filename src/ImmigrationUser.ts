@@ -48,13 +48,20 @@ export default class ImmigrationUser {
 
   async getUsername() {
     if (this.username === null) {
-      const response = await this.fetchUser();
-      if (response.statusCode === 200) {
-        const json = response.body as any;
-        if (json) {
-          this.username = json.name;
-          return this.username;
+      let json = null;
+
+      if (config.proxy.enabled) {
+        json = await this.fetchDataProxy("user");
+      } else {
+        const response = await this.fetchUser();
+        if (response.statusCode === 200) {
+          json = response.body as any;
         }
+      }
+
+      if (json) {
+        this.username = json.name;
+        return this.username;
       }
     }
     return this.username;
@@ -131,17 +138,25 @@ export default class ImmigrationUser {
   }
 
   async getTestStatus(blacklist_only: boolean = false) {
-    await Promise.all([this.fetchUser(), this.fetchGroups()]);
+    if (config.proxy.enabled) {
+      await this.fetchUserDataViaProxy();
+    } else {
+      await Promise.all([this.fetchUser(), this.fetchGroups()]);
+    }
+
     const isBanned = await this.isBanned();
     if (isBanned) {
       throw new Error("Banned");
     } else {
       if (!blacklist_only) {
-        await Promise.all([
-          this.fetchFriends(),
-          this.fetchBadges(),
-          this.fetchAccessories(),
-        ]);
+        if (!config.proxy.enabled) {
+          await Promise.all([
+            this.fetchFriends(),
+            this.fetchBadges(),
+            this.fetchAccessories(),
+          ]);
+        }
+
         const tests = await Promise.all([
           this.testAge(),
           this.testBlacklist(),
@@ -485,6 +500,31 @@ export default class ImmigrationUser {
     }
   }
 
+  proxyPromise: Promise<Response> | null = null;
+
+  async fetchUserDataViaProxy() {
+    if (this.proxyPromise) {
+      return this.proxyPromise;
+    }
+
+    try {
+      this.proxyPromise = got.get<any>(
+        `${config.proxy.url}?userId=${this.userId}`,
+        {
+          throwHttpErrors: false,
+          responseType: "json",
+          cache: config.cache,
+        }
+      );
+
+      const response = await this.proxyPromise;
+
+      return response;
+    } finally {
+      // this.proxyPromise = null;
+    }
+  }
+
   fetchUser() {
     return this.fetchRobloxURL(
       `https://users.roblox.com/v1/users/${this.userId}`
@@ -507,6 +547,13 @@ export default class ImmigrationUser {
     return this.fetchRobloxURL(
       `https://badges.roblox.com/v1/users/${this.userId}/badges?limit=10&sortOrder=Asc`
     );
+  }
+
+  async fetchDataProxy(
+    key: "user" | "friends" | "groups" | "badges" | "accessories"
+  ) {
+    const data = await this.fetchUserDataViaProxy();
+    return (data.body as any)[key].data;
   }
 
   fetchAccessories() {
@@ -552,9 +599,17 @@ export default class ImmigrationUser {
     }
   }
   async getBadges() {
-    const response = await this.fetchBadges();
-    if (response.statusCode === 200) {
-      const json = response.body as any;
+    let json = null;
+
+    if (config.proxy.enabled) {
+      json = await this.fetchDataProxy("badges");
+    } else {
+      const response = await this.fetchBadges();
+      if (response.statusCode === 200) {
+        json = response.body as any;
+      }
+    }
+    if (json) {
       return json.data.length as number;
     } else {
       throw new Error("Error occured while fetching badges data");
@@ -562,12 +617,23 @@ export default class ImmigrationUser {
   }
 
   async getGroups() {
-    const response = await this.fetchGroups();
-    const json: RobloxAPI_Group_ApiArrayResponse = response.body as any;
-    if (!json.data) {
+    let json: RobloxAPI_Group_ApiArrayResponse | null = null;
+
+    if (config.proxy.enabled) {
+      json = await this.fetchDataProxy("groups");
+    } else {
+      const response = await this.fetchGroups();
+      if (response.statusCode === 200) {
+        json = response.body as any;
+      }
+    }
+
+    if (!json || !json.data) {
       throw new Error("Group data not available");
     }
+
     const player_groups: RobloxAPI_Group_GroupMembershipResponse[] = json.data;
+
     player_groups.forEach(
       (player_group_membership: RobloxAPI_Group_GroupMembershipResponse) => {
         if (player_group_membership.group?.id === activeGroup.id) {
@@ -615,9 +681,18 @@ export default class ImmigrationUser {
   }
 
   async getAge() {
-    const response = await this.fetchUser();
-    if (response.statusCode === 200) {
-      const json = response.body as any;
+    let json = null;
+
+    if (config.proxy.enabled) {
+      json = await this.fetchDataProxy("user");
+    } else {
+      const response = await this.fetchUser();
+      if (response.statusCode === 200) {
+        json = response.body as any;
+      }
+    }
+
+    if (json) {
       this.setUsername(json.name);
       const createdDate = new Date(json.created);
       const currentDate = new Date();
@@ -625,36 +700,51 @@ export default class ImmigrationUser {
       const age = Math.round(timeDifference / (1000 * 3600 * 24));
       return age;
     } else {
-      if (response.statusCode === 429) {
-        throw new Error(`Unable to get age: too many requests`);
-      }
+      // if (response.statusCode === 429) {
+      //   throw new Error(`Unable to get age: too many requests`);
+      // }
       throw new Error("Unable to get age");
     }
   }
 
   async isBanned() {
-    const response = await this.fetchUser();
-    if (response.statusCode === 200) {
-      const json = response.body as any;
+    let json = null;
+    if (config.proxy.enabled) {
+      json = await this.fetchDataProxy("user");
+    } else {
+      const response = await this.fetchUser();
+      if (response.statusCode === 200) {
+        json = response.body as any;
+      }
+    }
+    if (json) {
       const banned = json.isBanned as boolean;
       return banned;
     } else {
-      if (response.statusCode === 429) {
-        throw new Error(`Unable to get banned status: too many requests`);
-      }
       throw new Error("Unable to get banned status");
     }
   }
 
   async getAccessoryCount() {
-    const response = await this.fetchAccessories();
-    const json = response.body as any;
-    if (response.statusCode === 200) {
-      const data = json.data as any[];
-      return data.length;
+    let json: any | null = null;
+
+    if (config.proxy.enabled) {
+      json = await this.fetchDataProxy("accessories");
     } else {
-      if (json.errors[0].code === 4) {
-        throw new Error("Not authorised to view " + this.userId + " inventory");
+      const response = await this.fetchAccessories();
+      json = response.body as any;
+    }
+
+    if (json) {
+      if (!json.errors) {
+        const data = json.data as any[];
+        return data.length;
+      } else {
+        if (json.errors[0].code === 4) {
+          throw new Error(
+            "Not authorised to view " + this.userId + " inventory"
+          );
+        }
       }
     }
   }
