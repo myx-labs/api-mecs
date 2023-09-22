@@ -9,8 +9,6 @@ import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import got from "got";
 import pLimit from "p-limit";
 
-const origin = "https://myx.yan.gg";
-
 // Classes
 import ImmigrationUser from "./ImmigrationUser.js";
 import config from "./config.js";
@@ -62,8 +60,16 @@ const port: number = config.port;
 const automated_limit = pLimit(1);
 const manual_limit = pLimit(1);
 
+const origins = [
+  /localhost/,
+  /127.0.0.1/,
+  /yan3321\.com$/,
+  /yan\.gg$/,
+  /mysver\.se$/,
+];
+
 server.register(fastifyCors, {
-  origin: [/localhost/, /yan3321\.com$/, /yan\.gg$/, /127.0.0.1/],
+  origin: origins,
 });
 
 const flattenObject = (obj: any, prefix = "") =>
@@ -649,9 +655,12 @@ server.get(
         throw new Error("User parameter is not valid.");
       }
       const limit = (() => {
-        if (req.headers.origin === origin) {
-          console.log("Manual limit in use");
-          return manual_limit;
+        const origin = req.headers.origin;
+        if (origin) {
+          if (origins.some((rx) => rx.test(origin))) {
+            console.log("Manual limit in use");
+            return manual_limit;
+          }
         }
         return automated_limit;
       })();
@@ -727,9 +736,12 @@ server.post(
         throw new Error("User parameter is not valid.");
       }
       const limit = (() => {
-        if (req.headers.origin === origin) {
-          console.log("Manual limit in use");
-          return manual_limit;
+        const origin = req.headers.origin;
+        if (origin) {
+          if (origins.some((rx) => rx.test(origin))) {
+            console.log("Manual limit in use");
+            return manual_limit;
+          }
         }
         return automated_limit;
       })();
