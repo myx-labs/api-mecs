@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
-    "@types/dotenv-safe": "^8.1.4",
-    "@types/node": "^20.8.10",
-    "@types/pg": "^8.10.8",
+    "@types/dotenv-safe": "^8.1.5",
+    "@types/node": "^20.9.0",
+    "@types/pg": "^8.10.9",
     "tsx": "^3.14.0",
     "typescript": "^5.2.2"
   },
@@ -37,7 +37,7 @@
     "fastify": "^4.24.3",
     "got": "^13.0.0",
     "iso8601-duration": "^2.1.1",
-    "p-limit": "^4.0.0",
+    "p-limit": "^5.0.0",
     "pg": "^8.11.3",
     "postgres-interval": "^4.0.1"
   }
