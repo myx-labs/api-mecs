@@ -24,14 +24,14 @@
     "@types/dotenv-safe": "^8.1.5",
     "@types/node": "^20.9.0",
     "@types/pg": "^8.10.9",
-    "tsx": "^3.14.0",
+    "tsx": "^4.1.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "@fastify/cors": "^8.4.1",
     "@fastify/type-provider-typebox": "^3.5.0",
     "@googleapis/docs": "^3.0.0",
-    "discord.js": "^14.13.0",
+    "discord.js": "^14.14.1",
     "dotenv-safe": "^8.2.0",
     "fast-fuzzy": "^1.12.0",
     "fastify": "^4.24.3",
