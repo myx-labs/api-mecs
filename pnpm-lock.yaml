@@ -39,8 +39,8 @@ dependencies:
     specifier: ^8.11.3
     version: 8.11.3
   postgres-interval:
-    specifier: ^4.0.1
-    version: 4.0.1
+    specifier: ^4.0.2
+    version: 4.0.2
 
 devDependencies:
   '@types/dotenv-safe':
@@ -1287,8 +1287,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /postgres-interval@4.0.1:
-    resolution: {integrity: sha512-51vDq943SQG1lFjIOwU48EabEQLkpXdfYwIVPSWSv6K5imu1kjoev3CuQePEKuAi/4E/Wi8coVyG8yIij89ZOw==}
+  /postgres-interval@4.0.2:
+    resolution: {integrity: sha512-EMsphSQ1YkQqKZL2cuG0zHkmjCCzQqQ71l2GXITqRwjhRleCdv00bDk/ktaSi0LnlaPzAc3535KTrjXsTdtx7A==}
     engines: {node: '>=12'}
     dev: false
 
