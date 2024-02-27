@@ -44,8 +44,8 @@ dependencies:
 
 devDependencies:
   '@types/dotenv-safe':
-    specifier: ^8.1.5
-    version: 8.1.5
+    specifier: ^8.1.6
+    version: 8.1.6
   '@types/node':
     specifier: ^20.11.17
     version: 20.11.17
@@ -422,8 +422,8 @@ packages:
       defer-to-connect: 2.0.1
     dev: false
 
-  /@types/dotenv-safe@8.1.5:
-    resolution: {integrity: sha512-E8z+Z0+yE8eEZ8BcMnb3I31fV3ROxobooqEDRBoQDAs4lb0c9X6Va6P6z+svj/USxw4R7TErcfEuW0tk7ymaPA==}
+  /@types/dotenv-safe@8.1.6:
+    resolution: {integrity: sha512-ftZXu3WGT6ALq+f98IX2gWriGMPds+0ku5h8kZewNpY47ua+Z+XNcin9apZ2kVd4B9LV1vMfUOyDf1/hhreR0Q==}
     dependencies:
       '@types/node': 20.11.17
       dotenv: 8.6.0
