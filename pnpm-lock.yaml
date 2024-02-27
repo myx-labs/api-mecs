@@ -50,8 +50,8 @@ devDependencies:
     specifier: ^20.11.17
     version: 20.11.17
   '@types/pg':
-    specifier: ^8.11.0
-    version: 8.11.0
+    specifier: ^8.11.2
+    version: 8.11.2
   tsx:
     specifier: ^4.7.1
     version: 4.7.1
@@ -438,8 +438,8 @@ packages:
     dependencies:
       undici-types: 5.26.5
 
-  /@types/pg@8.11.0:
-    resolution: {integrity: sha512-sDAlRiBNthGjNFfvt0k6mtotoVYVQ63pA8R4EMWka7crawSR60waVYR0HAgmPRs/e2YaeJTD/43OoZ3PFw80pw==}
+  /@types/pg@8.11.2:
+    resolution: {integrity: sha512-G2Mjygf2jFMU/9hCaTYxJrwdObdcnuQde1gndooZSOHsNSaCehAuwc7EIuSA34Do8Jx2yZ19KtvW8P0j4EuUXw==}
     dependencies:
       '@types/node': 20.11.17
       pg-protocol: 1.6.0
