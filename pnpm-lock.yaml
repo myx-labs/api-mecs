@@ -47,8 +47,8 @@ devDependencies:
     specifier: ^8.1.6
     version: 8.1.6
   '@types/node':
-    specifier: ^20.11.22
-    version: 20.11.22
+    specifier: ^20.11.24
+    version: 20.11.24
   '@types/pg':
     specifier: ^8.11.2
     version: 8.11.2
@@ -425,7 +425,7 @@ packages:
   /@types/dotenv-safe@8.1.6:
     resolution: {integrity: sha512-ftZXu3WGT6ALq+f98IX2gWriGMPds+0ku5h8kZewNpY47ua+Z+XNcin9apZ2kVd4B9LV1vMfUOyDf1/hhreR0Q==}
     dependencies:
-      '@types/node': 20.11.22
+      '@types/node': 20.11.24
       dotenv: 8.6.0
     dev: true
 
@@ -433,15 +433,15 @@ packages:
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
     dev: false
 
-  /@types/node@20.11.22:
-    resolution: {integrity: sha512-/G+IxWxma6V3E+pqK1tSl2Fo1kl41pK1yeCyDsgkF9WlVAme4j5ISYM2zR11bgLFJGLN5sVK40T4RJNuiZbEjA==}
+  /@types/node@20.11.24:
+    resolution: {integrity: sha512-Kza43ewS3xoLgCEpQrsT+xRo/EJej1y0kVYGiLFE1NEODXGzTfwiC6tXTLMQskn1X4/Rjlh0MQUvx9W+L9long==}
     dependencies:
       undici-types: 5.26.5
 
   /@types/pg@8.11.2:
     resolution: {integrity: sha512-G2Mjygf2jFMU/9hCaTYxJrwdObdcnuQde1gndooZSOHsNSaCehAuwc7EIuSA34Do8Jx2yZ19KtvW8P0j4EuUXw==}
     dependencies:
-      '@types/node': 20.11.22
+      '@types/node': 20.11.24
       pg-protocol: 1.6.0
       pg-types: 4.0.1
     dev: true
@@ -449,7 +449,7 @@ packages:
   /@types/ws@8.5.9:
     resolution: {integrity: sha512-jbdrY0a8lxfdTp/+r7Z4CkycbOFN8WX+IOchLJr3juT/xzbJ8URyTVSJ/hvNdadTgM1mnedb47n+Y31GsFnQlg==}
     dependencies:
-      '@types/node': 20.11.22
+      '@types/node': 20.11.24
     dev: false
 
   /@vladfrangu/async_event_emitter@2.2.4:
