@@ -25,7 +25,7 @@
     "@types/node": "^20.12.4",
     "@types/pg": "^8.11.4",
     "tsx": "^4.7.1",
-    "typescript": "^5.4.3"
+    "typescript": "^5.4.4"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
