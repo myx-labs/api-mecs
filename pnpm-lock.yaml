@@ -12,8 +12,8 @@ dependencies:
     specifier: ^4.0.0
     version: 4.0.0(@sinclair/typebox@0.32.4)
   '@googleapis/docs':
-    specifier: ^3.0.1
-    version: 3.0.1
+    specifier: ^3.0.2
+    version: 3.0.2
   discord.js:
     specifier: ^14.15.2
     version: 14.15.2
@@ -373,8 +373,8 @@ packages:
       '@sinclair/typebox': 0.32.4
     dev: false
 
-  /@googleapis/docs@3.0.1:
-    resolution: {integrity: sha512-V87S+IWEN5QugjHMWFcU4rQ1aRp9THAAKCXJtxGfKwhWYSdcoQDs6sg0ju2v9ApGCS8nAEehCs+owqnuPh7o8w==}
+  /@googleapis/docs@3.0.2:
+    resolution: {integrity: sha512-7AjDSKcZlmt+3cE+t2+kRmDyySl1sCyDYxfnWCY9rpSUhuEFRT7foqdGscI/H2f1blw3LSnF7SVvaYYHlfVHNg==}
     engines: {node: '>=12.0.0'}
     dependencies:
       googleapis-common: 7.0.1
