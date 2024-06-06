@@ -27,8 +27,8 @@ dependencies:
     specifier: ^4.27.0
     version: 4.27.0
   got:
-    specifier: ^14.3.0
-    version: 14.3.0
+    specifier: ^14.4.0
+    version: 14.4.0
   iso8601-duration:
     specifier: ^2.1.2
     version: 2.1.2
@@ -884,8 +884,8 @@ packages:
       get-intrinsic: 1.2.2
     dev: false
 
-  /got@14.3.0:
-    resolution: {integrity: sha512-vZkrXdq5BtPWTXqvjXSpl6zky3zpHaOVfSug/RfFHu3YrtSsvYzopVMDqrh2do77WnGoCSSRCHW25zXOSAQ9zw==}
+  /got@14.4.0:
+    resolution: {integrity: sha512-baa2HMfREJ9UQSXOPwWe0DNK+FT8Okcxe9kmTJvaetv2q/MUxq0qFzEnfSbxo+wj45/QioGcH5ZhuT9VBIPJ5Q==}
     engines: {node: '>=20'}
     dependencies:
       '@sindresorhus/is': 6.3.1
