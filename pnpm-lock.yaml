@@ -27,8 +27,8 @@ dependencies:
     specifier: ^4.27.0
     version: 4.27.0
   got:
-    specifier: ^14.4.0
-    version: 14.4.0
+    specifier: ^14.4.1
+    version: 14.4.1
   iso8601-duration:
     specifier: ^2.1.2
     version: 2.1.2
@@ -884,8 +884,8 @@ packages:
       get-intrinsic: 1.2.2
     dev: false
 
-  /got@14.4.0:
-    resolution: {integrity: sha512-baa2HMfREJ9UQSXOPwWe0DNK+FT8Okcxe9kmTJvaetv2q/MUxq0qFzEnfSbxo+wj45/QioGcH5ZhuT9VBIPJ5Q==}
+  /got@14.4.1:
+    resolution: {integrity: sha512-IvDJbJBUeexX74xNQuMIVgCRRuNOm5wuK+OC3Dc2pnSoh1AOmgc7JVj7WC+cJ4u0aPcO9KZ2frTXcqK4W/5qTQ==}
     engines: {node: '>=20'}
     dependencies:
       '@sindresorhus/is': 6.3.1
@@ -899,6 +899,7 @@ packages:
       lowercase-keys: 3.0.0
       p-cancelable: 4.0.1
       responselike: 3.0.0
+      type-fest: 4.19.0
     dev: false
 
   /graphemesplit@2.4.4:
@@ -1488,6 +1489,11 @@ packages:
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
+
+  /type-fest@4.19.0:
+    resolution: {integrity: sha512-CN2l+hWACRiejlnr68vY0/7734Kzu+9+TOslUXbSCQ1ruY9XIHDBSceVXCcHm/oXrdzhtLMMdJEKfemf1yXiZQ==}
+    engines: {node: '>=16'}
+    dev: false
 
   /typescript@5.4.5:
     resolution: {integrity: sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==}
