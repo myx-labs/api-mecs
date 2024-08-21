@@ -15,8 +15,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0(@sinclair/typebox@0.32.4)
       '@googleapis/docs':
-        specifier: ^3.1.0
-        version: 3.1.0
+        specifier: ^3.3.0
+        version: 3.3.0
       discord.js:
         specifier: ^14.15.3
         version: 14.15.3
@@ -255,8 +255,8 @@ packages:
     peerDependencies:
       '@sinclair/typebox': '>=0.26 <=0.33'
 
-  '@googleapis/docs@3.1.0':
-    resolution: {integrity: sha512-8tw3nT0ppvElnIEOByijz/kpOoLDUazQVNxP2ZmaXStPfP1VVPaAqz7KQfiZM3e3fFhe+0eYoTv3a93XUf9auA==}
+  '@googleapis/docs@3.3.0':
+    resolution: {integrity: sha512-F9euIJ44IUwaiDH9vP2XWeaVV4zMpYZ5dMbdpQDuDyuIBguCf7zdEfYKllAoOxCiCx4Rj5BmMhAUn2SJJpULDA==}
     engines: {node: '>=12.0.0'}
 
   '@sapphire/async-queue@1.5.2':
@@ -1069,7 +1069,7 @@ snapshots:
     dependencies:
       '@sinclair/typebox': 0.32.4
 
-  '@googleapis/docs@3.1.0':
+  '@googleapis/docs@3.3.0':
     dependencies:
       googleapis-common: 7.0.1
     transitivePeerDependencies:
