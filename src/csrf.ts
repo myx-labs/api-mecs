@@ -7,7 +7,14 @@ interface CSRFCacheItem {
 
 const cache: CSRFCacheItem[] = [];
 
+const TEMP_VALIDATION_BYPASS = true;
+
 async function validateCSRFtoken(cookie: string, ROBLOX_X_CSRF_TOKEN: string) {
+  // TODO: REPLACE WITH PROPER CSRF IMPLEMENTATION https://devforum.roblox.com/t/swagger-docs-are-no-longer-available-on-most-but-not-all-subdomains/3187954/7?u=yan3321
+  if (TEMP_VALIDATION_BYPASS) {
+    return true;
+  }
+
   const response = await got.post(`https://auth.roblox.com/`, {
     throwHttpErrors: false,
     headers: {
@@ -25,6 +32,9 @@ async function validateCSRFtoken(cookie: string, ROBLOX_X_CSRF_TOKEN: string) {
 
 export default async function getCSRFToken(cookie: string, force = false) {
   const cacheHit = cache.find((item) => item.cookie === cookie);
+  if (TEMP_VALIDATION_BYPASS) {
+    return "TEMP_VALIDATION_BYPASS";
+  }
   if (typeof cacheHit === "undefined" || force === true) {
     const response = await got.post(`https://auth.roblox.com/`, {
       throwHttpErrors: false,
