@@ -196,14 +196,40 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
   return idArray;
 }
 
+interface ExternalResponse {
+  updated: string;
+  types: string[];
+  name: string;
+  id?: string;
+  type: "user" | "group";
+}
+
 async function getIDs(type: string, includeNames = false) {
+  const config = groups[0].blacklists;
+  const external = config.external;
+  if (external) {
+    const data = await fetch(external);
+    const json = (await data.json()) as ExternalResponse[];
+    return json
+      .filter(
+        (item) => item.type === (type === "users" ? "user" : "group") && item.id
+      )
+      .map((value) => {
+        return {
+          id: parseInt(value.id as string),
+          name: value.name,
+          reason: value.types.join(", "),
+        };
+      });
+    // return data;
+  }
   let documentId = null;
   let regex: RegExp | null = null;
   if (type === "users") {
-    documentId = groups[0].blacklists.docs[type];
+    documentId = config.docs[type];
     regex = /\/users\/(\d+)/;
   } else if (type === "groups") {
-    documentId = groups[0].blacklists.docs[type];
+    documentId = config.docs[type];
     regex = /\/groups\/(\d+)/;
   }
   if (documentId != null && regex != null) {

@@ -22,6 +22,7 @@ export default {
         },
       },
       blacklists: {
+        external: process.env.EXTERNAL_BLACKLIST_ENDPOINT,
         docs: {
           users: "1SurqGXE34siGefJTGiUQfZgHnC6l3xlatGcVBI8mn8A",
           groups: "1viFDTScJyvTVwUWdkNFWt-1eVu7yvRxp5ST7S-pH2eY",
