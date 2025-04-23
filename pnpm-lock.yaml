@@ -15,8 +15,8 @@ importers:
         specifier: ^5.1.0
         version: 5.1.0(@sinclair/typebox@0.32.4)
       '@googleapis/docs':
-        specifier: ^3.3.3
-        version: 3.3.3
+        specifier: ^3.3.4
+        version: 3.3.4
       discord.js:
         specifier: ^14.18.0
         version: 14.18.0
@@ -267,8 +267,8 @@ packages:
     peerDependencies:
       '@sinclair/typebox': '>=0.26 <=0.34'
 
-  '@googleapis/docs@3.3.3':
-    resolution: {integrity: sha512-9R1YpdR9AYSk/nKFA1phsjLNfYpdLy26vKPTyePbE3qRlwnhOly7e4hQNiADV6N/89nxYytoUYOcEM5nXUquNg==}
+  '@googleapis/docs@3.3.4':
+    resolution: {integrity: sha512-EPSJjnr1gdfmXUkbgcA80g0siZNh2T9x6w8WXRcYbUkEEbv1lWz/3xfegweh3p83BK9+4UkVZetsYJvrh/TLRQ==}
     engines: {node: '>=12.0.0'}
 
   '@sapphire/async-queue@1.5.5':
@@ -344,8 +344,8 @@ packages:
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
 
-  bignumber.js@9.1.2:
-    resolution: {integrity: sha512-2/mKyZH9K85bzOEfhXDBFZTGd1CTs+5IHpeFQo9luiBG7hghdC851Pj2WAhb6E3R6b9tZj/XKhbg4fum+Kepug==}
+  bignumber.js@9.3.0:
+    resolution: {integrity: sha512-EM7aMFTXbptt/wZdMlBv2t8IViwQL+h6SLHosp8Yf0dqJMTnY6iL32opnAB6kAdL0SZPuvcAzFr31o0c/R3/RA==}
 
   buffer-equal-constant-time@1.0.1:
     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
@@ -1068,7 +1068,7 @@ snapshots:
     dependencies:
       '@sinclair/typebox': 0.32.4
 
-  '@googleapis/docs@3.3.3':
+  '@googleapis/docs@3.3.4':
     dependencies:
       googleapis-common: 7.2.0
     transitivePeerDependencies:
@@ -1141,7 +1141,7 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  bignumber.js@9.1.2: {}
+  bignumber.js@9.3.0: {}
 
   buffer-equal-constant-time@1.0.1: {}
 
@@ -1451,7 +1451,7 @@ snapshots:
 
   json-bigint@1.0.0:
     dependencies:
-      bignumber.js: 9.1.2
+      bignumber.js: 9.3.0
 
   json-buffer@3.0.1: {}
 
