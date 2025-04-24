@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.6",
     "@types/node": "^22.14.1",
-    "@types/pg": "^8.11.13",
+    "@types/pg": "^8.11.14",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   },
@@ -38,7 +38,7 @@
     "got": "^14.4.7",
     "iso8601-duration": "^2.1.2",
     "p-limit": "^6.2.0",
-    "pg": "^8.15.1",
+    "pg": "^8.15.5",
     "postgres-interval": "^4.0.2"
   }
 }
