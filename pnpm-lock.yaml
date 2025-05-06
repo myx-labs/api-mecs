@@ -49,8 +49,8 @@ importers:
         specifier: ^8.1.6
         version: 8.1.6
       '@types/node':
-        specifier: ^22.15.3
-        version: 22.15.3
+        specifier: ^22.15.9
+        version: 22.15.9
       '@types/pg':
         specifier: ^8.11.14
         version: 8.11.14
@@ -303,8 +303,8 @@ packages:
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
 
-  '@types/node@22.15.3':
-    resolution: {integrity: sha512-lX7HFZeHf4QG/J7tBZqrCAXwz9J5RD56Y6MpP0eJkka8p+K0RY/yBTW7CYFJ4VGCclxqOLKmiGP5juQc6MKgcw==}
+  '@types/node@22.15.9':
+    resolution: {integrity: sha512-l6QaCgJSJQ0HngL1TjvEY2DlefKggyGeXP1KYvYLBX41ZDPM1FsgDMAr5c+T673NMy7VCptMOzXOuJqf5uB0bA==}
 
   '@types/pg@8.11.14':
     resolution: {integrity: sha512-qyD11E5R3u0eJmd1lB0WnWKXJGA7s015nyARWljfz5DcX83TKAIlY+QrmvzQTsbIe+hkiFtkyL2gHC6qwF6Fbg==}
@@ -1096,24 +1096,24 @@ snapshots:
 
   '@types/dotenv-safe@8.1.6':
     dependencies:
-      '@types/node': 22.15.3
+      '@types/node': 22.15.9
       dotenv: 8.6.0
 
   '@types/http-cache-semantics@4.0.4': {}
 
-  '@types/node@22.15.3':
+  '@types/node@22.15.9':
     dependencies:
       undici-types: 6.21.0
 
   '@types/pg@8.11.14':
     dependencies:
-      '@types/node': 22.15.3
+      '@types/node': 22.15.9
       pg-protocol: 1.9.5
       pg-types: 4.0.2
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.15.3
+      '@types/node': 22.15.9
 
   '@vladfrangu/async_event_emitter@2.4.6': {}
 
