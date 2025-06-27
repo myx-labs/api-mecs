@@ -20,6 +20,9 @@ export default {
         hcc: {
           id: 1251870,
         },
+        firearms: {
+          id: 12068147,
+        },
       },
       blacklists: {
         external: process.env.EXTERNAL_BLACKLIST_ENDPOINT,

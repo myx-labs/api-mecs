@@ -672,13 +672,15 @@ server.get(
         );
       });
 
-      const [testResults, hccGamepassOwned, history] = await Promise.all([
-        limit(async () => user.getTestStatus(blacklistOnly)),
-        user.getHCC().catch(() => false),
-        includeHistory
-          ? getRankingHistory(user.userId).catch(() => undefined)
-          : undefined,
-      ]);
+      const [testResults, hccGamepassOwned, firearmsGamepassOwned, history] =
+        await Promise.all([
+          limit(async () => user.getTestStatus(blacklistOnly)),
+          user.getHCC().catch(() => false),
+          user.getFirearms().catch(() => false),
+          includeHistory
+            ? getRankingHistory(user.userId).catch(() => undefined)
+            : undefined,
+        ]);
 
       if (testResults !== null && typeof testResults !== "undefined") {
         const payload = {
@@ -687,6 +689,7 @@ server.get(
             username: user.username,
             groupMembership: user.groupMembership,
             hccGamepassOwned: hccGamepassOwned,
+            firearmsGamepassOwned: firearmsGamepassOwned,
             exempt: user.groupMembership?.role?.id
               ? user.isExempt(user.groupMembership?.role?.id)
               : false,

@@ -576,6 +576,18 @@ export default class ImmigrationUser {
     }
   }
 
+  async getFirearms() {
+    const response = await this.fetchGamepassOwnership(
+      activeGroup.gamepasses.firearms.id
+    );
+    if (response.statusCode === 200) {
+      const json = response.body as any;
+      return (json.data as any[]).length > 0;
+    } else {
+      throw new Error("Error occured while fetching firearms licence data");
+    }
+  }
+
   async getMembership() {
     await this.getGroups();
     if (this.groupMembership !== null) {

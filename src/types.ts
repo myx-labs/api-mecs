@@ -92,6 +92,9 @@ export interface GroupData {
     hcc: {
       id: number;
     };
+    firearms: {
+      id: number;
+    };
   };
   blacklists: {
     docs: {
