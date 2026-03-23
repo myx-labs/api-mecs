@@ -22,6 +22,7 @@ async function validateCSRFtoken(cookie: string, ROBLOX_X_CSRF_TOKEN: string) {
       cookie: `.ROBLOSECURITY=${cookie};`,
       "X-CSRF-TOKEN": ROBLOX_X_CSRF_TOKEN,
     },
+    timeout: { request: 10000 },
   });
   if (response.statusCode === 200) {
     // console.log(`Token ${ROBLOX_X_CSRF_TOKEN} validated for cookie ${cookie}!`);
@@ -42,6 +43,7 @@ export default async function getCSRFToken(cookie: string, force = false) {
         "content-type": "application/json;charset=UTF-8",
         cookie: `.ROBLOSECURITY=${cookie};`,
       },
+      timeout: { request: 10000 },
     });
     // console.log(response.headers);
     const ROBLOX_X_CSRF_TOKEN = response.headers["x-csrf-token"] as string;

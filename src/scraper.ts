@@ -57,6 +57,7 @@ async function getRobloxURL(url: string, cookieRequired: boolean = false) {
     .get(url, {
       throwHttpErrors: false,
       headers: headers,
+      timeout: { request: 10000 },
     })
     .json<any>();
 }
@@ -81,6 +82,7 @@ async function postRobloxURL(
       headers: headers,
       json: body,
       cache: config.cache,
+      timeout: { request: 10000 },
     })
     .json<any>();
 }
@@ -172,7 +174,9 @@ function extractIDsFromDocument(res: docs_v1.Schema$Document, regex: RegExp) {
                                   }
                                 }
                               }
-                            } catch (error) {}
+                            } catch (error) {
+                              console.error("Failed to extract reason from blacklist entry:", error);
+                            }
 
                             idArray.pushIfNotExist(
                               { id: id, reason: reason || undefined },
@@ -302,15 +306,31 @@ async function getBlacklist(type: string, force = false, includeNames = false) {
 }
 
 export async function getBlacklistedGroupIDs(
-  force = true,
+  force = false,
   includeNames = false
 ) {
   return getBlacklist("groups", force, includeNames);
 }
 
 export async function getBlacklistedUserIDs(
-  force = true,
+  force = false,
   includeNames = false
 ) {
   return getBlacklist("users", force, includeNames);
 }
+
+export async function preloadBlacklists() {
+  await Promise.all([
+    getBlacklist("users", true),
+    getBlacklist("groups", true),
+  ]);
+}
+
+const BLACKLIST_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+setInterval(async () => {
+  try {
+    await preloadBlacklists();
+  } catch (error) {
+    console.error("Failed to refresh blacklist cache:", error);
+  }
+}, BLACKLIST_REFRESH_INTERVAL);

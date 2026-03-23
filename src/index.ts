@@ -27,7 +27,7 @@ import {
   RobloxAPI_GroupUserItem,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
-import { getBlacklistedGroupIDs, getBlacklistedUserIDs } from "./scraper.js";
+import { getBlacklistedGroupIDs, getBlacklistedUserIDs, preloadBlacklists } from "./scraper.js";
 import { loadCookies } from "./cookies.js";
 import {
   getAggregateActorData,
@@ -39,6 +39,7 @@ import {
   getUserIdFromUsername,
   PGTimeCaseStats,
   startDB,
+  stopDB,
 } from "./postgres.js";
 
 import { getMembershipGroupStaff, processAuditLogs } from "./AuditAccuracy.js";
@@ -54,6 +55,7 @@ const group = config.groups[0];
 
 const server = fastify({
   trustProxy: true,
+  requestTimeout: 30000,
 }).withTypeProvider<TypeBoxTypeProvider>();
 const port: number = config.port;
 
@@ -116,6 +118,7 @@ async function getImmigrationUser(
             accept: "application/json",
           },
           responseType: "json",
+          timeout: { request: 10000 },
         }
       );
       if (response) {
@@ -198,16 +201,24 @@ async function logPayload(req: FastifyRequest, payload: any) {
         })
       )
       .setTitle("Test data");
-    webhookClient.send({
-      username: "MECS",
-      embeds: [requestEmbed, userEmbed, testEmbed],
-    });
-  } catch {}
+    webhookClient
+      .send({
+        username: "MECS",
+        embeds: [requestEmbed, userEmbed, testEmbed],
+      })
+      .catch((err) => console.error("Discord webhook send failed:", err));
+  } catch (error) {
+    console.error("Failed to log payload to Discord:", error);
+  }
 }
+
+server.get("/health", async () => {
+  return { status: "ok", uptime: process.uptime() };
+});
 
 server.get("/blacklist/groups", async (req, res) => {
   try {
-    return await getBlacklistedGroupIDs(undefined, true);
+    return await getBlacklistedGroupIDs(true, true);
   } catch (error) {
     res.status(500);
     return {
@@ -218,7 +229,7 @@ server.get("/blacklist/groups", async (req, res) => {
 
 server.get("/blacklist/users", async (req, res) => {
   try {
-    return await getBlacklistedUserIDs(undefined, true);
+    return await getBlacklistedUserIDs(true, true);
   } catch (error) {
     res.status(500);
     return {
@@ -584,11 +595,9 @@ server.get(
   "/audit/staff/:id",
   {
     schema: {
-      params: Type.Strict(
-        Type.Object({
-          id: Type.String(),
-        })
-      ),
+      params: Type.Object({
+        id: Type.String(),
+      }),
     },
   },
   async (req, res) => {
@@ -619,22 +628,18 @@ server.get(
   "/user/:id",
   {
     schema: {
-      params: Type.Strict(
-        Type.Object({
-          id: Type.String(),
-        })
-      ),
-      querystring: Type.Strict(
-        Type.Object({
-          blacklistOnly: Type.Optional(Type.Boolean()),
-          includeHistory: Type.Optional(Type.Boolean()),
-          paramType: Type.Optional(
-            Type.Union([Type.Literal("id"), Type.Literal("name")])
-          ),
-        })
-      ),
+      params: Type.Object({
+        id: Type.String(),
+      }),
+      querystring: Type.Object({
+        blacklistOnly: Type.Optional(Type.Boolean()),
+        includeHistory: Type.Optional(Type.Boolean()),
+        paramType: Type.Optional(
+          Type.Union([Type.Literal("id"), Type.Literal("name")])
+        ),
+      }),
       // no idea why but header types can't be inferred without this line
-      headers: Type.Strict(Type.Object({})),
+      headers: Type.Object({}),
     },
   },
   async (req, res) => {
@@ -718,18 +723,14 @@ server.post(
   "/user/:id/automated-review",
   {
     schema: {
-      params: Type.Strict(
-        Type.Object({
-          id: Type.String(),
-        })
-      ),
-      querystring: Type.Strict(
-        Type.Object({
-          blacklistOnly: Type.Optional(Type.Boolean()),
-        })
-      ),
+      params: Type.Object({
+        id: Type.String(),
+      }),
+      querystring: Type.Object({
+        blacklistOnly: Type.Optional(Type.Boolean()),
+      }),
       // no idea why but header types can't be inferred without this line
-      headers: Type.Strict(Type.Object({})),
+      headers: Type.Object({}),
     },
   },
   async (req, res) => {
@@ -781,7 +782,7 @@ server.get("/session", async (req, res) => {
 });
 
 async function bootstrap() {
-  await Promise.all([loadCookies(), startDB()]);
+  await Promise.all([loadCookies(), startDB(), preloadBlacklists()]);
   await Promise.all([
     updateAggregateDataCache(),
     updateOfficerDecisionDataCache(),
@@ -793,10 +794,14 @@ async function bootstrap() {
   if (config.flags.processAudit) {
     if (config.flags.onlyNewAudit) {
       console.log("Processing latest audit logs...");
-      processAuditLogs(undefined, true);
+      processAuditLogs(undefined, true).catch((err) =>
+        console.error("processAuditLogs (latest) failed:", err)
+      );
     } else {
       console.log("Processing all audit logs...");
-      processAuditLogs(undefined, false);
+      processAuditLogs(undefined, false).catch((err) =>
+        console.error("processAuditLogs (all) failed:", err)
+      );
     }
   }
 
@@ -810,9 +815,21 @@ async function bootstrap() {
         latest,
         oldest,
       };
-      processAuditLogs(undefined, false, range);
+      processAuditLogs(undefined, false, range).catch((err) =>
+        console.error("processAuditLogs (gap fill) failed:", err)
+      );
     }
   }
 }
 
 await bootstrap();
+
+async function shutdown() {
+  console.log("Shutting down gracefully...");
+  await server.close();
+  await stopDB();
+  process.exit(0);
+}
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

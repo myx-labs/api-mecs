@@ -22,6 +22,10 @@ export async function startDB() {
   }
 }
 
+export async function stopDB() {
+  await pool.end();
+}
+
 interface PGCount {
   count: string;
 }

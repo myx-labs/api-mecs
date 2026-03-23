@@ -32,6 +32,7 @@ async function fetchRobloxURL(
     .get(url, {
       throwHttpErrors: false,
       headers: headers,
+      timeout: { request: 10000 },
     })
     .json();
   return response;

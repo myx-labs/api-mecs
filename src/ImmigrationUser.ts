@@ -24,17 +24,12 @@ const activeGroup = config.groups[0];
 const rolesets = activeGroup.rolesets;
 const array_rolesets = Object.values(rolesets);
 
-interface cachedResponse {
-  url: string;
-  response: Response;
-}
-
 export default class ImmigrationUser {
   userId: number;
   username: string | null;
   groupMembership: RobloxAPI_Group_GroupMembershipResponse | undefined;
   private lastRolesetId: number | null;
-  private requestCache: cachedResponse[] = [];
+  private requestCache: Map<string, Response> = new Map();
 
   constructor(
     userId: number,
@@ -108,6 +103,7 @@ export default class ImmigrationUser {
             cookie: `.ROBLOSECURITY=${ROBLOSECURITY}`,
             "X-CSRF-TOKEN": ROBLOX_X_CSRF_TOKEN,
           },
+          timeout: { request: 10000 },
         }
       );
       if (response.statusCode === 200) {
@@ -202,48 +198,46 @@ export default class ImmigrationUser {
       },
     } as IndividualTest;
 
-    // User blacklist
+    // Fetch user and group blacklists in parallel
+    const [userBlacklistResult, blacklisted_groups] = await Promise.all([
+      this.getUserBlacklisted().catch((error) => {
+        console.error(error);
+        throw new Error("Unable to fetch user blacklist");
+      }),
+      this.getGroupBlacklisted().catch(() => {
+        throw new Error("Unable to fetch group blacklist");
+      }),
+    ]);
 
-    try {
-      const [user_blacklisted, reason] = await this.getUserBlacklisted();
-      if (user_blacklisted) {
-        results.status = false;
-        results.values.current = false;
-        results.metadata.player = true;
-        results.metadata.reason =
-          processReasonString(
-            reason !== null ? reason : undefined,
-            this.username ? this.username : undefined
-          ) || undefined;
-        if (results.descriptions)
-          results.descriptions.current += `User is individually blacklisted`;
-      } else {
-        results.metadata.player = false;
-        if (results.descriptions)
-          results.descriptions.current += `User is not individually blacklisted`;
-      }
-    } catch (error) {
-      console.error(error);
-      throw new Error("Unable to fetch user blacklist");
+    // User blacklist
+    const [user_blacklisted, reason] = userBlacklistResult;
+    if (user_blacklisted) {
+      results.status = false;
+      results.values.current = false;
+      results.metadata.player = true;
+      results.metadata.reason =
+        processReasonString(
+          reason !== null ? reason : undefined,
+          this.username ? this.username : undefined
+        ) || undefined;
+      if (results.descriptions)
+        results.descriptions.current += `User is individually blacklisted`;
+    } else {
+      results.metadata.player = false;
+      if (results.descriptions)
+        results.descriptions.current += `User is not individually blacklisted`;
     }
 
     // Group blacklist
-
-    try {
-      const blacklisted_groups: BlacklistedGroup[] =
-        await this.getGroupBlacklisted();
-      if (blacklisted_groups.length > 0) {
-        results.status = false;
-        results.values.current = false;
-        results.metadata.group = blacklisted_groups;
-        if (results.descriptions)
-          results.descriptions.current = `Account ${this.userId} is in ${blacklisted_groups.length} blacklisted groups`;
-      } else {
-        if (results.descriptions)
-          results.descriptions.current = `Account ${this.userId} is not in any blacklisted groups`;
-      }
-    } catch (error) {
-      throw new Error("Unable to fetch group blacklist");
+    if (blacklisted_groups.length > 0) {
+      results.status = false;
+      results.values.current = false;
+      results.metadata.group = blacklisted_groups;
+      if (results.descriptions)
+        results.descriptions.current = `Account ${this.userId} is in ${blacklisted_groups.length} blacklisted groups`;
+    } else {
+      if (results.descriptions)
+        results.descriptions.current = `Account ${this.userId} is not in any blacklisted groups`;
     }
 
     return results;
@@ -471,7 +465,7 @@ export default class ImmigrationUser {
   }
 
   async fetchRobloxURL(url: string) {
-    const cacheHit = this.requestCache.find((element) => element.url === url);
+    const cacheHit = this.requestCache.get(url);
     if (cacheHit === undefined) {
       const headers = {
         "content-type": "application/json;charset=UTF-8",
@@ -486,13 +480,14 @@ export default class ImmigrationUser {
         throwHttpErrors: false,
         headers: headers,
         responseType: "json",
+        timeout: { request: 10000 },
       });
 
       const clone = Object.assign({}, response);
-      this.requestCache.push({ url: url, response: clone });
+      this.requestCache.set(url, clone);
       return clone;
     } else {
-      return Object.assign({}, cacheHit.response);
+      return Object.assign({}, cacheHit);
     }
   }
 
@@ -510,6 +505,7 @@ export default class ImmigrationUser {
           throwHttpErrors: false,
           responseType: "json",
           cache: config.cache,
+          timeout: { request: 10000 },
         }
       );
 
@@ -669,20 +665,22 @@ export default class ImmigrationUser {
     if (blacklisted_IDs === null) {
       throw new Error("Unable to obtain blacklisted IDs");
     }
-    groups.forEach(
-      (player_group_membership: RobloxAPI_Group_GroupMembershipResponse) => {
-        const group = player_group_membership.group;
-        blacklisted_IDs.forEach((blacklistedGroupID) => {
-          if (group?.id === blacklistedGroupID.id) {
-            blacklistedGroups.push({
-              id: group.id,
-              name: group.name,
-              reason: blacklistedGroupID.reason || undefined,
-            });
-          }
-        });
-      }
+    const blacklistMap = new Map(
+      blacklisted_IDs.map((b) => [b.id, b])
     );
+    for (const player_group_membership of groups) {
+      const group = player_group_membership.group;
+      if (group?.id) {
+        const blacklisted = blacklistMap.get(group.id);
+        if (blacklisted) {
+          blacklistedGroups.push({
+            id: group.id,
+            name: group.name,
+            reason: blacklisted.reason || undefined,
+          });
+        }
+      }
+    }
     return blacklistedGroups;
   }
 
