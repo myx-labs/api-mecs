@@ -15,8 +15,8 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0(typebox@1.1.6)
       '@googleapis/docs':
-        specifier: ^9.2.1
-        version: 9.2.1
+        specifier: ^9.3.0
+        version: 9.3.0
       discord.js:
         specifier: ^14.26.4
         version: 14.26.4
@@ -273,8 +273,8 @@ packages:
     peerDependencies:
       typebox: ^1.0.13
 
-  '@googleapis/docs@9.2.1':
-    resolution: {integrity: sha512-CmrOPR1ZGvL4h1H/zBGb/RisTQpKnam+HusElBG/lknIB9IdXz2fkL83fuynguEGuq4aL0m/X3TGzNJoUfQtJQ==}
+  '@googleapis/docs@9.3.0':
+    resolution: {integrity: sha512-ga0ZlsrYxZGUfWbio7paMEs/0f6UtwUSJZcayFZ3DpJFSAnh9KhsPGj0bynrojensab18eO0ffVllUGKYCvOqA==}
     engines: {node: '>=12.0.0'}
 
   '@keyv/serialize@1.1.1':
@@ -726,8 +726,8 @@ packages:
   process-warning@5.0.0:
     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
 
-  qs@6.15.1:
-    resolution: {integrity: sha512-6YHEFRL9mfgcAvql/XhwTvf5jKcOiiupt2FiJxHkiX1z4j7WL8J/jRHYLluORvc1XxB5rV20KoeK00gVJamspg==}
+  qs@6.15.2:
+    resolution: {integrity: sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw==}
     engines: {node: '>=0.6'}
 
   quick-format-unescaped@4.0.4:
@@ -1051,7 +1051,7 @@ snapshots:
     dependencies:
       typebox: 1.1.6
 
-  '@googleapis/docs@9.2.1':
+  '@googleapis/docs@9.3.0':
     dependencies:
       googleapis-common: 8.0.1
     transitivePeerDependencies:
@@ -1371,7 +1371,7 @@ snapshots:
       extend: 3.0.2
       gaxios: 7.1.4
       google-auth-library: 10.6.2
-      qs: 6.15.1
+      qs: 6.15.2
       url-template: 2.0.8
     transitivePeerDependencies:
       - supports-color
@@ -1564,7 +1564,7 @@ snapshots:
 
   process-warning@5.0.0: {}
 
-  qs@6.15.1:
+  qs@6.15.2:
     dependencies:
       side-channel: 1.1.0
 
