@@ -29,7 +29,7 @@ export default async function getCSRFToken(cookie: string, force = false) {
       return ROBLOX_X_CSRF_TOKEN;
     } else {
       throw new Error(
-        `Failed to obtain CSRF token: Roblox returned ${response.statusCode}`
+        `Failed to obtain CSRF token: Roblox returned ${response.statusCode}. Check that the .ROBLOSECURITY cookie is valid and not expired.`
       );
     }
   }

@@ -11,7 +11,7 @@ interface CookieItem {
   cookie: string;
   audit: boolean;
   rank: boolean;
-  csrf: string;
+  csrf: string | null;
 }
 
 const cache: CookieItem[] = [];
@@ -27,20 +27,42 @@ export async function loadCookies() {
       throw new Error("No cookies");
     }
     for (const item of data) {
+      if (typeof item.cookie !== "string" || item.cookie.trim().length === 0) {
+        console.warn("Skipping cookie entry with an empty cookie value.");
+        continue;
+      }
+
+      let csrf: string | null = null;
+      const rank = item.rank ? true : false;
+      if (rank) {
+        try {
+          csrf = await getCSRFToken(item.cookie);
+        } catch (error) {
+          console.warn("Skipping rank cookie because CSRF fetch failed:");
+          console.warn(error);
+          continue;
+        }
+      }
+
       const cookie = {
         cookie: item.cookie,
         audit: item.audit ? true : false,
-        rank: item.rank ? true : false,
-        csrf: await getCSRFToken(item.cookie),
+        rank,
+        csrf,
       };
       // console.log(cookie);
       cache.push(cookie);
+    }
+    if (cache.length === 0) {
+      throw new Error("No valid cookies loaded");
     }
     console.log(`${cache.length} cookies loaded!`);
   } catch (error) {
     console.error(error);
     throw new Error(
-      "Unable to load cookies; cookies.json might not exist at project root."
+      `Unable to load cookies from cookies.json: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
     );
   }
 }
@@ -51,11 +73,11 @@ export async function getCookie(audit = false, rank = false) {
   }
   const validCookies = cache.filter(
     audit && rank
-      ? (item) => item.audit && item.rank
+      ? (item) => item.audit && item.rank && typeof item.csrf === "string"
       : audit
       ? (item) => item.audit === true
       : rank
-      ? (item) => item.rank === true
+      ? (item) => item.rank === true && typeof item.csrf === "string"
       : (item) => true
   );
   if (validCookies.length > 0) {
@@ -75,6 +97,7 @@ export async function updateCookieCSRF(cookie: string, csrf?: string) {
     const newCSRF = csrf || (await getCSRFToken(cookie, true));
     console.log(`Changing CSRF from ${c.csrf} to ${newCSRF}`);
     cache[index].csrf = newCSRF;
+    return newCSRF;
   } else {
     throw new Error("Unable to find cookie");
   }

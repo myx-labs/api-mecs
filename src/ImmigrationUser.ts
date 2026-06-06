@@ -195,7 +195,10 @@ export default class ImmigrationUser {
     if (rolesetValid) {
       const cookie = await getCookie(false, true);
       const ROBLOSECURITY = cookie.cookie;
-      let ROBLOX_X_CSRF_TOKEN: string = cookie.csrf;
+      if (typeof cookie.csrf !== "string") {
+        throw new Error("Selected rank cookie does not have a CSRF token");
+      }
+      let ROBLOX_X_CSRF_TOKEN = cookie.csrf;
       const rankUser = () =>
         got<unknown>(
           `https://groups.roblox.com/v1/groups/${activeGroup.id}/users/${this.userId}`,
