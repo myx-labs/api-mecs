@@ -68,11 +68,11 @@ export async function getCookie(audit = false, rank = false) {
   }
 }
 
-export async function updateCookieCSRF(cookie: string) {
+export async function updateCookieCSRF(cookie: string, csrf?: string) {
   const index = cache.findIndex((c) => c.cookie === cookie);
   if (index !== -1) {
     const c = cache[index];
-    const newCSRF = await getCSRFToken(cookie, true);
+    const newCSRF = csrf || (await getCSRFToken(cookie, true));
     console.log(`Changing CSRF from ${c.csrf} to ${newCSRF}`);
     cache[index].csrf = newCSRF;
   } else {
