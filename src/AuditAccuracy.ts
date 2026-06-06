@@ -62,6 +62,9 @@ async function fetchRobloxURL(
   };
   if (cookieRequired) {
     const cookie = await getCookie(cookieRequired);
+    if (cookie === null) {
+      throw new Error("Cookie required but no cookies are available");
+    }
     const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
