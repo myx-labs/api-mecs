@@ -1,4 +1,4 @@
-import { config as config_env } from "dotenv-safe";
+import { config as config_env } from "dotenv";
 config_env();
 
 export default {
@@ -38,10 +38,14 @@ export default {
       ? parseInt(process.env.API_PORT)
       : 3000,
   credentials: {
-    google:
-      typeof process.env.GOOGLEAUTH !== "undefined"
-        ? JSON.parse(process.env.GOOGLEAUTH)
-        : undefined,
+    google: (() => {
+      try {
+        return process.env.GOOGLEAUTH ? JSON.parse(process.env.GOOGLEAUTH) : undefined;
+      } catch {
+        console.warn("Failed to parse GOOGLEAUTH env var, Google credentials disabled.");
+        return undefined;
+      }
+    })(),
     api: process.env.AUTHENTICATION_KEY as string,
     discord: {
       webhook: {
