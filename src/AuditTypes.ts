@@ -8,7 +8,7 @@ export interface AuditLogItem {
   actor: AuditLogActor;
   actionType: string;
   description: AuditLogDescription;
-  created: Date;
+  created: string;
 }
 
 export interface AuditLogActor {

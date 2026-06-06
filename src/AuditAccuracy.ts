@@ -1,7 +1,7 @@
 import got from "got";
 
 import config from "./config.js";
-import { AuditLogResponse } from "./AuditTypes.js";
+import { AuditLogItem, AuditLogResponse } from "./AuditTypes.js";
 import ImmigrationUser from "./ImmigrationUser.js";
 import { getCookie } from "./cookies.js";
 import {
@@ -16,32 +16,80 @@ import {
 import { getCache, setPagingCursor } from "./cache.js";
 
 const group = config.groups[0];
+const AUDIT_RETRY_DELAY_MS = 10 * 1000;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function getRobloxErrorMessage(response: unknown) {
+  if (!isRecord(response) || !Array.isArray(response.errors)) {
+    return undefined;
+  }
+
+  const messages = response.errors
+    .map((error) => {
+      if (!isRecord(error)) {
+        return String(error);
+      }
+      const code =
+        typeof error.code === "number" || typeof error.code === "string"
+          ? `code ${error.code}`
+          : undefined;
+      const message =
+        typeof error.message === "string" ? error.message : undefined;
+      return [code, message].filter(Boolean).join(": ");
+    })
+    .filter((message) => message.length > 0);
+
+  return messages.length > 0 ? messages.join("; ") : undefined;
+}
+
+function getAuditLogItems(page: unknown) {
+  if (isRecord(page) && Array.isArray(page.data)) {
+    return page.data as AuditLogItem[];
+  }
+  return null;
+}
 
 async function fetchRobloxURL(
   url: string,
-  auditCookieRequired: boolean = false
+  cookieRequired: boolean = false
 ) {
   const headers = {
     "content-type": "application/json;charset=UTF-8",
     cookie: undefined as string | undefined,
   };
-  const cookie = await getCookie(auditCookieRequired);
-  const ROBLOSECURITY = cookie.cookie;
-  headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
-  const response = await got
-    .get(url, {
-      throwHttpErrors: false,
-      headers: headers,
-      timeout: { request: 10000 },
-    })
-    .json();
-  return response;
+  if (cookieRequired) {
+    const cookie = await getCookie(cookieRequired);
+    const ROBLOSECURITY = cookie.cookie;
+    headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+  }
+  const response = await got.get<unknown>(url, {
+    throwHttpErrors: false,
+    headers: headers,
+    responseType: "json",
+    timeout: { request: 10000 },
+  });
+  if (response.statusCode >= 200 && response.statusCode < 300) {
+    return response.body;
+  }
+
+  const robloxError = getRobloxErrorMessage(response.body);
+  throw new Error(
+    `Roblox request failed with HTTP ${response.statusCode}${
+      response.statusMessage ? ` ${response.statusMessage}` : ""
+    }${robloxError ? `: ${robloxError}` : ""}`
+  );
 }
 
 export async function getMembershipGroupStaff() {
   const response = (await fetchRobloxURL(
     `https://groups.roblox.com/v1/groups/${group.subgroups.membership}/users?sortOrder=Asc&limit=100`
   )) as RobloxAPI_GroupUsersResponse;
+  if (!Array.isArray(response.data)) {
+    throw new Error("Membership staff response did not include a data array");
+  }
   return response.data;
 }
 
@@ -49,6 +97,11 @@ export async function getMembershipStaff() {
   const response = (await fetchRobloxURL(
     `https://groups.roblox.com/v1/groups/${group.id}/roles/${group.rolesets.staff}/users?sortOrder=Asc&limit=100`
   )) as RobloxAPI_GroupRolesetUserResponse;
+  if (!Array.isArray(response.data)) {
+    throw new Error(
+      "Membership roleset staff response did not include a data array"
+    );
+  }
   return response.data;
 }
 
@@ -98,15 +151,45 @@ export async function processAuditLogs(
   }
 
   while (typeof limit !== "undefined" ? counter < limit : true) {
-    const page = await getAuditLogPage(nextCursor);
+    let page: AuditLogResponse;
+
+    try {
+      page = await getAuditLogPage(nextCursor);
+    } catch (error) {
+      if (onlyNew) {
+        console.error("Failed to fetch audit log page, retrying:", error);
+        await delay(AUDIT_RETRY_DELAY_MS);
+        continue;
+      }
+      throw error;
+    }
+
+    const pageData = getAuditLogItems(page);
+    if (pageData === null) {
+      const robloxError = getRobloxErrorMessage(page);
+      const message = `Audit log response did not include a data array${
+        robloxError ? ` (${robloxError})` : ""
+      }`;
+
+      if (onlyNew) {
+        console.error(`${message}; retrying.`);
+        await delay(AUDIT_RETRY_DELAY_MS);
+        continue;
+      }
+
+      throw new Error(message);
+    }
 
     if (shouldCache) {
       await setPagingCursor(nextCursor);
     }
 
-    const filteredPage = page.data.filter((item) => {
+    const filteredPage = pageData.filter((item) => {
       const timestamp = new Date(item.created).getTime();
-      const rolesetId = item.description.NewRoleSetId;
+      if (Number.isNaN(timestamp)) {
+        return false;
+      }
+      const rolesetId = item.description?.NewRoleSetId;
       const withinRolesetScope =
         rolesetId === group.rolesets.citizen ||
         rolesetId === group.rolesets.idc;
@@ -125,10 +208,13 @@ export async function processAuditLogs(
     const shouldStop = (() => {
       if (filteredPage.length === 0) {
         if (specificRange) {
-          const outOfRange = page.data.some(
-            (item) =>
-              specificRange.oldest.getTime() > new Date(item.created).getTime()
-          );
+          const outOfRange = pageData.some((item) => {
+            const timestamp = new Date(item.created).getTime();
+            return (
+              !Number.isNaN(timestamp) &&
+              specificRange.oldest.getTime() > timestamp
+            );
+          });
           return outOfRange;
         }
         return true;
@@ -210,7 +296,7 @@ export async function processAuditLogs(
     }
   }
   if (onlyNew || specificRange) {
-    await delay(10 * 1000);
+    await delay(AUDIT_RETRY_DELAY_MS);
     await processAuditLogs(undefined, true);
   }
 }
