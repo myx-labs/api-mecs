@@ -11,14 +11,22 @@ import {
 
 const pool = new Pool();
 
+let dbAvailable = false;
+
+export function isDatabaseAvailable(): boolean {
+  return dbAvailable;
+}
+
 const table = "mecs.action_log";
 
 export async function startDB() {
   try {
     await pool.connect();
+    dbAvailable = true;
   } catch (error) {
-    console.error(error);
-    throw new Error("Unable to connect to Postgres database!");
+    console.warn("Unable to connect to Postgres database — running without database.");
+    console.warn(error);
+    dbAvailable = false;
   }
 }
 
@@ -81,12 +89,14 @@ interface PGTimestampRange {
 }
 
 export async function getDistinctActorIds() {
+  if (!dbAvailable) return [];
   let query = `SELECT DISTINCT actor_id FROM ${table}`;
   const response = await pool.query<PGActorIds>(query);
   return response.rows.map((item) => parseInt(item.actor_id));
 }
 
 export async function getUserIdFromUsername(name: string) {
+  if (!dbAvailable) return NaN;
   let query = `SELECT target_id AS user_id
   FROM ${table}
   WHERE LOWER(review_data -> 'user' ->> 'username')
@@ -96,6 +106,10 @@ export async function getUserIdFromUsername(name: string) {
 }
 
 export async function getActionTimestampRange() {
+  if (!dbAvailable) {
+    const now = new Date();
+    return { latest: now, oldest: new Date(0) };
+  }
   let query = `
     (SELECT action_timestamp
     FROM ${table}
@@ -153,6 +167,7 @@ export interface PGTimeCaseStats {
 }
 
 export async function getTimeCaseStats() {
+  if (!dbAvailable) return [];
   let query = `--sql
   SELECT date_trunc('month', action_timestamp) AS time,
   COUNT(DISTINCT target_id) AS users,
@@ -168,6 +183,7 @@ export async function getTimeCaseStats() {
 }
 
 export async function getAggregateData() {
+  if (!dbAvailable) throw new Error("Database is not available");
   let query = `SELECT 
         COUNT(DISTINCT actor_id) as actors, 
         COUNT(*) as total, 
@@ -245,6 +261,7 @@ export async function getAggregateData() {
 }
 
 export async function getAggregateActorData() {
+  if (!dbAvailable) return [];
   let query = `
       SELECT 
         ${table}.actor_id, 
@@ -326,6 +343,7 @@ export async function getAggregateActorData() {
 }
 
 export async function getMTBD(actorId: number) {
+  if (!dbAvailable) return null;
   let query = `
     SELECT 
       mode() WITHIN GROUP (
@@ -359,6 +377,7 @@ export async function getMTBD(actorId: number) {
 }
 
 export async function getDecisionValues(actorId: number) {
+  if (!dbAvailable) return null;
   const group = config.groups[0];
   const rolesets = group.rolesets;
   let query = `SELECT (SELECT COUNT(*) FROM ${table} WHERE actor_id = $3 AND ((review_pass = true AND new_role_id = $1) OR (review_pass = false AND new_role_id = $2))) as correct, COUNT(*) as total FROM ${table} WHERE actor_id = $3`;
@@ -382,6 +401,7 @@ export async function getRankingLogs(
   targetId?: number,
   excludeJSON = false
 ) {
+  if (!dbAvailable) return [];
   let scope = `*`;
 
   if (excludeJSON) {
@@ -422,6 +442,7 @@ export async function checkIfExists(
   newRolesetId: number,
   actionTimestamp: Date
 ) {
+  if (!dbAvailable) return false;
   const countResponse = await pool.query<PGCount>(
     `SELECT COUNT(*) FROM ${table} WHERE actor_id = $1 AND target_id = $2 AND old_role_id = $3 AND new_role_id = $4 AND action_timestamp = $5`,
     [actorId, targetId, oldRolesetId, newRolesetId, actionTimestamp]
@@ -440,6 +461,7 @@ export async function addToRankingLogs(
   reviewPassing?: boolean,
   reviewData?: DefaultAPIResponse
 ) {
+  if (!dbAvailable) return;
   const exists = await checkIfExists(
     actorId,
     targetId,
