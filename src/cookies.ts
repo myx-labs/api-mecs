@@ -24,7 +24,8 @@ export async function loadCookies() {
     });
     const data = JSON.parse(fileString) as CookieItemJSON[];
     if (data.length === 0) {
-      throw new Error("No cookies");
+      console.warn("cookies.json is empty, running without cookies.");
+      return;
     }
     for (const item of data) {
       if (typeof item.cookie !== "string" || item.cookie.trim().length === 0) {
@@ -54,20 +55,32 @@ export async function loadCookies() {
       cache.push(cookie);
     }
     if (cache.length === 0) {
-      throw new Error("No valid cookies loaded");
+      console.warn("No valid cookies loaded from cookies.json, running without cookies.");
+      return;
     }
     console.log(`${cache.length} cookies loaded!`);
   } catch (error) {
-    console.error(error);
-    throw new Error(
-      `Unable to load cookies from cookies.json: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      console.warn("cookies.json not found, running without cookies.");
+    } else {
+      console.warn(
+        `Unable to load cookies from cookies.json: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
   }
 }
 
-export async function getCookie(audit = false, rank = false) {
+export function hasCookies(): boolean {
+  return cache.length > 0;
+}
+
+export function getCookieCount(): number {
+  return cache.length;
+}
+
+export async function getCookie(audit = false, rank = false): Promise<CookieItem | null> {
   if (cache.length === 0) {
     await loadCookies();
   }
@@ -86,11 +99,11 @@ export async function getCookie(audit = false, rank = false) {
     // console.log(`Using cookie ${selectedCookie.cookie}`);
     return selectedCookie;
   } else {
-    throw new Error("No valid cookies found for given requirements!");
+    return null;
   }
 }
 
-export async function updateCookieCSRF(cookie: string, csrf?: string) {
+export async function updateCookieCSRF(cookie: string, csrf?: string): Promise<string | null> {
   const index = cache.findIndex((c) => c.cookie === cookie);
   if (index !== -1) {
     const c = cache[index];
@@ -99,6 +112,7 @@ export async function updateCookieCSRF(cookie: string, csrf?: string) {
     cache[index].csrf = newCSRF;
     return newCSRF;
   } else {
-    throw new Error("Unable to find cookie");
+    console.warn("Unable to find cookie for CSRF update");
+    return null;
   }
 }
