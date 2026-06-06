@@ -194,6 +194,9 @@ export default class ImmigrationUser {
     }
     if (rolesetValid) {
       const cookie = await getCookie(false, true);
+      if (cookie === null) {
+        return respond(false, "No rank cookies available");
+      }
       const ROBLOSECURITY = cookie.cookie;
       if (typeof cookie.csrf !== "string") {
         throw new Error("Selected rank cookie does not have a CSRF token");
@@ -253,16 +256,16 @@ export default class ImmigrationUser {
     if (config.proxy.enabled) {
       await this.fetchUserDataViaProxy();
     } else {
-      await Promise.all([this.fetchUser(), this.fetchGroups()]);
+      await Promise.allSettled([this.fetchUser(), this.fetchGroups()]);
     }
 
-    const isBanned = await this.isBanned();
+    const isBanned = await this.isBanned().catch(() => false);
     if (isBanned) {
       throw new Error("Banned");
     } else {
       if (!blacklist_only) {
         if (!config.proxy.enabled) {
-          await Promise.all([
+          await Promise.allSettled([
             this.fetchFriends(),
             this.fetchBadges(),
             this.fetchAccessories(),
@@ -443,7 +446,7 @@ export default class ImmigrationUser {
 
   async testAge() {
     const results = {
-      status: true,
+      status: false,
       values: {
         pass: 60, // Max age
         current: 0,
@@ -454,12 +457,16 @@ export default class ImmigrationUser {
       },
     } as IndividualTest;
 
-    const age: number = await this.getAge();
-
-    results.status = age >= results.values.pass;
-    results.values.current = age;
-    if (typeof results.descriptions !== "undefined") {
-      results.descriptions.current = `Account age is ${age}`;
+    try {
+      const age: number = await this.getAge();
+      results.status = age >= results.values.pass;
+      results.values.current = age;
+      if (typeof results.descriptions !== "undefined") {
+        results.descriptions.current = `Account age is ${age}`;
+      }
+    } catch {
+      results.status = false;
+      if (results.descriptions) results.descriptions.current = "Unable to fetch age data";
     }
 
     return results;
@@ -506,7 +513,7 @@ export default class ImmigrationUser {
 
   async testBadges() {
     const results = {
-      status: true,
+      status: false,
       values: {
         pass: 10, // Max age
         current: 0,
@@ -517,19 +524,23 @@ export default class ImmigrationUser {
       },
     } as IndividualTest;
 
-    const badges: number = await this.getBadges();
-
-    results.status = badges >= results.values.pass;
-    results.values.current = badges;
-    if (results.descriptions)
-      results.descriptions.current = `User has ${badges} badge(s)`;
+    try {
+      const badges: number = await this.getBadges();
+      results.status = badges >= results.values.pass;
+      results.values.current = badges;
+      if (results.descriptions)
+        results.descriptions.current = `User has ${badges} badge(s)`;
+    } catch {
+      results.status = false;
+      if (results.descriptions) results.descriptions.current = "Unable to fetch badge data";
+    }
 
     return results;
   }
 
   async testFriends() {
     const results = {
-      status: true,
+      status: false,
       values: {
         pass: 5, // Max age
         current: 0,
@@ -540,12 +551,16 @@ export default class ImmigrationUser {
       },
     } as IndividualTest;
 
-    const friends: number = await this.getFriends();
-
-    results.status = friends >= results.values.pass;
-    results.values.current = friends;
-    if (results.descriptions)
-      results.descriptions.current = `User has ${friends} friends(s)`;
+    try {
+      const friends: number = await this.getFriends();
+      results.status = friends >= results.values.pass;
+      results.values.current = friends;
+      if (results.descriptions)
+        results.descriptions.current = `User has ${friends} friends(s)`;
+    } catch {
+      results.status = false;
+      if (results.descriptions) results.descriptions.current = "Unable to fetch friends data";
+    }
 
     return results;
   }
@@ -560,7 +575,7 @@ export default class ImmigrationUser {
 
   async testGroups() {
     const results = {
-      status: true,
+      status: false,
       values: {
         pass: 3, // Max age
         current: 0,
@@ -571,14 +586,18 @@ export default class ImmigrationUser {
       },
     } as IndividualTest;
 
-    const groups: RobloxAPI_Group_GroupMembershipResponse[] =
-      await this.getGroups();
-    const group_count: number = groups.length;
-
-    results.status = group_count >= results.values.pass;
-    results.values.current = group_count;
-    if (results.descriptions)
-      results.descriptions.current = `User is in ${group_count} group(s)`;
+    try {
+      const groups: RobloxAPI_Group_GroupMembershipResponse[] =
+        await this.getGroups();
+      const group_count: number = groups.length;
+      results.status = group_count >= results.values.pass;
+      results.values.current = group_count;
+      if (results.descriptions)
+        results.descriptions.current = `User is in ${group_count} group(s)`;
+    } catch {
+      results.status = false;
+      if (results.descriptions) results.descriptions.current = "Unable to fetch group data";
+    }
 
     return results;
   }
@@ -594,8 +613,10 @@ export default class ImmigrationUser {
 
       if (options.cookieRequired) {
         const cookie = await getCookie();
-        const ROBLOSECURITY = cookie.cookie;
-        headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+        if (cookie !== null) {
+          const ROBLOSECURITY = cookie.cookie;
+          headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+        }
       }
 
       const response = await got.get<unknown>(url, {
