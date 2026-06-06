@@ -1,7 +1,4 @@
 // Modules
-import { config as config_env } from "dotenv-safe";
-config_env();
-
 import fastify, { FastifyRequest } from "fastify";
 import fastifyCors from "@fastify/cors";
 import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
@@ -15,10 +12,28 @@ import config from "./config.js";
 
 import { EmbedBuilder, WebhookClient } from "discord.js";
 
-const webhookClient = new WebhookClient({
-  id: config.credentials.discord.webhook.id,
-  token: config.credentials.discord.webhook.token,
-});
+const subsystemStatus = {
+  cookies: { available: false, count: 0 },
+  database: { available: false },
+  blacklists: { available: false },
+  discord: { available: false },
+};
+
+let webhookClient: WebhookClient | null = null;
+
+if (config.credentials.discord.webhook.id && config.credentials.discord.webhook.token) {
+  try {
+    webhookClient = new WebhookClient({
+      id: config.credentials.discord.webhook.id,
+      token: config.credentials.discord.webhook.token,
+    });
+    subsystemStatus.discord.available = true;
+  } catch {
+    console.warn("Discord webhook credentials are invalid, webhook logging disabled.");
+  }
+} else {
+  console.warn("Discord webhook credentials not set, webhook logging disabled.");
+}
 
 // Typings
 import {
@@ -28,8 +43,8 @@ import {
   RobloxAPI_GroupUserItem,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
-import { getBlacklistedGroupIDs, getBlacklistedUserIDs, preloadBlacklists } from "./scraper.js";
-import { loadCookies } from "./cookies.js";
+import { getBlacklistedGroupIDs, getBlacklistedUserIDs, isBlacklistAvailable, preloadBlacklists } from "./scraper.js";
+import { getCookieCount, hasCookies, loadCookies } from "./cookies.js";
 import {
   getAggregateActorData,
   getAggregateData,
@@ -38,6 +53,7 @@ import {
   getRankingLogs,
   getTimeCaseStats,
   getUserIdFromUsername,
+  isDatabaseAvailable,
   PGTimeCaseStats,
   startDB,
   stopDB,
@@ -187,6 +203,7 @@ async function getImmigrationUser(
 }
 
 async function logPayload(req: FastifyRequest, payload: any) {
+  if (!webhookClient) return;
   try {
     requestCounter.valid++;
     const requestEmbed = new EmbedBuilder()
@@ -241,7 +258,16 @@ async function logPayload(req: FastifyRequest, payload: any) {
 }
 
 server.get("/health", async () => {
-  return { status: "ok", uptime: process.uptime() };
+  const allAvailable =
+    subsystemStatus.cookies.available &&
+    subsystemStatus.database.available &&
+    subsystemStatus.blacklists.available &&
+    subsystemStatus.discord.available;
+  return {
+    status: allAvailable ? "ok" : "degraded",
+    uptime: process.uptime(),
+    subsystems: subsystemStatus,
+  };
 });
 
 server.get("/blacklist/groups", async (req, res) => {
@@ -810,8 +836,14 @@ server.get("/session", async (req, res) => {
 });
 
 async function bootstrap() {
-  await Promise.all([loadCookies(), startDB(), preloadBlacklists()]);
-  await Promise.all([
+  await Promise.allSettled([loadCookies(), startDB(), preloadBlacklists()]);
+
+  subsystemStatus.cookies.available = hasCookies();
+  subsystemStatus.cookies.count = getCookieCount();
+  subsystemStatus.database.available = isDatabaseAvailable();
+  subsystemStatus.blacklists.available = isBlacklistAvailable();
+
+  await Promise.allSettled([
     updateAggregateDataCache(),
     updateOfficerDecisionDataCache(),
   ]);
