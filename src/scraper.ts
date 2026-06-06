@@ -5,6 +5,7 @@ import { search } from "fast-fuzzy";
 
 import config from "./config.js";
 import { getCookie } from "./cookies.js";
+import { RobloxAPI_ErrorResponse } from "./types.js";
 const groups = config.groups;
 
 const cache_blacklist = {
@@ -43,6 +44,27 @@ interface blacklisted_id {
   reason?: string;
 }
 
+function getRobloxErrorMessage(json: unknown) {
+  if (typeof json !== "object" || json === null || !("errors" in json)) {
+    return undefined;
+  }
+
+  const errors = (json as RobloxAPI_ErrorResponse).errors;
+  const messages = errors
+    ?.map((error) => {
+      const code =
+        typeof error.code === "number" || typeof error.code === "string"
+          ? `code ${error.code}`
+          : undefined;
+      const message =
+        typeof error.message === "string" ? error.message : undefined;
+      return [code, message].filter(Boolean).join(": ");
+    })
+    .filter((message) => message.length > 0);
+
+  return messages && messages.length > 0 ? messages.join("; ") : undefined;
+}
+
 async function getRobloxURL(url: string, cookieRequired: boolean = false) {
   const headers = {
     "content-type": "application/json;charset=UTF-8",
@@ -53,13 +75,22 @@ async function getRobloxURL(url: string, cookieRequired: boolean = false) {
     const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
-  return got
-    .get(url, {
-      throwHttpErrors: false,
-      headers: headers,
-      timeout: { request: 10000 },
-    })
-    .json<any>();
+  const response = await got.get<unknown>(url, {
+    throwHttpErrors: false,
+    headers: headers,
+    responseType: "json",
+    timeout: { request: 10000 },
+  });
+  if (response.statusCode >= 200 && response.statusCode < 300) {
+    return response.body;
+  }
+
+  const robloxError = getRobloxErrorMessage(response.body);
+  throw new Error(
+    `Roblox GET failed with HTTP ${response.statusCode}${
+      response.statusMessage ? ` ${response.statusMessage}` : ""
+    }${robloxError ? `: ${robloxError}` : ""}`
+  );
 }
 
 async function postRobloxURL(
@@ -76,15 +107,24 @@ async function postRobloxURL(
     const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
-  return got
-    .post(url, {
-      throwHttpErrors: false,
-      headers: headers,
-      json: body,
-      cache: config.cache,
-      timeout: { request: 10000 },
-    })
-    .json<any>();
+  const response = await got.post<unknown>(url, {
+    throwHttpErrors: false,
+    headers: headers,
+    json: body,
+    cache: config.cache,
+    responseType: "json",
+    timeout: { request: 10000 },
+  });
+  if (response.statusCode >= 200 && response.statusCode < 300) {
+    return response.body;
+  }
+
+  const robloxError = getRobloxErrorMessage(response.body);
+  throw new Error(
+    `Roblox POST failed with HTTP ${response.statusCode}${
+      response.statusMessage ? ` ${response.statusMessage}` : ""
+    }${robloxError ? `: ${robloxError}` : ""}`
+  );
 }
 
 export function processReasonString(reason: string | undefined, name?: string) {
@@ -252,7 +292,13 @@ async function getIDs(type: string, includeNames = false) {
               .map((id) => id.id)
               .join(",")}`
           );
-          const data = groupData.data as any[];
+          const data =
+            typeof groupData === "object" &&
+            groupData !== null &&
+            "data" in groupData &&
+            Array.isArray(groupData.data)
+              ? groupData.data
+              : [];
           const newIds = ids.map((id) => ({
             ...id,
             name: data.find((value) => value.id === id.id)?.name || undefined,
@@ -263,7 +309,13 @@ async function getIDs(type: string, includeNames = false) {
             `https://users.roblox.com/v1/users`,
             { userIds: ids.map((id) => id.id), excludeBannedUsers: false }
           );
-          const data = userData.data as any[];
+          const data =
+            typeof userData === "object" &&
+            userData !== null &&
+            "data" in userData &&
+            Array.isArray(userData.data)
+              ? userData.data
+              : [];
           const newIds = ids.map((id) => {
             const user = data.find((value) => value.id === id.id);
             if (user) {

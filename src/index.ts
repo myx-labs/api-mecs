@@ -24,6 +24,7 @@ const webhookClient = new WebhookClient({
 import {
   DefaultAPIResponse,
   RobloxAPI_ApiArrayResponse,
+  RobloxAPI_ErrorResponse,
   RobloxAPI_GroupUserItem,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
@@ -87,6 +88,27 @@ function isEmpty(text: string) {
   return text == null || text.match(/^\s*$/) !== null;
 }
 
+function getRobloxErrorMessage(json: unknown) {
+  if (typeof json !== "object" || json === null || !("errors" in json)) {
+    return undefined;
+  }
+
+  const errors = (json as RobloxAPI_ErrorResponse).errors;
+  const messages = errors
+    ?.map((error) => {
+      const code =
+        typeof error.code === "number" || typeof error.code === "string"
+          ? `code ${error.code}`
+          : undefined;
+      const message =
+        typeof error.message === "string" ? error.message : undefined;
+      return [code, message].filter(Boolean).join(": ");
+    })
+    .filter((message) => message.length > 0);
+
+  return messages && messages.length > 0 ? messages.join("; ") : undefined;
+}
+
 async function getImmigrationUser(
   userParam: string,
   inferType = true,
@@ -104,7 +126,7 @@ async function getImmigrationUser(
     if (dbUserId) {
       userId = Number(dbUserId);
     } else {
-      const response = await got<any>(
+      const response = await got<RobloxAPI_ApiArrayResponse>(
         `https://users.roblox.com/v1/usernames/users`,
         {
           throwHttpErrors: false,
@@ -121,29 +143,35 @@ async function getImmigrationUser(
           timeout: { request: 10000 },
         }
       );
-      if (response) {
-        if (response.statusCode === 200) {
-          const json: RobloxAPI_ApiArrayResponse = response.body;
-          if (json.data) {
-            if (json.data.length !== 0) {
-              json.data.forEach(
-                (element: RobloxAPI_MultiGetUserByNameResponse) => {
-                  if (element.requestedUsername === userParam) {
-                    if (element.name && element.id) {
-                      userName = element.name;
-                      userId = element.id;
-                    } else {
-                      throw new Error("Unable to get name and ID of user!");
-                    }
-                  }
-                }
-              );
-            } else {
-              throw new Error("No user found with that username!");
-            }
-          }
+
+      if (response.statusCode !== 200) {
+        const robloxError = getRobloxErrorMessage(response.body);
+        throw new Error(
+          `Username lookup failed with HTTP ${response.statusCode}${
+            response.statusMessage ? ` ${response.statusMessage}` : ""
+          }${robloxError ? `: ${robloxError}` : ""}`
+        );
+      }
+
+      const json = response.body;
+      if (!Array.isArray(json.data)) {
+        throw new Error("Username lookup response did not include a data array");
+      }
+
+      if (json.data.length === 0) {
+        throw new Error("No user found with that username!");
+      }
+
+      const match = json.data.find(
+        (element: RobloxAPI_MultiGetUserByNameResponse) =>
+          element.requestedUsername?.toLowerCase() === userParam.toLowerCase()
+      );
+      if (match) {
+        if (match.name && match.id) {
+          userName = match.name;
+          userId = match.id;
         } else {
-          console.error(response);
+          throw new Error("Unable to get name and ID of user!");
         }
       }
     }

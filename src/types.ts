@@ -3,6 +3,7 @@ export interface RobloxAPI_GroupRolesetUser {
   userId?: number;
   username?: string;
   displayName?: string;
+  hasVerifiedBadge?: boolean;
 }
 
 export interface RobloxAPI_GroupRolesetUserRole {
@@ -35,6 +36,62 @@ export interface RobloxAPI_MultiGetUserByNameResponse {
 }
 export interface RobloxAPI_ApiArrayResponse {
   data?: RobloxAPI_MultiGetUserByNameResponse[];
+}
+
+export interface RobloxAPI_Error {
+  code?: number;
+  subcode?: number;
+  message?: string;
+  userFacingMessage?: string;
+}
+
+export interface RobloxAPI_ErrorResponse {
+  errors?: RobloxAPI_Error[];
+}
+
+export interface RobloxAPI_UserResponse {
+  description?: string;
+  created?: string;
+  isBanned?: boolean;
+  externalAppDisplayName?: string | null;
+  hasVerifiedBadge?: boolean;
+  id?: number;
+  name?: string;
+  displayName?: string;
+}
+
+export interface RobloxAPI_CountResponse {
+  count?: number;
+}
+
+export interface RobloxAPI_PaginatedResponse<T> {
+  previousPageCursor?: string | null;
+  nextPageCursor?: string | null;
+  data?: T[];
+}
+
+export interface RobloxAPI_BadgeAwardResponse {
+  id?: number;
+  name?: string;
+  description?: string;
+  displayName?: string;
+  displayDescription?: string;
+  enabled?: boolean;
+  iconImageId?: number;
+  displayIconImageId?: number;
+  created?: string;
+  updated?: string;
+  statistics?: Record<string, unknown>;
+  awardingUniverse?: Record<string, unknown>;
+}
+
+export interface RobloxAPI_InventoryItemResponse {
+  assetId?: number;
+  name?: string;
+  assetType?: string;
+  created?: string;
+  updated?: string;
+  [key: string]: unknown;
 }
 
 export interface BlacklistedGroup {

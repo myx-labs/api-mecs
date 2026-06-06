@@ -5,10 +5,14 @@ import got, { Response } from "got";
 import {
   IndividualTest,
   BlacklistedGroup,
+  RobloxAPI_BadgeAwardResponse,
+  RobloxAPI_ErrorResponse,
   RobloxAPI_Group_ApiArrayResponse,
   RobloxAPI_Group_GroupMembershipResponse,
+  RobloxAPI_InventoryItemResponse,
   RankResponse,
   TestStatus,
+  RobloxAPI_UserResponse,
 } from "./types.js";
 
 // Functions
@@ -23,13 +27,116 @@ import { getCookie, updateCookieCSRF } from "./cookies.js";
 const activeGroup = config.groups[0];
 const rolesets = activeGroup.rolesets;
 const array_rolesets = Object.values(rolesets);
+const ROBLOX_REQUEST_TIMEOUT_MS = 10000;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function getArrayData<T>(json: unknown): T[] | null {
+  if (Array.isArray(json)) {
+    return json as T[];
+  }
+  if (isRecord(json) && Array.isArray(json.data)) {
+    return json.data as T[];
+  }
+  return null;
+}
+
+function getRobloxErrorCode(json: unknown) {
+  if (!isRecord(json) || !Array.isArray(json.errors)) {
+    return undefined;
+  }
+
+  const [error] = json.errors;
+  if (!isRecord(error)) {
+    return undefined;
+  }
+
+  return typeof error.code === "number" ? error.code : undefined;
+}
+
+function getRobloxErrorMessage(json: unknown) {
+  if (!isRecord(json) || !Array.isArray(json.errors)) {
+    return undefined;
+  }
+
+  const errorResponse = json as RobloxAPI_ErrorResponse;
+  const messages = errorResponse.errors
+    ?.map((error) => {
+      const code =
+        typeof error.code === "number" || typeof error.code === "string"
+          ? `code ${error.code}`
+          : undefined;
+      const message =
+        typeof error.message === "string" ? error.message : undefined;
+      return [code, message].filter(Boolean).join(": ");
+    })
+    .filter((message) => message.length > 0);
+
+  return messages && messages.length > 0 ? messages.join("; ") : undefined;
+}
+
+function isSuccessfulStatus(statusCode: number) {
+  return statusCode >= 200 && statusCode < 300;
+}
+
+function getSuccessfulBody(response: Response<unknown>, context: string) {
+  if (isSuccessfulStatus(response.statusCode)) {
+    return response.body;
+  }
+
+  const robloxError = getRobloxErrorMessage(response.body);
+  throw new Error(
+    `${context} failed with HTTP ${response.statusCode}${
+      response.statusMessage ? ` ${response.statusMessage}` : ""
+    }${robloxError ? `: ${robloxError}` : ""}`
+  );
+}
+
+function getCountData(json: unknown) {
+  if (isRecord(json) && typeof json.count === "number") {
+    return json.count;
+  }
+  return null;
+}
+
+function getUserData(json: unknown) {
+  if (isRecord(json)) {
+    return json as RobloxAPI_UserResponse;
+  }
+  return null;
+}
+
+function getGamepassOwnership(json: unknown) {
+  if (typeof json === "boolean") {
+    return json;
+  }
+
+  const data = getArrayData(json);
+  if (data !== null) {
+    return data.length > 0;
+  }
+
+  return null;
+}
+
+class PrivateInventoryError extends Error {
+  constructor(userId: number) {
+    super(`Not authorised to view ${userId} inventory`);
+  }
+}
+
+interface RobloxFetchOptions {
+  cookieRequired?: boolean;
+}
 
 export default class ImmigrationUser {
   userId: number;
   username: string | null;
   groupMembership: RobloxAPI_Group_GroupMembershipResponse | undefined;
   private lastRolesetId: number | null;
-  private requestCache: Map<string, Response> = new Map();
+  private requestCache: Map<string, Response<unknown>> = new Map();
 
   constructor(
     userId: number,
@@ -43,19 +150,18 @@ export default class ImmigrationUser {
 
   async getUsername() {
     if (this.username === null) {
-      let json = null;
+      let json: unknown = null;
 
       if (config.proxy.enabled) {
         json = await this.fetchDataProxy("user");
       } else {
         const response = await this.fetchUser();
-        if (response.statusCode === 200) {
-          json = response.body as any;
-        }
+        json = getSuccessfulBody(response, "Fetching user");
       }
 
-      if (json) {
-        this.username = json.name;
+      const user = getUserData(json);
+      if (user && typeof user.name === "string") {
+        this.username = user.name;
         return this.username;
       }
     }
@@ -89,23 +195,32 @@ export default class ImmigrationUser {
     if (rolesetValid) {
       const cookie = await getCookie(false, true);
       const ROBLOSECURITY = cookie.cookie;
-      const ROBLOX_X_CSRF_TOKEN: string = cookie.csrf;
-      const response = await got(
-        `https://groups.roblox.com/v1/groups/${activeGroup.id}/users/${this.userId}`,
-        {
-          throwHttpErrors: false,
-          method: "PATCH",
-          body: JSON.stringify({
-            roleId: rolesetId,
-          }),
-          headers: {
-            "content-type": "application/json",
-            cookie: `.ROBLOSECURITY=${ROBLOSECURITY}`,
-            "X-CSRF-TOKEN": ROBLOX_X_CSRF_TOKEN,
-          },
-          timeout: { request: 10000 },
-        }
-      );
+      let ROBLOX_X_CSRF_TOKEN: string = cookie.csrf;
+      const rankUser = () =>
+        got<unknown>(
+          `https://groups.roblox.com/v1/groups/${activeGroup.id}/users/${this.userId}`,
+          {
+            throwHttpErrors: false,
+            method: "PATCH",
+            json: {
+              roleId: rolesetId,
+            },
+            headers: {
+              "content-type": "application/json",
+              cookie: `.ROBLOSECURITY=${ROBLOSECURITY}`,
+              "X-CSRF-TOKEN": ROBLOX_X_CSRF_TOKEN,
+            },
+            responseType: "json",
+            timeout: { request: ROBLOX_REQUEST_TIMEOUT_MS },
+          }
+        );
+      let response = await rankUser();
+      const refreshedToken = response.headers["x-csrf-token"];
+      if (response.statusCode === 403 && typeof refreshedToken === "string") {
+        ROBLOX_X_CSRF_TOKEN = refreshedToken;
+        await updateCookieCSRF(ROBLOSECURITY, refreshedToken);
+        response = await rankUser();
+      }
       if (response.statusCode === 200) {
         let descriptorString = null;
         for (const [key, value] of Object.entries(rolesets)) {
@@ -120,13 +235,11 @@ export default class ImmigrationUser {
         );
         return respond(true, `Player ranked to ${rolesetId}`);
       } else {
-        // console.error(response);
-        console.error(
-          "Error occurred during ranking, will attempt to reset CSRF for cookie"
-        );
-        await updateCookieCSRF(ROBLOSECURITY);
+        const robloxError = getRobloxErrorMessage(response.body);
         throw new Error(
-          `Error occurred attempting to rank user: ${response.statusMessage}`
+          `Error occurred attempting to rank user (${response.statusCode})${
+            response.statusMessage ? ` ${response.statusMessage}` : ""
+          }${robloxError ? `: ${robloxError}` : ""}`
         );
       }
     }
@@ -364,7 +477,7 @@ export default class ImmigrationUser {
 
     try {
       const acc_count = await this.getAccessoryCount();
-      if (acc_count) {
+      if (typeof acc_count === "number") {
         results.values.current = acc_count;
         if (results.descriptions)
           results.descriptions.current = `${acc_count} accessory(s) found`;
@@ -376,6 +489,9 @@ export default class ImmigrationUser {
         }
       }
     } catch (error) {
+      if (!(error instanceof PrivateInventoryError)) {
+        throw error;
+      }
       results.values.current = null;
       if (results.descriptions)
         results.descriptions.current = `Private inventory`;
@@ -464,34 +580,37 @@ export default class ImmigrationUser {
     return results;
   }
 
-  async fetchRobloxURL(url: string) {
-    const cacheHit = this.requestCache.get(url);
+  async fetchRobloxURL(url: string, options: RobloxFetchOptions = {}) {
+    const cacheKey = `${options.cookieRequired ? "auth" : "anon"}:${url}`;
+    const cacheHit = this.requestCache.get(cacheKey);
     if (cacheHit === undefined) {
       const headers = {
         "content-type": "application/json;charset=UTF-8",
         cookie: undefined as string | undefined,
       };
 
-      const cookie = await getCookie();
-      const ROBLOSECURITY = cookie.cookie;
-      headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+      if (options.cookieRequired) {
+        const cookie = await getCookie();
+        const ROBLOSECURITY = cookie.cookie;
+        headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+      }
 
-      const response = await got.get<any>(url, {
+      const response = await got.get<unknown>(url, {
         throwHttpErrors: false,
         headers: headers,
         responseType: "json",
-        timeout: { request: 10000 },
+        timeout: { request: ROBLOX_REQUEST_TIMEOUT_MS },
       });
 
       const clone = Object.assign({}, response);
-      this.requestCache.set(url, clone);
+      this.requestCache.set(cacheKey, clone);
       return clone;
     } else {
       return Object.assign({}, cacheHit);
     }
   }
 
-  proxyPromise: Promise<Response> | null = null;
+  proxyPromise: Promise<Response<unknown>> | null = null;
 
   async fetchUserDataViaProxy() {
     if (this.proxyPromise) {
@@ -499,21 +618,23 @@ export default class ImmigrationUser {
     }
 
     try {
-      this.proxyPromise = got.get<any>(
+      this.proxyPromise = got.get<unknown>(
         `${config.proxy.url}?userId=${this.userId}`,
         {
           throwHttpErrors: false,
           responseType: "json",
           cache: config.cache,
-          timeout: { request: 10000 },
+          timeout: { request: ROBLOX_REQUEST_TIMEOUT_MS },
         }
       );
 
       const response = await this.proxyPromise;
+      getSuccessfulBody(response, "Fetching proxy user data");
 
       return response;
-    } finally {
-      // this.proxyPromise = null;
+    } catch (error) {
+      this.proxyPromise = null;
+      throw error;
     }
   }
 
@@ -537,7 +658,8 @@ export default class ImmigrationUser {
 
   fetchBadges() {
     return this.fetchRobloxURL(
-      `https://badges.roblox.com/v1/users/${this.userId}/badges?limit=10&sortOrder=Asc`
+      `https://badges.roblox.com/v1/users/${this.userId}/badges?limit=10&sortOrder=Asc`,
+      { cookieRequired: true }
     );
   }
 
@@ -545,7 +667,17 @@ export default class ImmigrationUser {
     key: "user" | "friends" | "groups" | "badges" | "accessories"
   ) {
     const data = await this.fetchUserDataViaProxy();
-    return (data.body as any)[key].data;
+    const body = data.body;
+    if (!isRecord(body) || !(key in body)) {
+      throw new Error(`Proxy response missing ${key} data`);
+    }
+
+    const payload = body[key];
+    if (isRecord(payload) && "data" in payload) {
+      return payload.data;
+    }
+
+    return payload;
   }
 
   fetchAccessories() {
@@ -556,7 +688,7 @@ export default class ImmigrationUser {
 
   fetchGamepassOwnership(id: number) {
     return this.fetchRobloxURL(
-      `https://inventory.roblox.com/v1/users/${this.userId}/items/GamePass/${id}`
+      `https://inventory.roblox.com/v1/users/${this.userId}/items/GamePass/${id}/is-owned`
     );
   }
 
@@ -564,24 +696,24 @@ export default class ImmigrationUser {
     const response = await this.fetchGamepassOwnership(
       activeGroup.gamepasses.hcc.id
     );
-    if (response.statusCode === 200) {
-      const json = response.body as any;
-      return (json.data as any[]).length > 0;
-    } else {
-      throw new Error("Error occured while fetching HCC data");
+    const json = getSuccessfulBody(response, "Fetching HCC data");
+    const ownership = getGamepassOwnership(json);
+    if (ownership !== null) {
+      return ownership;
     }
+    throw new Error("Error occured while fetching HCC data");
   }
 
   async getFirearms() {
     const response = await this.fetchGamepassOwnership(
       activeGroup.gamepasses.firearms.id
     );
-    if (response.statusCode === 200) {
-      const json = response.body as any;
-      return (json.data as any[]).length > 0;
-    } else {
-      throw new Error("Error occured while fetching firearms licence data");
+    const json = getSuccessfulBody(response, "Fetching firearms licence data");
+    const ownership = getGamepassOwnership(json);
+    if (ownership !== null) {
+      return ownership;
     }
+    throw new Error("Error occured while fetching firearms licence data");
   }
 
   async getMembership() {
@@ -594,58 +726,55 @@ export default class ImmigrationUser {
   }
 
   async getFriends() {
-    let json = null;
+    let json: unknown = null;
 
     if (config.proxy.enabled) {
       json = await this.fetchDataProxy("friends");
     } else {
       const response = await this.fetchFriends();
-      if (response.statusCode === 200) {
-        json = response.body as any;
-      }
+      json = getSuccessfulBody(response, "Fetching friends data");
     }
 
-    if (json) {
-      return json.count as number;
-    } else {
-      throw new Error("Error occured while fetching friends data");
+    const count = getCountData(json);
+    if (count !== null) {
+      return count;
     }
+
+    throw new Error("Error occured while fetching friends data");
   }
   async getBadges() {
-    let json = null;
+    let json: unknown = null;
 
     if (config.proxy.enabled) {
       json = await this.fetchDataProxy("badges");
     } else {
       const response = await this.fetchBadges();
-      if (response.statusCode === 200) {
-        json = response.body as any;
-      }
+      json = getSuccessfulBody(response, "Fetching badges data");
     }
-    if (json) {
-      return json.data.length as number;
-    } else {
-      throw new Error("Error occured while fetching badges data");
+    const badges = getArrayData<RobloxAPI_BadgeAwardResponse>(json);
+    if (badges !== null) {
+      return badges.length;
     }
+
+    throw new Error("Error occured while fetching badges data");
   }
 
   async getGroups() {
-    let json: RobloxAPI_Group_ApiArrayResponse | null = null;
+    let json: RobloxAPI_Group_ApiArrayResponse | unknown = null;
 
     if (config.proxy.enabled) {
       json = await this.fetchDataProxy("groups");
     } else {
       const response = await this.fetchGroups();
-      if (response.statusCode === 200) {
-        json = response.body as any;
-      }
+      json = getSuccessfulBody(response, "Fetching group data");
     }
 
-    if (!json || !json.data) {
+    const player_groups =
+      getArrayData<RobloxAPI_Group_GroupMembershipResponse>(json);
+
+    if (player_groups === null) {
       throw new Error("Group data not available");
     }
-
-    const player_groups: RobloxAPI_Group_GroupMembershipResponse[] = json.data;
 
     player_groups.forEach(
       (player_group_membership: RobloxAPI_Group_GroupMembershipResponse) => {
@@ -696,20 +825,24 @@ export default class ImmigrationUser {
   }
 
   async getAge() {
-    let json = null;
+    let json: unknown = null;
 
     if (config.proxy.enabled) {
       json = await this.fetchDataProxy("user");
     } else {
       const response = await this.fetchUser();
-      if (response.statusCode === 200) {
-        json = response.body as any;
-      }
+      json = getSuccessfulBody(response, "Fetching age data");
     }
 
-    if (json) {
-      this.setUsername(json.name);
-      const createdDate = new Date(json.created);
+    const user = getUserData(json);
+    if (user && typeof user.created === "string") {
+      if (typeof user.name === "string") {
+        this.setUsername(user.name);
+      }
+      const createdDate = new Date(user.created);
+      if (Number.isNaN(createdDate.getTime())) {
+        throw new Error("Unable to get age: invalid created date");
+      }
       const currentDate = new Date();
       const timeDifference = currentDate.getTime() - createdDate.getTime();
       const age = Math.round(timeDifference / (1000 * 3600 * 24));
@@ -723,17 +856,16 @@ export default class ImmigrationUser {
   }
 
   async isBanned() {
-    let json = null;
+    let json: unknown = null;
     if (config.proxy.enabled) {
       json = await this.fetchDataProxy("user");
     } else {
       const response = await this.fetchUser();
-      if (response.statusCode === 200) {
-        json = response.body as any;
-      }
+      json = getSuccessfulBody(response, "Fetching banned status");
     }
-    if (json) {
-      const banned = json.isBanned as boolean;
+    const user = getUserData(json);
+    if (user && typeof user.isBanned === "boolean") {
+      const banned = user.isBanned;
       return banned;
     } else {
       throw new Error("Unable to get banned status");
@@ -741,26 +873,33 @@ export default class ImmigrationUser {
   }
 
   async getAccessoryCount() {
-    let json: any | null = null;
+    let json: unknown = null;
 
     if (config.proxy.enabled) {
       json = await this.fetchDataProxy("accessories");
     } else {
       const response = await this.fetchAccessories();
-      json = response.body as any;
-    }
-
-    if (json) {
-      if (!json.errors) {
-        const data = json.data as any[];
-        return data.length;
-      } else {
-        if (json.errors[0].code === 4) {
-          throw new Error(
-            "Not authorised to view " + this.userId + " inventory"
-          );
+      json = response.body;
+      if (!isSuccessfulStatus(response.statusCode)) {
+        if (
+          response.statusCode === 403 &&
+          (getRobloxErrorCode(json) === 3 || getRobloxErrorCode(json) === 4)
+        ) {
+          throw new PrivateInventoryError(this.userId);
         }
+        getSuccessfulBody(response, "Fetching accessories data");
       }
     }
+
+    if (getRobloxErrorCode(json) === 3 || getRobloxErrorCode(json) === 4) {
+      throw new PrivateInventoryError(this.userId);
+    }
+
+    const data = getArrayData<RobloxAPI_InventoryItemResponse>(json);
+    if (data !== null) {
+      return data.length;
+    }
+
+    throw new Error("Error occured while fetching accessories data");
   }
 }
