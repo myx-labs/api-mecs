@@ -33,10 +33,12 @@ Array.prototype.pushIfNotExist = function (element, comparer) {
   }
 };
 
-const doc_auth = new auth.GoogleAuth({
-  scopes: ["https://www.googleapis.com/auth/documents.readonly"],
-  credentials: config.credentials.google,
-});
+const doc_auth = config.credentials.google
+  ? new auth.GoogleAuth({
+      scopes: ["https://www.googleapis.com/auth/documents.readonly"],
+      credentials: config.credentials.google,
+    })
+  : null;
 
 interface blacklisted_id {
   id: number;
@@ -72,8 +74,10 @@ async function getRobloxURL(url: string, cookieRequired: boolean = false) {
   };
   if (cookieRequired) {
     const cookie = await getCookie();
-    const ROBLOSECURITY = cookie.cookie;
-    headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+    if (cookie !== null) {
+      const ROBLOSECURITY = cookie.cookie;
+      headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+    }
   }
   const response = await got.get<unknown>(url, {
     throwHttpErrors: false,
@@ -104,8 +108,10 @@ async function postRobloxURL(
   };
   if (cookieRequired) {
     const cookie = await getCookie();
-    const ROBLOSECURITY = cookie.cookie;
-    headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+    if (cookie !== null) {
+      const ROBLOSECURITY = cookie.cookie;
+      headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
+    }
   }
   const response = await got.post<unknown>(url, {
     throwHttpErrors: false,
@@ -277,6 +283,10 @@ async function getIDs(type: string, includeNames = false) {
     regex = /\/groups\/(\d+)/;
   }
   if (documentId != null && regex != null) {
+    if (!doc_auth) {
+      console.warn("Google credentials not available, skipping doc-based blacklist fetch.");
+      return [];
+    }
     const doc_obj = docs({ version: "v1", auth: doc_auth });
     const res = await doc_obj.documents.get({
       documentId: documentId,
@@ -346,9 +356,14 @@ async function getIDs(type: string, includeNames = false) {
 async function getBlacklist(type: string, force = false, includeNames = false) {
   if (type === "users" || type === "groups") {
     if (cache_blacklist[type] === null || force === true) {
-      const id_array = await getIDs(type, includeNames);
-      cache_blacklist[type] = id_array;
-      return id_array;
+      try {
+        const id_array = await getIDs(type, includeNames);
+        cache_blacklist[type] = id_array;
+        return id_array;
+      } catch (error) {
+        console.warn(`Failed to fetch ${type} blacklist:`, error);
+        return cache_blacklist[type] ?? [];
+      }
     } else {
       return cache_blacklist[type];
     }
@@ -372,10 +387,14 @@ export async function getBlacklistedUserIDs(
 }
 
 export async function preloadBlacklists() {
-  await Promise.all([
+  await Promise.allSettled([
     getBlacklist("users", true),
     getBlacklist("groups", true),
   ]);
+}
+
+export function isBlacklistAvailable(): boolean {
+  return cache_blacklist.users !== null || cache_blacklist.groups !== null;
 }
 
 const BLACKLIST_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
