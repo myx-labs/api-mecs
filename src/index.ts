@@ -3,7 +3,7 @@ import fastify, { FastifyRequest } from "fastify";
 import fastifyCors from "@fastify/cors";
 import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
-import got from "got";
+import { http } from "./http.js";
 import pLimit from "p-limit";
 
 // Classes
@@ -142,10 +142,9 @@ async function getImmigrationUser(
     if (dbUserId) {
       userId = Number(dbUserId);
     } else {
-      const response = await got<RobloxAPI_ApiArrayResponse>(
+      const response = await http<RobloxAPI_ApiArrayResponse>(
         `https://users.roblox.com/v1/usernames/users`,
         {
-          throwHttpErrors: false,
           method: "POST",
           json: {
             usernames: [userParam],
@@ -156,7 +155,6 @@ async function getImmigrationUser(
             accept: "application/json",
           },
           responseType: "json",
-          timeout: { request: 10000 },
         }
       );
 

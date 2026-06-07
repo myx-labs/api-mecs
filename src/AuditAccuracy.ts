@@ -1,4 +1,4 @@
-import got from "got";
+import { http } from "./http.js";
 
 import config from "./config.js";
 import { AuditLogItem, AuditLogResponse } from "./AuditTypes.js";
@@ -68,11 +68,9 @@ async function fetchRobloxURL(
     const ROBLOSECURITY = cookie.cookie;
     headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
   }
-  const response = await got.get<unknown>(url, {
-    throwHttpErrors: false,
+  const response = await http.get<unknown>(url, {
     headers: headers,
     responseType: "json",
-    timeout: { request: 10000 },
   });
   if (response.statusCode >= 200 && response.statusCode < 300) {
     return response.body;

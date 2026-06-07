@@ -1,5 +1,6 @@
 // Modules
-import got, { Response } from "got";
+import { Response } from "got";
+import { http } from "./http.js";
 
 // Typings
 import {
@@ -23,11 +24,21 @@ import {
 } from "./scraper.js";
 import config from "./config.js";
 import { getCookie, updateCookieCSRF } from "./cookies.js";
+import { TTLCache } from "./ttlCache.js";
 
 const activeGroup = config.groups[0];
 const rolesets = activeGroup.rolesets;
 const array_rolesets = Object.values(rolesets);
-const ROBLOX_REQUEST_TIMEOUT_MS = 10000;
+
+// Short-lived cross-instance cache for proxy responses. Membership/eligibility
+// data is volatile, so keep the TTL small; this only de-duplicates the same
+// user being evaluated repeatedly within a short window (e.g. during an audit
+// run). Bounded in size + time so it cannot leak like got's built-in cache.
+const PROXY_CACHE_TTL_MS = 30_000;
+const proxyCache = new TTLCache<Response<unknown>>({
+  max: 500,
+  defaultTtlMs: PROXY_CACHE_TTL_MS,
+});
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -203,10 +214,9 @@ export default class ImmigrationUser {
       }
       let ROBLOX_X_CSRF_TOKEN = cookie.csrf;
       const rankUser = () =>
-        got<unknown>(
+        http<unknown>(
           `https://groups.roblox.com/v1/groups/${activeGroup.id}/users/${this.userId}`,
           {
-            throwHttpErrors: false,
             method: "PATCH",
             json: {
               roleId: rolesetId,
@@ -217,7 +227,6 @@ export default class ImmigrationUser {
               "X-CSRF-TOKEN": ROBLOX_X_CSRF_TOKEN,
             },
             responseType: "json",
-            timeout: { request: ROBLOX_REQUEST_TIMEOUT_MS },
           }
         );
       let response = await rankUser();
@@ -619,11 +628,9 @@ export default class ImmigrationUser {
         }
       }
 
-      const response = await got.get<unknown>(url, {
-        throwHttpErrors: false,
+      const response = await http.get<unknown>(url, {
         headers: headers,
         responseType: "json",
-        timeout: { request: ROBLOX_REQUEST_TIMEOUT_MS },
       });
 
       const clone = Object.assign({}, response);
@@ -641,19 +648,20 @@ export default class ImmigrationUser {
       return this.proxyPromise;
     }
 
+    const cacheKey = `${config.proxy.url}?userId=${this.userId}`;
+    const cached = proxyCache.get(cacheKey);
+    if (cached !== undefined) {
+      return cached;
+    }
+
     try {
-      this.proxyPromise = got.get<unknown>(
-        `${config.proxy.url}?userId=${this.userId}`,
-        {
-          throwHttpErrors: false,
-          responseType: "json",
-          cache: config.cache,
-          timeout: { request: ROBLOX_REQUEST_TIMEOUT_MS },
-        }
-      );
+      this.proxyPromise = http.get<unknown>(cacheKey, {
+        responseType: "json",
+      });
 
       const response = await this.proxyPromise;
       getSuccessfulBody(response, "Fetching proxy user data");
+      proxyCache.set(cacheKey, response);
 
       return response;
     } catch (error) {

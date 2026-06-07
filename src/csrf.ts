@@ -1,4 +1,4 @@
-import got from "got";
+import { http } from "./http.js";
 
 interface CSRFCacheItem {
   cookie: string;
@@ -10,13 +10,11 @@ const cache: CSRFCacheItem[] = [];
 export default async function getCSRFToken(cookie: string, force = false) {
   const cacheHit = cache.find((item) => item.cookie === cookie);
   if (typeof cacheHit === "undefined" || force === true) {
-    const response = await got.post(`https://auth.roblox.com/v2/logout`, {
-      throwHttpErrors: false,
+    const response = await http.post(`https://auth.roblox.com/v2/logout`, {
       headers: {
         "content-type": "application/json;charset=UTF-8",
         cookie: `.ROBLOSECURITY=${cookie};`,
       },
-      timeout: { request: 10000 },
     });
     // console.log(response.headers);
     const ROBLOX_X_CSRF_TOKEN = response.headers["x-csrf-token"] as string;

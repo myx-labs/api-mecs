@@ -1,12 +1,18 @@
 import { docs, auth, docs_v1 } from "@googleapis/docs";
-import got from "got";
+import { http } from "./http.js";
 
 import { search } from "fast-fuzzy";
 
 import config from "./config.js";
 import { getCookie } from "./cookies.js";
 import { RobloxAPI_ErrorResponse } from "./types.js";
+import { TTLCache } from "./ttlCache.js";
 const groups = config.groups;
+
+// Short-lived cache for POST lookups (e.g. username → id). These mappings are
+// stable, so a 5-minute TTL safely de-duplicates repeated lookups without the
+// listener leak / unbounded growth of got's built-in cache.
+const postCache = new TTLCache<unknown>({ max: 500, defaultTtlMs: 5 * 60_000 });
 
 const cache_blacklist = {
   users: null as blacklisted_id[] | null,
@@ -79,11 +85,9 @@ async function getRobloxURL(url: string, cookieRequired: boolean = false) {
       headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
     }
   }
-  const response = await got.get<unknown>(url, {
-    throwHttpErrors: false,
+  const response = await http.get<unknown>(url, {
     headers: headers,
     responseType: "json",
-    timeout: { request: 10000 },
   });
   if (response.statusCode >= 200 && response.statusCode < 300) {
     return response.body;
@@ -102,6 +106,14 @@ async function postRobloxURL(
   body: any,
   cookieRequired: boolean = false
 ) {
+  const cacheKey = `${cookieRequired ? "auth" : "anon"}:${url}:${JSON.stringify(
+    body
+  )}`;
+  const cached = postCache.get(cacheKey);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   const headers = {
     "content-type": "application/json;charset=UTF-8",
     cookie: undefined as string | undefined,
@@ -113,15 +125,13 @@ async function postRobloxURL(
       headers.cookie = `.ROBLOSECURITY=${ROBLOSECURITY};`;
     }
   }
-  const response = await got.post<unknown>(url, {
-    throwHttpErrors: false,
+  const response = await http.post<unknown>(url, {
     headers: headers,
     json: body,
-    cache: config.cache,
     responseType: "json",
-    timeout: { request: 10000 },
   });
   if (response.statusCode >= 200 && response.statusCode < 300) {
+    postCache.set(cacheKey, response.body);
     return response.body;
   }
 
