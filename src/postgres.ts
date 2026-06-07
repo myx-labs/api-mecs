@@ -9,7 +9,16 @@ import {
   toSeconds as durationToSeconds,
 } from "iso8601-duration";
 
-const pool = new Pool();
+const pool = new Pool({
+  max: 10,
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 5_000,
+});
+
+// Without this handler, an error on an idle pooled client crashes the process.
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle Postgres client:", err);
+});
 
 let dbAvailable = false;
 
@@ -21,7 +30,9 @@ const table = "mecs.action_log";
 
 export async function startDB() {
   try {
-    await pool.connect();
+    // Probe via query() so the client is acquired and released back to the pool.
+    // pool.connect() would check out a client and never release it (pool leak).
+    await pool.query("SELECT 1");
     dbAvailable = true;
   } catch (error) {
     console.warn("Unable to connect to Postgres database — running without database.");
