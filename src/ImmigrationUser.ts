@@ -634,7 +634,12 @@ export default class ImmigrationUser {
       });
 
       const clone = Object.assign({}, response);
-      this.requestCache.set(cacheKey, clone);
+      // Only cache successful responses so that transient failures (e.g. 429)
+      // don't poison every subsequent call to the same endpoint within this
+      // evaluation — the next call will retry the real HTTP request.
+      if (isSuccessfulStatus(response.statusCode)) {
+        this.requestCache.set(cacheKey, clone);
+      }
       return clone;
     } else {
       return Object.assign({}, cacheHit);

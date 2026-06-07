@@ -787,6 +787,16 @@ server.get(
             : undefined,
         ]);
 
+      // If the Roblox user fetch failed (e.g. 429), username may still be
+      // null at this point.  Fall back to the stale value stored in the DB
+      // history so consumers always receive a string rather than null.
+      if (user.username === null && history && history.length > 0) {
+        const historyEntry = history.find((h) => h.target.id === user.userId);
+        if (historyEntry) {
+          user.setUsername(historyEntry.target.name);
+        }
+      }
+
       if (testResults !== null && typeof testResults !== "undefined") {
         const payload = {
           user: {
