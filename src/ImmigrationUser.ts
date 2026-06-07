@@ -101,7 +101,7 @@ function getSuccessfulBody(response: Response<unknown>, context: string) {
   throw new Error(
     `${context} failed with HTTP ${response.statusCode}${
       response.statusMessage ? ` ${response.statusMessage}` : ""
-    }${robloxError ? `: ${robloxError}` : ""}`
+    }${robloxError ? `: ${robloxError}` : ""}`,
   );
 }
 
@@ -152,7 +152,7 @@ export default class ImmigrationUser {
   constructor(
     userId: number,
     username: string | null = null,
-    lastRolesetId: number | null = null
+    lastRolesetId: number | null = null,
   ) {
     this.userId = userId;
     this.username = username;
@@ -227,7 +227,7 @@ export default class ImmigrationUser {
               "X-CSRF-TOKEN": ROBLOX_X_CSRF_TOKEN,
             },
             responseType: "json",
-          }
+          },
         );
       let response = await rankUser();
       const refreshedToken = response.headers["x-csrf-token"];
@@ -246,7 +246,7 @@ export default class ImmigrationUser {
         console.log(
           `${await this.getUsername()} (${
             this.userId
-          }) ranked to ${descriptorString}`
+          }) ranked to ${descriptorString}`,
         );
         return respond(true, `Player ranked to ${rolesetId}`);
       } else {
@@ -254,7 +254,7 @@ export default class ImmigrationUser {
         throw new Error(
           `Error occurred attempting to rank user (${response.statusCode})${
             response.statusMessage ? ` ${response.statusMessage}` : ""
-          }${robloxError ? `: ${robloxError}` : ""}`
+          }${robloxError ? `: ${robloxError}` : ""}`,
         );
       }
     }
@@ -346,7 +346,7 @@ export default class ImmigrationUser {
       results.metadata.reason =
         processReasonString(
           reason !== null ? reason : undefined,
-          this.username ? this.username : undefined
+          this.username ? this.username : undefined,
         ) || undefined;
       if (results.descriptions)
         results.descriptions.current += `User is individually blacklisted`;
@@ -475,7 +475,8 @@ export default class ImmigrationUser {
       }
     } catch {
       results.status = false;
-      if (results.descriptions) results.descriptions.current = "Unable to fetch age data";
+      if (results.descriptions)
+        results.descriptions.current = "Unable to fetch age data";
     }
 
     return results;
@@ -541,7 +542,8 @@ export default class ImmigrationUser {
         results.descriptions.current = `User has ${badges} badge(s)`;
     } catch {
       results.status = false;
-      if (results.descriptions) results.descriptions.current = "Unable to fetch badge data";
+      if (results.descriptions)
+        results.descriptions.current = "Unable to fetch badge data";
     }
 
     return results;
@@ -568,7 +570,8 @@ export default class ImmigrationUser {
         results.descriptions.current = `User has ${friends} friends(s)`;
     } catch {
       results.status = false;
-      if (results.descriptions) results.descriptions.current = "Unable to fetch friends data";
+      if (results.descriptions)
+        results.descriptions.current = "Unable to fetch friends data";
     }
 
     return results;
@@ -605,7 +608,8 @@ export default class ImmigrationUser {
         results.descriptions.current = `User is in ${group_count} group(s)`;
     } catch {
       results.status = false;
-      if (results.descriptions) results.descriptions.current = "Unable to fetch group data";
+      if (results.descriptions)
+        results.descriptions.current = "Unable to fetch group data";
     }
 
     return results;
@@ -677,31 +681,31 @@ export default class ImmigrationUser {
 
   fetchUser() {
     return this.fetchRobloxURL(
-      `https://users.roblox.com/v1/users/${this.userId}`
+      `https://users.roblox.com/v1/users/${this.userId}`,
     );
   }
 
   fetchFriends() {
     return this.fetchRobloxURL(
-      `https://friends.roblox.com/v1/users/${this.userId}/friends/count`
+      `https://friends.roblox.com/v1/users/${this.userId}/friends/count`,
     );
   }
 
   fetchGroups() {
     return this.fetchRobloxURL(
-      `https://groups.roblox.com/v2/users/${this.userId}/groups/roles`
+      `https://groups.roblox.com/v2/users/${this.userId}/groups/roles`,
     );
   }
 
   fetchBadges() {
     return this.fetchRobloxURL(
       `https://badges.roblox.com/v1/users/${this.userId}/badges?limit=10&sortOrder=Asc`,
-      { cookieRequired: true }
+      { cookieRequired: true },
     );
   }
 
   async fetchDataProxy(
-    key: "user" | "friends" | "groups" | "badges" | "accessories"
+    key: "user" | "friends" | "groups" | "badges" | "accessories",
   ) {
     const data = await this.fetchUserDataViaProxy();
     const body = data.body;
@@ -719,19 +723,19 @@ export default class ImmigrationUser {
 
   fetchAccessories() {
     return this.fetchRobloxURL(
-      `https://inventory.roblox.com/v2/users/${this.userId}/inventory?assetTypes=Shirt,Pants,Hat&limit=10&sortOrder=Asc`
+      `https://inventory.roblox.com/v2/users/${this.userId}/inventory?assetTypes=Shirt,Pants,Hat&limit=10&sortOrder=Asc`,
     );
   }
 
   fetchGamepassOwnership(id: number) {
     return this.fetchRobloxURL(
-      `https://inventory.roblox.com/v1/users/${this.userId}/items/GamePass/${id}/is-owned`
+      `https://inventory.roblox.com/v1/users/${this.userId}/items/GamePass/${id}/is-owned`,
     );
   }
 
   async getHCC() {
     const response = await this.fetchGamepassOwnership(
-      activeGroup.gamepasses.hcc.id
+      activeGroup.gamepasses.hcc.id,
     );
     const json = getSuccessfulBody(response, "Fetching HCC data");
     const ownership = getGamepassOwnership(json);
@@ -743,7 +747,7 @@ export default class ImmigrationUser {
 
   async getFirearms() {
     const response = await this.fetchGamepassOwnership(
-      activeGroup.gamepasses.firearms.id
+      activeGroup.gamepasses.firearms.id,
     );
     const json = getSuccessfulBody(response, "Fetching firearms licence data");
     const ownership = getGamepassOwnership(json);
@@ -818,7 +822,7 @@ export default class ImmigrationUser {
         if (player_group_membership.group?.id === activeGroup.id) {
           this.groupMembership = player_group_membership;
         }
-      }
+      },
     );
     return player_groups;
   }
@@ -831,9 +835,7 @@ export default class ImmigrationUser {
     if (blacklisted_IDs === null) {
       throw new Error("Unable to obtain blacklisted IDs");
     }
-    const blacklistMap = new Map(
-      blacklisted_IDs.map((b) => [b.id, b])
-    );
+    const blacklistMap = new Map(blacklisted_IDs.map((b) => [b.id, b]));
     for (const player_group_membership of groups) {
       const group = player_group_membership.group;
       if (group?.id) {
