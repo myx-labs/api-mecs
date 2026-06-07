@@ -242,7 +242,7 @@ async function logPayload(req: FastifyRequest, payload: any) {
         },
         {
           name: "User Name",
-          value: payload.user.username,
+          value: payload.user.username ?? "Unknown",
           inline: true,
         },
       ])
