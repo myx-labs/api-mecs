@@ -405,6 +405,10 @@ server.get("/audit/accuracy", async (req, res) => {
     if (aggregateDataCache === null) {
       aggregateDataCache = await getAggregateData();
     }
+    if (aggregateDataCache === null) {
+      res.status(503);
+      return { error: "Aggregate data is currently unavailable" };
+    }
     return aggregateDataCache;
   } catch (error) {
     res.status(500);

@@ -194,7 +194,9 @@ export async function getTimeCaseStats() {
 }
 
 export async function getAggregateData() {
-  if (!dbAvailable) throw new Error("Database is not available");
+  // Degrade to null (like the other DB accessors) instead of throwing, so the
+  // /audit/accuracy route can serve a clean "unavailable" response, not a 500.
+  if (!dbAvailable) return null;
   let query = `SELECT 
         COUNT(DISTINCT actor_id) as actors, 
         COUNT(*) as total, 
