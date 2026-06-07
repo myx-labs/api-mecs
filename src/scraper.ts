@@ -408,10 +408,16 @@ export function isBlacklistAvailable(): boolean {
 }
 
 const BLACKLIST_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-setInterval(async () => {
+let blacklistRefreshing = false;
+const blacklistRefreshTimer = setInterval(async () => {
+  if (blacklistRefreshing) return; // skip if a previous refresh is still running
+  blacklistRefreshing = true;
   try {
     await preloadBlacklists();
   } catch (error) {
     console.error("Failed to refresh blacklist cache:", error);
+  } finally {
+    blacklistRefreshing = false;
   }
 }, BLACKLIST_REFRESH_INTERVAL);
+blacklistRefreshTimer.unref(); // don't keep the process alive for cache refreshes

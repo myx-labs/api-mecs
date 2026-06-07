@@ -1,5 +1,5 @@
 // Modules
-import fastify, { FastifyRequest } from "fastify";
+import fastify, { FastifyError, FastifyRequest } from "fastify";
 import fastifyCors from "@fastify/cors";
 import { Type, TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
@@ -73,6 +73,7 @@ const group = config.groups[0];
 const server = fastify({
   trustProxy: true,
   requestTimeout: 30000,
+  bodyLimit: 65536, // 64 KiB — all request bodies are small JSON
 }).withTypeProvider<TypeBoxTypeProvider>();
 const port: number = config.port;
 
@@ -89,6 +90,19 @@ const origins = [
 
 server.register(fastifyCors, {
   origin: origins,
+});
+
+// Safety net for any uncaught throw / validation error in a route handler, so
+// the response is always clean JSON (and validation 4xx codes are preserved).
+server.setErrorHandler((error: FastifyError, req, reply) => {
+  console.error(`Error handling ${req.method} ${req.url}:`, error);
+  reply.status(error.statusCode ?? 500).send({
+    error: error.message || "Unknown error occurred",
+  });
+});
+
+server.setNotFoundHandler((req, reply) => {
+  reply.status(404).send({ error: "Not found" });
 });
 
 const flattenObject = (obj: any, prefix = "") =>
@@ -388,17 +402,22 @@ interface AggregateData {
 const cacheUpdateInterval = 5 * 60 * 1000; // 5 minutes
 
 let aggregateDataCache: AggregateData | null = null;
+let aggregateRefreshing = false;
 
 async function updateAggregateDataCache() {
+  if (aggregateRefreshing) return; // skip if a previous refresh is still running
+  aggregateRefreshing = true;
   try {
     aggregateDataCache = await getAggregateData();
   } catch (error) {
     console.error("Failed to update aggregate data cache:");
     console.error(error);
+  } finally {
+    aggregateRefreshing = false;
   }
 }
 
-setInterval(updateAggregateDataCache, cacheUpdateInterval);
+setInterval(updateAggregateDataCache, cacheUpdateInterval).unref();
 
 server.get("/audit/accuracy", async (req, res) => {
   try {
@@ -419,17 +438,22 @@ server.get("/audit/accuracy", async (req, res) => {
 });
 
 let timeCaseStatsCache: PGTimeCaseStats[] | null = null;
+let timeCaseStatsRefreshing = false;
 
 async function updateTimeCaseStats() {
+  if (timeCaseStatsRefreshing) return; // skip if a previous refresh is still running
+  timeCaseStatsRefreshing = true;
   try {
     timeCaseStatsCache = await getTimeCaseStats();
   } catch (error) {
     console.error("Failed to update time case stats data cache:");
     console.error(error);
+  } finally {
+    timeCaseStatsRefreshing = false;
   }
 }
 
-setInterval(updateTimeCaseStats, cacheUpdateInterval);
+setInterval(updateTimeCaseStats, cacheUpdateInterval).unref();
 
 server.get("/stats/case", async (req, res) => {
   try {
@@ -622,16 +646,22 @@ async function getOfficerDecisionData() {
   return filtered;
 }
 
+let officerDecisionRefreshing = false;
+
 async function updateOfficerDecisionDataCache() {
+  if (officerDecisionRefreshing) return; // skip if a previous refresh is still running
+  officerDecisionRefreshing = true;
   try {
     officerDecisionDataCache = await getOfficerDecisionData();
   } catch (error) {
     console.error("Failed to update officer decision data cache:");
     console.error(error);
+  } finally {
+    officerDecisionRefreshing = false;
   }
 }
 
-setInterval(updateOfficerDecisionDataCache, cacheUpdateInterval);
+setInterval(updateOfficerDecisionDataCache, cacheUpdateInterval).unref();
 
 server.get("/audit/staff", async (req, res) => {
   try {
@@ -886,12 +916,48 @@ async function bootstrap() {
 
 await bootstrap();
 
-async function shutdown() {
+let shuttingDown = false;
+
+async function shutdown(exitCode = 0) {
+  if (shuttingDown) return; // guard against re-entry (e.g. signal + uncaughtException)
+  shuttingDown = true;
   console.log("Shutting down gracefully...");
-  await server.close();
-  await stopDB();
-  process.exit(0);
+
+  // Hard-exit fallback in case server.close()/stopDB() hangs.
+  const hardExit = setTimeout(() => {
+    console.error("Graceful shutdown timed out; forcing exit.");
+    process.exit(exitCode);
+  }, 10_000);
+  hardExit.unref();
+
+  try {
+    await server.close();
+    await stopDB();
+  } catch (error) {
+    console.error("Error during shutdown:", error);
+  } finally {
+    clearTimeout(hardExit);
+    process.exit(exitCode);
+  }
 }
 
-process.on("SIGTERM", shutdown);
-process.on("SIGINT", shutdown);
+process.on("SIGTERM", () => void shutdown(0));
+process.on("SIGINT", () => void shutdown(0));
+
+// Log and continue: floating rejections are common and usually benign here
+// (e.g. webhook sends, background audit work).
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection:", reason);
+});
+
+// An uncaught exception means unknown/corrupt state: log, drain briefly, then
+// exit non-zero so the process manager (PM2) restarts us cleanly.
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
+  void shutdown(1);
+});
+
+// Surface runtime warnings (e.g. MaxListenersExceededWarning) into the logs.
+process.on("warning", (warning) => {
+  console.warn("Process warning:", warning.name, warning.message);
+});
