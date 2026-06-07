@@ -21,7 +21,10 @@ const subsystemStatus = {
 
 let webhookClient: WebhookClient | null = null;
 
-if (config.credentials.discord.webhook.id && config.credentials.discord.webhook.token) {
+if (
+  config.credentials.discord.webhook.id &&
+  config.credentials.discord.webhook.token
+) {
   try {
     webhookClient = new WebhookClient({
       id: config.credentials.discord.webhook.id,
@@ -29,10 +32,14 @@ if (config.credentials.discord.webhook.id && config.credentials.discord.webhook.
     });
     subsystemStatus.discord.available = true;
   } catch {
-    console.warn("Discord webhook credentials are invalid, webhook logging disabled.");
+    console.warn(
+      "Discord webhook credentials are invalid, webhook logging disabled.",
+    );
   }
 } else {
-  console.warn("Discord webhook credentials not set, webhook logging disabled.");
+  console.warn(
+    "Discord webhook credentials not set, webhook logging disabled.",
+  );
 }
 
 // Typings
@@ -43,7 +50,12 @@ import {
   RobloxAPI_GroupUserItem,
   RobloxAPI_MultiGetUserByNameResponse,
 } from "./types.js";
-import { getBlacklistedGroupIDs, getBlacklistedUserIDs, isBlacklistAvailable, preloadBlacklists } from "./scraper.js";
+import {
+  getBlacklistedGroupIDs,
+  getBlacklistedUserIDs,
+  isBlacklistAvailable,
+  preloadBlacklists,
+} from "./scraper.js";
 import { getCookieCount, hasCookies, loadCookies } from "./cookies.js";
 import {
   getAggregateActorData,
@@ -142,7 +154,7 @@ function getRobloxErrorMessage(json: unknown) {
 async function getImmigrationUser(
   userParam: string,
   inferType = true,
-  treatAsUserId = false
+  treatAsUserId = false,
 ) {
   let userName: string | undefined;
   let userId: number | undefined;
@@ -169,7 +181,7 @@ async function getImmigrationUser(
             accept: "application/json",
           },
           responseType: "json",
-        }
+        },
       );
 
       if (response.statusCode !== 200) {
@@ -177,13 +189,15 @@ async function getImmigrationUser(
         throw new Error(
           `Username lookup failed with HTTP ${response.statusCode}${
             response.statusMessage ? ` ${response.statusMessage}` : ""
-          }${robloxError ? `: ${robloxError}` : ""}`
+          }${robloxError ? `: ${robloxError}` : ""}`,
         );
       }
 
       const json = response.body;
       if (!Array.isArray(json.data)) {
-        throw new Error("Username lookup response did not include a data array");
+        throw new Error(
+          "Username lookup response did not include a data array",
+        );
       }
 
       if (json.data.length === 0) {
@@ -192,7 +206,7 @@ async function getImmigrationUser(
 
       const match = json.data.find(
         (element: RobloxAPI_MultiGetUserByNameResponse) =>
-          element.requestedUsername?.toLowerCase() === userParam.toLowerCase()
+          element.requestedUsername?.toLowerCase() === userParam.toLowerCase(),
       );
       if (match) {
         if (match.name && match.id) {
@@ -255,7 +269,7 @@ async function logPayload(req: FastifyRequest, payload: any) {
             name: key,
             value: test.status ? "Yes" : "No",
           };
-        })
+        }),
       )
       .setTitle("Test data");
     webhookClient
@@ -364,7 +378,7 @@ async function getRankingHistory(targetId: number) {
         officer: parseInt(item.actor_id),
         officerName:
           membershipStaffCache.find(
-            (cacheItem) => cacheItem.user?.userId === parseInt(item.actor_id)
+            (cacheItem) => cacheItem.user?.userId === parseInt(item.actor_id),
           )?.user?.username || undefined,
         target: {
           id: parseInt(item.target_id),
@@ -625,7 +639,7 @@ async function getOfficerDecisionData() {
   const data: OfficerDecisionData[] = [];
   for (const item of officers) {
     const decisions = decisionData.find(
-      (item2) => item2.id === item.user?.userId
+      (item2) => item2.id === item.user?.userId,
     );
     const user = item.user;
     if (user?.userId && decisions) {
@@ -641,7 +655,7 @@ async function getOfficerDecisionData() {
   }
   const filtered = data.filter((item) => typeof item.decisions !== "undefined");
   filtered.sort((a, z) =>
-    z.decisions.dar.data.total > a.decisions.dar.data.total ? 1 : -1
+    z.decisions.dar.data.total > a.decisions.dar.data.total ? 1 : -1,
   );
   return filtered;
 }
@@ -702,7 +716,7 @@ server.get(
           error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
-  }
+  },
 );
 
 enum ParamType {
@@ -721,7 +735,7 @@ server.get(
         blacklistOnly: Type.Optional(Type.Boolean()),
         includeHistory: Type.Optional(Type.Boolean()),
         paramType: Type.Optional(
-          Type.Union([Type.Literal("id"), Type.Literal("name")])
+          Type.Union([Type.Literal("id"), Type.Literal("name")]),
         ),
       }),
       // no idea why but header types can't be inferred without this line
@@ -759,7 +773,7 @@ server.get(
         return getImmigrationUser(
           userParam,
           typeof paramType === "undefined",
-          paramType === "id"
+          paramType === "id",
         );
       });
 
@@ -802,7 +816,7 @@ server.get(
           error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
-  }
+  },
 );
 
 server.post(
@@ -850,7 +864,7 @@ server.post(
           error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
-  }
+  },
 );
 
 server.get("/session", async (req, res) => {
@@ -897,18 +911,18 @@ async function bootstrap() {
   if (gapRange) {
     console.log("Filling audit data gap...");
     processAuditLogs(undefined, false, gapRange).catch((err) =>
-      console.error("processAuditLogs (gap fill) failed:", err)
+      console.error("processAuditLogs (gap fill) failed:", err),
     );
   } else if (config.flags.processAudit) {
     if (config.flags.onlyNewAudit) {
       console.log("Processing latest audit logs...");
       processAuditLogs(undefined, true).catch((err) =>
-        console.error("processAuditLogs (latest) failed:", err)
+        console.error("processAuditLogs (latest) failed:", err),
       );
     } else {
       console.log("Processing all audit logs...");
       processAuditLogs(undefined, false).catch((err) =>
-        console.error("processAuditLogs (all) failed:", err)
+        console.error("processAuditLogs (all) failed:", err),
       );
     }
   }
