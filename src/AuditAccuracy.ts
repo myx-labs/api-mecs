@@ -127,7 +127,31 @@ interface AuditRange {
   oldest: Date;
 }
 
-export async function processAuditLogs(
+let auditInFlight: Promise<void> | null = null;
+
+// Public entry point. Guards against overlapping runs: while one audit pipeline
+// is active, additional calls return the in-flight promise instead of starting a
+// second concurrent pipeline (which would double the Roblox request load and
+// could spawn duplicate continuous pollers). The internal recursion below calls
+// runAuditLogs() directly, so the continuous poll is never blocked by this guard.
+export function processAuditLogs(
+  limit?: number,
+  onlyNew = false,
+  specificRange?: AuditRange
+): Promise<void> {
+  if (auditInFlight) {
+    console.warn(
+      "processAuditLogs is already running; skipping overlapping run."
+    );
+    return auditInFlight;
+  }
+  auditInFlight = runAuditLogs(limit, onlyNew, specificRange).finally(() => {
+    auditInFlight = null;
+  });
+  return auditInFlight;
+}
+
+async function runAuditLogs(
   limit?: number,
   onlyNew = false,
   specificRange?: AuditRange
@@ -298,6 +322,8 @@ export async function processAuditLogs(
   }
   if (onlyNew || specificRange) {
     await delay(AUDIT_RETRY_DELAY_MS);
-    await processAuditLogs(undefined, true);
+    // Call the internal function directly so the continuous poll is not blocked
+    // by the in-flight guard in the public processAuditLogs() wrapper.
+    await runAuditLogs(undefined, true);
   }
 }

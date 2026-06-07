@@ -849,7 +849,23 @@ async function bootstrap() {
   const address = await server.listen({ port: port });
   console.log(`Server listening at ${address}`);
 
-  if (config.flags.processAudit) {
+  // Start at most one audit pipeline. The in-flight guard in processAuditLogs
+  // rejects overlapping runs, so we must not kick off two concurrent pipelines.
+  // A configured gap-fill takes priority because it backfills its range and then
+  // transitions into continuous polling on its own; otherwise we start the
+  // configured processing mode.
+  const fillAuditGaps = config.flags.fillAuditGaps;
+  const gapRange =
+    fillAuditGaps.enabled && fillAuditGaps.range.from && fillAuditGaps.range.to
+      ? { latest: fillAuditGaps.range.from, oldest: fillAuditGaps.range.to }
+      : null;
+
+  if (gapRange) {
+    console.log("Filling audit data gap...");
+    processAuditLogs(undefined, false, gapRange).catch((err) =>
+      console.error("processAuditLogs (gap fill) failed:", err)
+    );
+  } else if (config.flags.processAudit) {
     if (config.flags.onlyNewAudit) {
       console.log("Processing latest audit logs...");
       processAuditLogs(undefined, true).catch((err) =>
@@ -859,22 +875,6 @@ async function bootstrap() {
       console.log("Processing all audit logs...");
       processAuditLogs(undefined, false).catch((err) =>
         console.error("processAuditLogs (all) failed:", err)
-      );
-    }
-  }
-
-  const fillAuditGaps = config.flags.fillAuditGaps;
-
-  if (fillAuditGaps.enabled) {
-    const latest = fillAuditGaps.range.from;
-    const oldest = fillAuditGaps.range.to;
-    if (latest && oldest) {
-      const range = {
-        latest,
-        oldest,
-      };
-      processAuditLogs(undefined, false, range).catch((err) =>
-        console.error("processAuditLogs (gap fill) failed:", err)
       );
     }
   }
