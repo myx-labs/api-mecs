@@ -36,8 +36,8 @@ importers:
         specifier: ^15.0.5
         version: 15.0.5
       iso8601-duration:
-        specifier: ^2.1.3
-        version: 2.1.3
+        specifier: ^2.1.4
+        version: 2.1.4
       p-limit:
         specifier: ^7.3.0
         version: 7.3.0
@@ -573,8 +573,8 @@ packages:
     resolution: {integrity: sha512-Dnz92NInDqYckGEUJv689RbRiTSEHCQ7wOVeALbkOz999YpqT46yMRIGtSNl2iCL1waAZSx40+h59NV/EwzV/A==}
     engines: {node: '>=18'}
 
-  iso8601-duration@2.1.3:
-    resolution: {integrity: sha512-OwkROKDXYhqKTl9uyB+/+lQ/Tx+L9LVb9tNRcsO4LtCSBDrmYbzyJLg9rGjYKAPDabD6IVdjMyUnnULHpejrCg==}
+  iso8601-duration@2.1.4:
+    resolution: {integrity: sha512-2TuWcuR6W0OhFZQDAY+jDUp9FC2fVTDgxTtbN0nFBfwmUA6HTqXc0wx2tIBVd/FhRp4CnJbDgCv3sCeTPMQbew==}
 
   js-base64@3.7.8:
     resolution: {integrity: sha512-hNngCeKxIUQiEUN3GPJOkz4wF/YvdUdbNL9hsBcMQTkKzboD7T/q3OYOuuPZLUE6dBxSGpwhk5mwuDud7JVAow==}
@@ -1418,7 +1418,7 @@ snapshots:
 
   is-stream@4.0.1: {}
 
-  iso8601-duration@2.1.3: {}
+  iso8601-duration@2.1.4: {}
 
   js-base64@3.7.8: {}
 
