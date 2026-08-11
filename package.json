@@ -24,7 +24,7 @@
   "homepage": "https://github.com/myx-labs/api-mecs#readme",
   "devDependencies": {
     "@types/dotenv-safe": "^9.1.0",
-    "@types/node": "^26.1.2",
+    "@types/node": "^26.2.0",
     "@types/pg": "^8.20.3",
     "tsx": "^4.23.5",
     "typescript": "^7.0.2"
